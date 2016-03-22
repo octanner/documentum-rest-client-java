@@ -30,6 +30,7 @@ public class JaxbEntry extends LinkableBase implements Entry {
 	private List<Link> links;
 	private Content content;
 	private RestObject contentObject;
+	private String published;
 	
 	@Override
 	public String getId() {
@@ -104,8 +105,16 @@ public class JaxbEntry extends LinkableBase implements Entry {
 	public String getContentType() {
 		return content==null?null:content.getType();
 	}
-	
-	@Override
+
+    @Override
+    public String getPublished() {
+        return this.published;
+    }
+    public void setPublished(String published) {
+        this.published = published;
+    }
+
+    @Override
 	public RestObject getContentObject() {
 		if(contentObject == null && content != null && content.getElement() != null) {
 			contentObject = DCTMJaxbContext.unmarshal(content.getElement());
@@ -158,6 +167,7 @@ public class JaxbEntry extends LinkableBase implements Entry {
 			&& Equals.equal(summary, that.summary)
 			&& Equals.equal(content, that.content)
 			&& Equals.equal(links, that.links)
-			&& Equals.equal(authors, that.authors);
+			&& Equals.equal(authors, that.authors)
+            && Equals.equal(published, that.published);
 	}
 }

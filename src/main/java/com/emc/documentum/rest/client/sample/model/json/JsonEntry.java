@@ -31,6 +31,8 @@ public class JsonEntry extends LinkableBase implements Entry {
 	private List<Link> links;
 	@JsonProperty
 	private Content content;
+    @JsonProperty
+	private String published;
 	
 	@Override
 	public String getId() {
@@ -104,7 +106,16 @@ public class JsonEntry extends LinkableBase implements Entry {
 		return content==null?null:content.getType();
 	}
 
-	@Override
+    @Override
+    public String getPublished() {
+        return published;
+    }
+
+    public void setPublished(String published) {
+        this.published = published;
+    }
+
+    @Override
 	public RestObject getContentObject() {
 		return content;
 	}

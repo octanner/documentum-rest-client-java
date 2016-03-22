@@ -46,6 +46,11 @@ public interface Entry extends Linkable {
      * @return the content type of the source uri
      */
     String getContentType();
+
+    /**
+     * @return entry publish time
+     */
+    String getPublished();
     
     /**
      * for entry with inline content

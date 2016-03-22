@@ -47,6 +47,7 @@ public class TestJaxbEntry extends TestJaxb {
 		entry.setSummary("entry summary");
 		entry.setTitle("entry title");
 		entry.setUpdated("entry updated");
+        entry.setPublished("entry published");
 		JaxbEntry.Content content = new JaxbEntry.Content();
 		content.setSrc("http://src");
 		content.setType("contenttype");

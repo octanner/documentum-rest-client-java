@@ -87,6 +87,7 @@ public class TestJaxbFeed extends TestJaxb {
 		entry.setSummary(id + "entry summary");
 		entry.setTitle(id + "entry title");
 		entry.setUpdated(id + "entry updated");
+        entry.setPublished(id + "entry published");
 		JaxbEntry.Content content = new JaxbEntry.Content();
 		content.setSrc("id + http://src");
 		content.setType(id + "contenttype");
