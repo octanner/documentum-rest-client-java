@@ -1,4 +1,15 @@
 language: java
 jdk:
-  - oraclejdk7
+- oraclejdk7
 script: mvn install -DskipTests
+deploy:
+  provider: releases
+  api_key:
+    secure: IJLNvJz/M47mzB+wSYBAFf1MI0NFmIuwSHVWaoaV9qUc++2NLDuHJgt97/yaGgAVnzOp69R7McU9Yr4SyvV/BjyCy0i9RR10OCAdBYr28Zth1gpE1QKYUvEoyX0qbQY0mt2bNyU2ddVIhHFbMt69EDPh18sIpp4uLW5qlIYFrMkcun8lUbz4xTNnLJUuHCBU10BM2ioP9tTb5c6wWbTBciMveW0j8z5D30TmrCgjXOC6RsJArRk9AKn6QvaCkPydQXdKxDdOTk4DC44BtnAIp4PmNZdaxrnCYcdit44lMiCNCuq5GV0zD3dAnK6oZAn31foe7Tkkw3PU2qP2tGio097OZzSL6mVwwYsxEykxvP3MJz8VCDUld2wL8e7OpO3Ez/olRwklmWV5xIg98pKu0vwSAgdDVGWBifRSjTyYYcgHtA2pwYCKKzwoWXtW2EhPufx5uSjQ4vnM83GLmnS/CfIRbaTt2NIL34pTDHdedA8wnvl4NtYc224FxbUXTlSdp/i+w3FZF6rL4bIYfTBdxB7Fsw3VY/HCVE6bYV18WBHWSoKBg9+EEj8tfrx8NZBQAXO9H/WQGeBQ3Vgyq6eUNFT08D7MMf9J1N8IGLXwPAzY853iy7IoM2L9M9E8M9Sxg9g7SKpiTvBIOOMjfVoOuOHcxfqqjX+ggAMkyIfLecg=
+  skip_cleanup: true
+  file_glob: true
+  file:
+  - target/*.jar
+  on:
+    repo: Enterprise-Content-Management/documentum-rest-client-java
+    tags: true
