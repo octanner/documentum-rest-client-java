@@ -1,6 +1,8 @@
 Documentum REST Java Client Samples
 =========
 
+[![Build Status](https://travis-ci.org/Enterprise-Content-Management/documentum-rest-client-java.svg?branch=master)](https://travis-ci.org/Enterprise-Content-Management/documentum-rest-client-java)
+
 This Java project contains a reference implementation of Documentum REST Services client written in Java code. The
 purpose of this project is to demonstrate one way to develop a hypermedia driven REST client to consume Documentum
 REST Services. It does NOT indicate that users could not develop a REST client using other technologies.
