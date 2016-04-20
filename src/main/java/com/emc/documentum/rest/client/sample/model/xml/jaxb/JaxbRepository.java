@@ -4,6 +4,7 @@
 package com.emc.documentum.rest.client.sample.model.xml.jaxb;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
@@ -113,6 +114,11 @@ public class JaxbRepository extends LinkableBase implements Repository {
 					&& Equals.equal(version, that.version)
 					&& Equals.equal(docbroker, that.docbroker);
 		}
+
+	    @Override
+	    public int hashCode() {
+	        return Objects.hash(name, host, version, docbroker);
+	    }
 	}
 
 	@Override
@@ -124,4 +130,9 @@ public class JaxbRepository extends LinkableBase implements Repository {
 				&& Equals.equal(servers, that.servers)
 				&& Equals.equal(links, that.links);
 	}
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, description, servers);
+    }
 }

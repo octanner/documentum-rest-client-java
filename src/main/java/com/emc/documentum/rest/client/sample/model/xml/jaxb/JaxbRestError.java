@@ -3,6 +3,8 @@
  */
 package com.emc.documentum.rest.client.sample.model.xml.jaxb;
 
+import java.util.Objects;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
@@ -60,4 +62,9 @@ public class JaxbRestError implements RestError {
 			&& Equals.equal(message, that.message)
 			&& Equals.equal(details, that.details);
 	}
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(status, code, message, details);
+    }
 }

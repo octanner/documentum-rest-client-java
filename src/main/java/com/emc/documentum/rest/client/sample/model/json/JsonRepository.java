@@ -4,6 +4,7 @@
 package com.emc.documentum.rest.client.sample.model.json;
 
 import java.util.List;
+import java.util.Objects;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.Link;
@@ -110,6 +111,11 @@ public class JsonRepository extends LinkableBase implements Repository {
 					&& Equals.equal(version, that.version)
 					&& Equals.equal(docbroker, that.docbroker);
 		}
+
+	    @Override
+	    public int hashCode() {
+	        return Objects.hash(name, host, version, docbroker);
+	    }
 	}
 
 	@Override
@@ -121,4 +127,9 @@ public class JsonRepository extends LinkableBase implements Repository {
 				&& Equals.equal(servers, that.servers)
 				&& Equals.equal(links, that.links);
 	}
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, servers);
+    }
 }

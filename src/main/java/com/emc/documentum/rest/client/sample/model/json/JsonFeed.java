@@ -4,6 +4,7 @@
 package com.emc.documentum.rest.client.sample.model.json;
 
 import java.util.List;
+import java.util.Objects;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.Author;
@@ -142,4 +143,9 @@ public class JsonFeed extends LinkableBase implements Feed {
 			&& Equals.equal(entries, that.entries)
 			&& Equals.equal(author, that.author);
 	}
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, updated, summary, page, total);
+    }
 }

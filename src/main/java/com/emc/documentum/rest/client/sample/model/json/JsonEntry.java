@@ -4,6 +4,7 @@
 package com.emc.documentum.rest.client.sample.model.json;
 
 import java.util.List;
+import java.util.Objects;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.Author;
@@ -157,4 +158,9 @@ public class JsonEntry extends LinkableBase implements Entry {
 			&& Equals.equal(links, that.links)
 			&& Equals.equal(author, that.author);
 	}
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, updated, summary, content);
+    }
 }

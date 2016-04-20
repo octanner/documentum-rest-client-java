@@ -5,6 +5,7 @@ package com.emc.documentum.rest.client.sample.model.json;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.Link;
@@ -91,4 +92,9 @@ public class JsonObject extends LinkableBase implements RestObject {
 			&& Equals.equal(definition, that.definition)
 			&& Equals.equal(properties, that.properties);
 	}
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, type, definition, properties);
+    }
 }

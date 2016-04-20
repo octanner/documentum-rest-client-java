@@ -4,6 +4,7 @@
 package com.emc.documentum.rest.client.sample.model.xml.jaxb;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -170,4 +171,9 @@ public class JaxbEntry extends LinkableBase implements Entry {
 			&& Equals.equal(authors, that.authors)
             && Equals.equal(published, that.published);
 	}
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, updated, summary, content);
+    }
 }

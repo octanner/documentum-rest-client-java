@@ -3,6 +3,8 @@
  */
 package com.emc.documentum.rest.client.sample.model.xml.jaxb;
 
+import java.util.Objects;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -82,4 +84,9 @@ public class JaxbLink implements Link {
 			&& Equals.equal(title, that.title)
 			&& Equals.equal(type, that.type);
 	}
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(rel, href, hreftemplate, title);
+    }
 }

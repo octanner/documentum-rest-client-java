@@ -3,6 +3,8 @@
  */
 package com.emc.documentum.rest.client.sample.model.json;
 
+import java.util.Objects;
+
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.Link;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -78,4 +80,9 @@ public class JsonLink implements Link {
 			&& Equals.equal(title, that.title)
 			&& Equals.equal(type, that.type);
 	}
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(rel, href, hreftemplate, title);
+    }
 }

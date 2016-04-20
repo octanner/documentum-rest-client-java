@@ -2,6 +2,7 @@ package com.emc.documentum.rest.client.sample.model.xml.jaxb;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -76,6 +77,11 @@ public class JaxbHomeDocument extends LinkableBase implements HomeDocument {
 		JaxbHomeDocument that = (JaxbHomeDocument)obj;
 		return Equals.equal(resources, that.resources);
 	}
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(resources);
+    }
 
 	@Override
 	public List<Link> getLinks() {

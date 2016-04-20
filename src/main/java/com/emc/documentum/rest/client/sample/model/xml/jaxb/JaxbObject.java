@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -164,4 +165,9 @@ public abstract class JaxbObject extends LinkableBase implements RestObject {
 				&& Equals.equal(definition, that.definition)
 				&& Equals.equal(getProperties(), that.getProperties());
 	}
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, definition, properties);
+    }
 }

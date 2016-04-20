@@ -3,6 +3,8 @@
  */
 package com.emc.documentum.rest.client.sample.model.json;
 
+import java.util.Objects;
+
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.Author;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -39,7 +41,12 @@ public class JsonAuthor implements Author {
 	@Override
 	public boolean equals(Object obj) {
 		JsonAuthor that = (JsonAuthor) obj;
-		return Equals.equal(email, that.email) && Equals.equal(uri, that.uri)
+		return Equals.equal(name, that.name) && Equals.equal(uri, that.uri)
 				&& Equals.equal(email, that.email);
 	}
+	
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, uri, email);
+    }
 }

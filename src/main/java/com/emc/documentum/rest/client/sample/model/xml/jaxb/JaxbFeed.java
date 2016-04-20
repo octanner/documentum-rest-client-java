@@ -4,6 +4,7 @@
 package com.emc.documentum.rest.client.sample.model.xml.jaxb;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -138,4 +139,9 @@ public class JaxbFeed extends LinkableBase implements Feed {
 			&& Equals.equal(entries, that.entries)
 			&& Equals.equal(authors, that.authors);
 	}
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, updated, summary, page, itemsPerPage, total);
+    }
 }

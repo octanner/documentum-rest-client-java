@@ -3,6 +3,8 @@
  */
 package com.emc.documentum.rest.client.sample.model.json;
 
+import java.util.Objects;
+
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.RestError;
 
@@ -56,4 +58,10 @@ public class JsonRestError implements RestError {
 			&& Equals.equal(message, that.message)
 			&& Equals.equal(details, that.details);
 	}
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(status, code, message);
+    }
+
 }

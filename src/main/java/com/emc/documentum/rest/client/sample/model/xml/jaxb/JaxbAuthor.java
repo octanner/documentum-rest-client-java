@@ -3,6 +3,8 @@
  */
 package com.emc.documentum.rest.client.sample.model.xml.jaxb;
 
+import java.util.Objects;
+
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -41,7 +43,12 @@ public class JaxbAuthor implements Author {
 	@Override
 	public boolean equals(Object obj) {
 		JaxbAuthor that = (JaxbAuthor) obj;
-		return Equals.equal(email, that.email) && Equals.equal(uri, that.uri)
+		return Equals.equal(name, that.name) && Equals.equal(uri, that.uri)
 				&& Equals.equal(email, that.email);
 	}
+	
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, email, uri);
+    }
 }
