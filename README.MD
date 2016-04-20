@@ -21,7 +21,7 @@ for JSON.
 
 ## System Requirements
 1. Documentum REST Services 7.0 or 7.1 is deployed in the development environment.
-2. Java 6 or later is installed.
+2. Java 7 or later is installed.
 3. Maven 3 is required to build the project.
 
 ### How To Use
