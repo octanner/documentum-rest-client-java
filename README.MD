@@ -20,7 +20,7 @@ for JSON.
 *DCTMRestClientSample* is the main class to be executed with some sample operations.
 
 ## System Requirements
-1. Documentum REST Services 7.0 or 7.1 is deployed in the development environment.
+1. Documentum REST Services 7.x is deployed in the development environment.
 2. Java 7 or later is installed.
 3. Maven 3 is required to build the project.
 

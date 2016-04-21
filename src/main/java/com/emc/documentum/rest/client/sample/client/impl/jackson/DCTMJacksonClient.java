@@ -3,11 +3,15 @@
  */
 package com.emc.documentum.rest.client.sample.client.impl.jackson;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.FormHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
 import com.emc.documentum.rest.client.sample.client.DCTMRestClient;
@@ -24,6 +28,7 @@ import com.emc.documentum.rest.client.sample.model.json.JsonFeed;
 import com.emc.documentum.rest.client.sample.model.json.JsonHomeDocument;
 import com.emc.documentum.rest.client.sample.model.json.JsonObject;
 import com.emc.documentum.rest.client.sample.model.json.JsonRepository;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * the DCTMRestClient implementation by Jackson json support
@@ -255,6 +260,25 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
 	@Override
 	protected void initRestTemplate(RestTemplate restTemplate) {
 		restTemplate.setErrorHandler(new DCTMJacksonErrorHandler(restTemplate.getMessageConverters()));
+		for(HttpMessageConverter<?> c : restTemplate.getMessageConverters()) {
+		    if(c instanceof MappingJackson2HttpMessageConverter) {
+		        ((MappingJackson2HttpMessageConverter)c).getObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+		    } else if(c instanceof FormHttpMessageConverter) {
+                try {
+                    Field pcField = FormHttpMessageConverter.class.getDeclaredField("partConverters");
+                    pcField.setAccessible(true);
+                    List<HttpMessageConverter<?>> partConverters = (List<HttpMessageConverter<?>>)pcField.get(c);
+                    for(HttpMessageConverter<?> pc : partConverters) {
+                        if(pc instanceof MappingJackson2HttpMessageConverter) {
+                            ((MappingJackson2HttpMessageConverter)pc).getObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+                            break;
+                        }
+                    }
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
+		    }
+		}
 	}
 
 	@Override

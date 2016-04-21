@@ -8,6 +8,9 @@ import java.util.List;
 import javax.annotation.concurrent.NotThreadSafe;
 
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.FormHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
 import com.emc.documentum.rest.client.sample.client.DCTMRestClient;
@@ -260,6 +263,12 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
 	@Override
 	protected void initRestTemplate(RestTemplate restTemplate) {
 		restTemplate.setErrorHandler(new DCTMJaxbErrorHandler(restTemplate.getMessageConverters()));
+        for(HttpMessageConverter<?> c : restTemplate.getMessageConverters()) {
+            if(c instanceof FormHttpMessageConverter) {
+                ((FormHttpMessageConverter)c).addPartConverter(new Jaxb2RootElementHttpMessageConverter());
+                break;
+            }
+        }
 	}
 
 	@Override

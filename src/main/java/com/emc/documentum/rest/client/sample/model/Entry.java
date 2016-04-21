@@ -5,9 +5,14 @@ package com.emc.documentum.rest.client.sample.model;
 
 import java.util.List;
 
+import com.emc.documentum.rest.client.sample.model.json.JsonEntry;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+
 /**
  * the class represents the entry of a feed
  */
+@JsonTypeInfo(use=Id.CLASS, defaultImpl=JsonEntry.class)
 public interface Entry extends Linkable {
     
     /**

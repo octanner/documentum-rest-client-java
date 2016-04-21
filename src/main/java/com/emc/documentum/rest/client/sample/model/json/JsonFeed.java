@@ -14,8 +14,6 @@ import com.emc.documentum.rest.client.sample.model.Link;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 public class JsonFeed extends LinkableBase implements Feed {
 	private String id;
@@ -27,13 +25,10 @@ public class JsonFeed extends LinkableBase implements Feed {
 	private Integer itemsPerPage;
 	private Integer total;
 	@JsonProperty
-	@JsonTypeInfo(use=Id.CLASS, defaultImpl=JsonAuthor.class)
 	private List<Author> author;
 	@JsonProperty
-	@JsonTypeInfo(use=Id.CLASS, defaultImpl=JsonLink.class)
 	private List<Link> links;
 	@JsonProperty
-	@JsonTypeInfo(use=Id.CLASS, defaultImpl=JsonEntry.class)
 	private List<Entry> entries;
 	
 	@Override
