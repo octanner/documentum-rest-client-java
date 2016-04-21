@@ -21,6 +21,7 @@ import com.emc.documentum.rest.client.sample.model.Entry;
 import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.HomeDocument;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
+import com.emc.documentum.rest.client.sample.model.PlainRestObject;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbCabinet;
@@ -136,8 +137,8 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
 	}
 	
 	@Override
-	public RestObject createObject(RestObject parent, RestObject objectToCreate, Object content, String... params) {
-		return post(parent.getHref(LinkRelation.OBJECTS), new JaxbSysObject(objectToCreate), content, JaxbSysObject.class, params);
+	public RestObject createObject(RestObject parent, LinkRelation rel, RestObject objectToCreate, Object content, String... params) {
+		return post(parent.getHref(rel), new JaxbSysObject(objectToCreate), content, JaxbSysObject.class, params);
 	}
 
 	@Override
@@ -219,6 +220,26 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
 	public Feed getVersions(RestObject object, String... params) {
 		return get(object.getHref(LinkRelation.VERSIONS), true, JaxbFeed.class, params);
 	}
+	
+    @Override
+    public RestObject materialize(RestObject oldObject) {
+        return put(oldObject.getHref(LinkRelation.MATERIALIZE), JaxbSysObject.class);
+    }
+
+    @Override
+    public void dematerialize(RestObject oldObject) {
+        delete(oldObject.getHref(LinkRelation.DEMATERIALIZE));
+    }
+    
+    @Override
+    public RestObject reparent(RestObject oldObject, RestObject newParent) {
+        try {
+            RestObject newRestObject = newRestObject(oldObject, new PlainRestObject(newParent.getHref(LinkRelation.SELF)));
+            return post(oldObject.getHref(LinkRelation.SHARED_PARENT), newRestObject, newRestObject.getClass());
+        } catch (Exception e) {
+            throw new IllegalArgumentException(oldObject.getClass().getName());
+        }
+    }
 	
 	@Override
 	public Feed nextPage(Feed feed) {

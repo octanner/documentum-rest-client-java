@@ -29,6 +29,7 @@ import com.emc.documentum.rest.client.sample.client.util.SupportedMediaTypes;
 import com.emc.documentum.rest.client.sample.client.util.UriHelper;
 import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.HomeDocument;
+import com.emc.documentum.rest.client.sample.model.LinkRelation;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestError;
 import com.emc.documentum.rest.client.sample.model.RestObject;
@@ -245,7 +246,12 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
 		}
 	}
 	
-	protected <T> T get(String uri, HttpHeaders headers, Class<? extends T> responseBodyClass, String... params) {
+	@Override
+    public RestObject createObject(RestObject parent, RestObject objectToCreate, Object content, String... params) {
+        return createObject(parent, LinkRelation.OBJECTS, objectToCreate, content, params);
+    }
+
+    protected <T> T get(String uri, HttpHeaders headers, Class<? extends T> responseBodyClass, String... params) {
     	return sendRequest(uri, HttpMethod.GET, headers, null, responseBodyClass, params);
     }
     

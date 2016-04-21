@@ -10,18 +10,14 @@ import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.Link;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 public class JsonRepository extends LinkableBase implements Repository {
 	private int id;
 	private String name;
 	private String description;
 	@JsonProperty
-	@JsonTypeInfo(use=Id.CLASS, defaultImpl=JasonServer.class)
 	private List<Server> servers;
 	@JsonProperty
-	@JsonTypeInfo(use=Id.CLASS, defaultImpl=JsonLink.class)
 	private List<Link> links;
 
 	@Override
@@ -69,7 +65,7 @@ public class JsonRepository extends LinkableBase implements Repository {
 		this.links = links;
 	}
 
-	public static class JasonServer implements Repository.Server {
+	public static class JsonServer implements Repository.Server {
 	    private String name;
 	    private String host;
 	    private String version;
@@ -105,7 +101,7 @@ public class JsonRepository extends LinkableBase implements Repository {
 
 		@Override
 		public boolean equals(Object obj) {
-			JasonServer that = (JasonServer) obj;
+			JsonServer that = (JsonServer) obj;
 			return Equals.equal(name, that.name)
 					&& Equals.equal(host, that.host)
 					&& Equals.equal(version, that.version)

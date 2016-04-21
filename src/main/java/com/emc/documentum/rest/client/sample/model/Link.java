@@ -7,6 +7,8 @@ import com.emc.documentum.rest.client.sample.model.json.JsonLink;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
+
+
 /**
  * the link of the resources
  */

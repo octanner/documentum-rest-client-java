@@ -31,6 +31,7 @@ public abstract class JaxbObject extends LinkableBase implements RestObject {
 	protected ObjectProperties objectProperties;
 
 	protected List<Link> links;
+	protected String href;
 	
 	public JaxbObject() {
 	}
@@ -39,8 +40,24 @@ public abstract class JaxbObject extends LinkableBase implements RestObject {
 		setType(object.getType());
 		setDefinition(object.getDefinition());
 		setProperties(object.getProperties());
+		setHref(object.getHref());
 	}
 	
+    @Override
+    public String getObjectId() {
+        return (String)getProperties().get("r_object_id");
+    }
+	   
+    @Override
+    public String getObjectName() {
+        return (String)getProperties().get("object_name");
+    }
+    
+    @Override
+    public String getObjectType() {
+        return (String)getProperties().get("r_object_type");
+    }
+
 	@Override
 	@XmlAttribute(namespace = XMLNamespace.SCHEMA_INSTANCE_NAMESPACE)
 	public String getType() {
@@ -62,6 +79,16 @@ public abstract class JaxbObject extends LinkableBase implements RestObject {
 	}
 
 	@Override
+	@XmlAttribute
+	public String getHref() {
+        return href;
+    }
+
+    public void setHref(String href) {
+        this.href = href;
+    }
+
+    @Override
 	@XmlTransient
 	public Map<String, Object> getProperties() {
 		if(properties == null) {

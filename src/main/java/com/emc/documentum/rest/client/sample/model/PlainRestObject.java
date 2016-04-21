@@ -14,10 +14,12 @@ import java.util.Map;
 public class PlainRestObject implements RestObject {
 	private final String type;
 	private final Map<String, Object> properties;
+	private final String href;
 
 	public PlainRestObject(String type, Map<String, Object> properties) {
 		this.properties = properties;
 		this.type = type;
+		this.href = null;
 	}
 	
 	public PlainRestObject(Map<String, Object> properties) {
@@ -33,8 +35,30 @@ public class PlainRestObject implements RestObject {
 			map.put(properties[i], properties[i+1]);
 		}
 		this.type = null;
+		this.href = null;
 		this.properties = map;
 	}
+	
+	public PlainRestObject(String href) {
+	    this.href = href;
+	    this.type = null;
+        this.properties = null;
+	}
+	
+    @Override
+    public String getObjectId() {
+        return properties==null?null:(String)properties.get("r_object_id");
+    }
+    
+    @Override
+    public String getObjectName() {
+        return properties==null?null:(String)properties.get("object_name");
+    }
+    
+    @Override
+    public String getObjectType() {
+        return properties==null?null:(String)properties.get("r_object_type");
+    }
 	
 	@Override
 	public String getType() {
@@ -45,6 +69,11 @@ public class PlainRestObject implements RestObject {
 	public Map<String, Object> getProperties() {
 		return properties;
 	}
+	
+    @Override
+    public String getHref() {
+        return href;
+    }
 
 	@Override
 	public List<Link> getLinks() {

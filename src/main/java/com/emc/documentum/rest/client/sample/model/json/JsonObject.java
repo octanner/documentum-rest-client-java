@@ -10,17 +10,16 @@ import java.util.Objects;
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.Link;
 import com.emc.documentum.rest.client.sample.model.RestObject;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 public class JsonObject extends LinkableBase implements RestObject {
 	private String name;
 	private String type;
 	private String definition;
 	private Map<String, Object> properties;
+	private String href;
 	@JsonProperty
-	@JsonTypeInfo(use=Id.CLASS, defaultImpl=JsonLink.class)
 	private List<Link> links;
 	
 	public JsonObject() {
@@ -32,9 +31,28 @@ public class JsonObject extends LinkableBase implements RestObject {
 		this.definition = object.getDefinition();
 		this.properties = object.getProperties();
 		this.links = object.getLinks();
+		this.href = object.getHref();
 	}
 	
 	@Override
+	@JsonIgnore
+    public String getObjectId() {
+        return properties==null?null:(String)properties.get("r_object_id");
+    }
+
+    @Override
+    @JsonIgnore
+    public String getObjectName() {
+        return properties==null?null:(String)properties.get("object_name");
+    }
+    
+    @Override
+    @JsonIgnore
+    public String getObjectType() {
+        return properties==null?null:(String)properties.get("r_object_type");
+    }
+
+    @Override
 	public String getName() {
 		return name;
 	}
@@ -61,7 +79,15 @@ public class JsonObject extends LinkableBase implements RestObject {
 		this.definition = definition;
 	}
 
-	@Override
+	public String getHref() {
+        return href;
+    }
+
+    public void setHref(String href) {
+        this.href = href;
+    }
+
+    @Override
 	public Map<String, Object> getProperties() {
 		return properties;
 	}
@@ -90,11 +116,12 @@ public class JsonObject extends LinkableBase implements RestObject {
 		return Equals.equal(name, that.name) 
 			&& Equals.equal(type, that.type)
 			&& Equals.equal(definition, that.definition)
-			&& Equals.equal(properties, that.properties);
+			&& Equals.equal(properties, that.properties)
+			&& Equals.equal(href, that.href);
 	}
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, type, definition, properties);
+        return Objects.hash(name, type, definition, properties, href);
     }
 }

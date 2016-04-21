@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 
 import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.HomeDocument;
+import com.emc.documentum.rest.client.sample.model.LinkRelation;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 
@@ -118,16 +119,27 @@ public interface DCTMRestClient {
 	public RestObject getFolder(String folderUri, String... params);
 	
 	/**
-	 * create a sysobject (or its subtype) under specified folder/cabinet
-	 * @param parent the folder/cabinet where the new sysobject will be created under
+	 * create a sysobject (or its subtype) under specified parent's link rel
+	 * @param parent the parent object where the new sysobject will be created under
+	 * @param rel the LinkRelation used to create new object under the parent
 	 * @param objectToCreate the new object with its properties
 	 * @param content the binary content, it can be byte array, String, javax.xml.transform.Source, org.springframework.core.io.Resource, JAXB object, and Jackson json object  
 	 * @param params
 	 * @return the created sysobject
 	 */
-	public RestObject createObject(RestObject parent, RestObject objectToCreate, Object content, String... params);
+	public RestObject createObject(RestObject parent, LinkRelation rel, RestObject objectToCreate, Object content, String... params);
 	
-	/**
+    /**
+     * create a sysobject (or its subtype) under specified folder/cabinet
+     * @param parent the folder/cabinet where the new sysobject will be created under
+     * @param objectToCreate the new object with its properties
+     * @param content the binary content, it can be byte array, String, javax.xml.transform.Source, org.springframework.core.io.Resource, JAXB object, and Jackson json object  
+     * @param params
+     * @return the created sysobject
+     */
+    public RestObject createObject(RestObject parent, RestObject objectToCreate, Object content, String... params);
+
+    /**
 	 * @param objectUri
 	 * @param params
 	 * @return the sysobject of the specified uri
@@ -278,4 +290,26 @@ public interface DCTMRestClient {
 	 * @return checked in object
 	 */
 	public RestObject checkinBranch(RestObject oldObject, RestObject newObject, Object content, String... params);
+	
+	/**
+	 * materialize the lightweight object
+	 * @param oldObject the object to be materialized
+	 * @return materialized lightweight object
+	 */
+	public RestObject materialize(RestObject oldObject);
+
+    /**
+     * dematerialize the lightweight object
+     * @param oldObject the object to be dematerialized
+     * @return dematerialized lightweight object
+     */
+    public void dematerialize(RestObject oldObject);
+
+    /**
+     * reparent the lightweight object to a new shared parent
+     * @param oldObject the object to be reparented
+     * @param newParent the new shared parent
+     * @return reparented lightweight object
+     */
+    public RestObject reparent(RestObject oldObject, RestObject newParent);
 }

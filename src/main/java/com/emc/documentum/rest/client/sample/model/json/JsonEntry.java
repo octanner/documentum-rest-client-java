@@ -3,7 +3,6 @@
  */
 package com.emc.documentum.rest.client.sample.model.json;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -13,10 +12,6 @@ import com.emc.documentum.rest.client.sample.model.Entry;
 import com.emc.documentum.rest.client.sample.model.Link;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 public class JsonEntry extends LinkableBase implements Entry {
 	@JsonProperty
@@ -28,12 +23,8 @@ public class JsonEntry extends LinkableBase implements Entry {
 	@JsonProperty
 	private String summary;
 	@JsonProperty
-    @JsonTypeInfo(use=Id.CLASS, defaultImpl=ArrayList.class)
-    @JsonSubTypes({@Type(JsonAuthor.class)})
 	private List<Author> author;
 	@JsonProperty
-    @JsonTypeInfo(use=Id.CLASS, defaultImpl=ArrayList.class)
-    @JsonSubTypes({@Type(JsonLink.class)})
 	private List<Link> links;
 	@JsonProperty
 	private Content content;

@@ -133,8 +133,8 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
 	}
 	
 	@Override
-	public RestObject createObject(RestObject parent, RestObject objectToCreate, Object content, String... params) {
-		return post(parent.getHref(LinkRelation.OBJECTS), new JsonObject(objectToCreate), content, JsonObject.class, params);
+	public RestObject createObject(RestObject parent, LinkRelation rel, RestObject objectToCreate, Object content, String... params) {
+		return post(parent.getHref(rel), new JsonObject(objectToCreate), content, JsonObject.class, params);
 	}
 
 	@Override
@@ -218,6 +218,23 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
 	}
 	
 	@Override
+    public RestObject materialize(RestObject oldObject) {
+        return put(oldObject.getHref(LinkRelation.MATERIALIZE), JsonObject.class);
+    }
+
+    @Override
+    public void dematerialize(RestObject oldObject) {
+        delete(oldObject.getHref(LinkRelation.DEMATERIALIZE));
+    }
+
+    @Override
+    public RestObject reparent(RestObject oldObject, RestObject newParent) {
+        JsonObject parent = new JsonObject();
+        parent.setHref(newParent.getHref(LinkRelation.SELF));
+        return post(oldObject.getHref(LinkRelation.SHARED_PARENT), parent, JsonObject.class);
+    }
+
+    @Override
 	public Feed nextPage(Feed feed) {
 		return page(feed.getHref(LinkRelation.PAGING_NEXT));
 	}

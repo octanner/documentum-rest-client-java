@@ -25,6 +25,26 @@ public interface RestObject extends Linkable {
 	String getDefinition();
 	
 	/**
+	 * @return href the href of the object
+	 */
+	String getHref();
+	
+	/**
+	 * @return the object id
+	 */
+	String getObjectId();
+	
+	/**
+	 * @return the object name
+	 */
+	String getObjectName();
+	
+    /**
+     * @return the object type
+     */
+    String getObjectType();
+    
+    /**
 	 * @return all attributes of item
 	 */
 	Map<String, Object> getProperties();

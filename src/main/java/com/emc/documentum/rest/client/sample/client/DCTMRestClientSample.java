@@ -3,6 +3,7 @@
  */
 package com.emc.documentum.rest.client.sample.client;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -34,9 +35,9 @@ public class DCTMRestClientSample {
 		String bindingStr = read(sb.toString(), "XML");
 		DCTMRestClientBinding binding = DCTMRestClientBinding.valueOf(bindingStr.toUpperCase());
 		String contextRoot = read("Please input the REST context path:", "http://localhost:8080/dctm-rest");
-		String repository = read("Please input the repository name:", "REPO");
-		String username = read("Please input the username:", "dmadmin");
-		String password = read("Please input the password:", "password");
+		String repository = read("Please input the repository name:");
+		String username = read("Please input the username:");
+		String password = read("Please input the password:");
 		String useFormatExtension = read("Please input the whether add format extension .xml or .json for URI:", "false");
 		String debug = read("Please input whether print debug information:", "false");
 		
@@ -59,7 +60,8 @@ public class DCTMRestClientSample {
 		  .append("4 Document Create/Update/Delete").append(NEWLINE)
 		  .append("5 Content Management").append(NEWLINE)
 		  .append("6 Version Management").append(NEWLINE)
-		  .append("7 DQL Query");
+		  .append("7 DQL Query").append(NEWLINE)
+          .append("8 Lightweight Object Create/Materialize/Dematerialize/Reparent (REST Services 7.3+)");
 		
 		while(true) {
 			String sample = read(sb.toString());
@@ -92,6 +94,11 @@ public class DCTMRestClientSample {
 					case 7:
 						dqlQuery();
 						break;
+					case 8:
+					    cmdrLightweightObject();
+					    break;
+				    default:
+				        System.out.println("Unsupported " + op);
 				}
 			} catch(Exception e) {
 				e.printStackTrace();
@@ -99,26 +106,37 @@ public class DCTMRestClientSample {
 		}
 	}
 	
-	private static String read(String prompt) throws Exception {
+	private static String read(String prompt) {
 		byte[] bytes = new byte[100];
 		String value = null;
 		while(value == null || value.length() == 0) {
-			System.out.println(prompt);
-			int readed = System.in.read(bytes);
-			while(readed <= 0) {
-				System.out.println(prompt);
-				readed = System.in.read(bytes);
-			}
-			value = new String(bytes, 0, readed).trim();
+		    try {
+    			System.out.println(prompt);
+    			int readed;
+                    readed = System.in.read(bytes);
+    			while(readed <= 0) {
+    				System.out.println(prompt);
+    				readed = System.in.read(bytes);
+    			}
+    			value = new String(bytes, 0, readed).trim();
+    		} catch (IOException e) {
+    		    e.printStackTrace();
+    		}
 		}
 		return value;
 	}
 	
-	private static String read(String prompt, String defaultValue) throws Exception {
+	private static String read(String prompt, String defaultValue) {
 		System.out.println(prompt + " [default " + defaultValue + "]"); 
 		String value = defaultValue;
 		byte[] bytes = new byte[100];
-		int readed = System.in.read(bytes);
+		int readed;
+        try {
+            readed = System.in.read(bytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return defaultValue;
+        }
 		if(readed > 0) {
 			String tmp = new String(bytes, 0, readed).trim();
 			if(tmp.length() > 0) {
@@ -202,7 +220,7 @@ public class DCTMRestClientSample {
 		
 		System.out.println("-------------get the Temp cabinet");
 		RestObject tempCabinet = client.getCabinet("Temp");
-		System.out.println(tempCabinet.getProperties().get("r_object_id"));
+		System.out.println(tempCabinet.getObjectId());
 		System.out.println(NEWLINE);
 
 		System.out.println("-------------get folders under the Temp cabinet");
@@ -230,7 +248,7 @@ public class DCTMRestClientSample {
 		cabinets = client.getCabinets("inline", "true");
 		for(Entry e : cabinets.getEntries()) {
 			RestObject o = e.getContentObject();
-			System.out.println("r_object_id=" + o.getProperties().get("r_object_id") + " object_name=" + o.getProperties().get("object_name"));
+			System.out.println("r_object_id=" + o.getObjectId() + " object_name=" + o.getObjectName());
 			System.out.println(LinkRelation.SELF.rel() + " -> " + o.getHref(LinkRelation.SELF));
 		}
 		System.out.println(NEWLINE);
@@ -239,7 +257,7 @@ public class DCTMRestClientSample {
 		folders = client.getFolders(tempCabinet, "inline", "true");
 		for(Entry e : folders.getEntries()) {
 			RestObject o = e.getContentObject();
-			System.out.println("r_object_id=" + o.getProperties().get("r_object_id") + " object_name=" + o.getProperties().get("object_name"));
+			System.out.println("r_object_id=" + o.getObjectId() + " object_name=" + o.getObjectName());
 			System.out.println(LinkRelation.SELF.rel() + " -> " + o.getHref(LinkRelation.SELF));
 		}
 		System.out.println(NEWLINE);
@@ -260,14 +278,14 @@ public class DCTMRestClientSample {
 		RestObject newFolder = new PlainRestObject("object_name", "my_new_folder");
 		RestObject createdFolder = client.createFolder(tempCabinet, newFolder);
 		System.out.println("http status: " + client.getStatus());
-		System.out.println("r_object_id=" + createdFolder.getProperties().get("r_object_id") + " object_name=" + createdFolder.getProperties().get("object_name"));
+		System.out.println("r_object_id=" + createdFolder.getObjectId() + " object_name=" + createdFolder.getObjectName());
 		System.out.println(NEWLINE);
 
 		System.out.println("-------------update the folder name");
 		RestObject updateFolder = new PlainRestObject("object_name", "my_new_folder_updated");
 		RestObject updatedFolder = client.update(createdFolder, updateFolder);
 		System.out.println("http status: " + client.getStatus());
-		System.out.println("r_object_id=" + updatedFolder.getProperties().get("r_object_id") + " object_name=" + updatedFolder.getProperties().get("object_name"));
+		System.out.println("r_object_id=" + updatedFolder.getObjectId() + " object_name=" + updatedFolder.getObjectName());
 		System.out.println(NEWLINE);
 		
 		System.out.println("-------------delete the created folder");
@@ -279,14 +297,14 @@ public class DCTMRestClientSample {
 		RestObject newFolder1 = new PlainRestObject("object_name", "my_new_folder1");
 		RestObject createdFolder1 = client.createFolder(tempCabinet, newFolder1);
 		System.out.println("http status: " + client.getStatus());
-		System.out.println("r_object_id=" + createdFolder1.getProperties().get("r_object_id") + " object_name=" + createdFolder1.getProperties().get("object_name"));
+		System.out.println("r_object_id=" + createdFolder1.getObjectId() + " object_name=" + createdFolder1.getObjectName());
 		System.out.println(NEWLINE);
 		
 		System.out.println("-------------create a folder under the folder just created");
 		RestObject newFolder2 = new PlainRestObject("object_name", "my_new_folder2");
 		RestObject createdFolder2 = client.createFolder(createdFolder1, newFolder2);
 		System.out.println("http status: " + client.getStatus());
-		System.out.println("r_object_id=" + createdFolder2.getProperties().get("r_object_id") + " object_name=" + createdFolder2.getProperties().get("object_name"));
+		System.out.println("r_object_id=" + createdFolder2.getObjectId() + " object_name=" + createdFolder2.getObjectName());
 		System.out.println(NEWLINE);
 		
 		System.out.println("-------------delete the created folder with a folder in it");
@@ -310,14 +328,14 @@ public class DCTMRestClientSample {
 		RestObject newObjectWithoutContent = new PlainRestObject("object_name", "obj_without_content");
 		RestObject createdObjectWithoutContent = client.createObject(tempCabinet, newObjectWithoutContent, null);
 		System.out.println("http status: " + client.getStatus());
-		System.out.println("r_object_id=" + createdObjectWithoutContent.getProperties().get("r_object_id") + " object_name=" + createdObjectWithoutContent.getProperties().get("object_name"));
+		System.out.println("r_object_id=" + createdObjectWithoutContent.getObjectId() + " object_name=" + createdObjectWithoutContent.getObjectName());
 		System.out.println(NEWLINE);
 		
 		System.out.println("-------------update the object with a new name");
 		RestObject updateObjectName = new PlainRestObject("object_name", "new_object_name");
 		RestObject updatedObjectWithObjectName = client.update(createdObjectWithoutContent, updateObjectName);
 		System.out.println("http status: " + client.getStatus());
-		System.out.println("r_object_id=" + updatedObjectWithObjectName.getProperties().get("r_object_id") + " object_name=" + updatedObjectWithObjectName.getProperties().get("object_name"));
+		System.out.println("r_object_id=" + updatedObjectWithObjectName.getObjectId() + " object_name=" + updatedObjectWithObjectName.getObjectName());
 		System.out.println(NEWLINE);
 		
 		System.out.println("-------------delete the created object");
@@ -333,8 +351,8 @@ public class DCTMRestClientSample {
 		RestObject newObjectWithRepeatingProperties = new PlainRestObject(newPropertiesMap);
 		RestObject createdObjectWithRepeatingProperties = client.createObject(tempCabinet, newObjectWithRepeatingProperties, null);
 		System.out.println("http status: " + client.getStatus());
-		System.out.println("r_object_id=" + createdObjectWithRepeatingProperties.getProperties().get("r_object_id") +
-				" object_name=" + createdObjectWithRepeatingProperties.getProperties().get("object_name") +
+		System.out.println("r_object_id=" + createdObjectWithRepeatingProperties.getObjectId() +
+				" object_name=" + createdObjectWithRepeatingProperties.getObjectName() +
 				" r_object_type=" + createdObjectWithRepeatingProperties.getProperties().get("r_object_type"));
 		System.out.println("keywords=" + createdObjectWithRepeatingProperties.getProperties().get("keywords"));
 		System.out.println(NEWLINE);
@@ -348,8 +366,8 @@ public class DCTMRestClientSample {
 		RestObject newObjectWithOverwriteType = new PlainRestObject("dm_sysobject", newPropertiesMap);
 		RestObject createdObjectWithOverwriteType = client.createObject(tempCabinet, newObjectWithOverwriteType, null);
 		System.out.println("http status: " + client.getStatus());
-		System.out.println("r_object_id=" + createdObjectWithOverwriteType.getProperties().get("r_object_id") +
-				" object_name=" + createdObjectWithOverwriteType.getProperties().get("object_name") +
+		System.out.println("r_object_id=" + createdObjectWithOverwriteType.getObjectId() +
+				" object_name=" + createdObjectWithOverwriteType.getObjectName() +
 				" r_object_type=" + createdObjectWithOverwriteType.getProperties().get("r_object_type"));
 		System.out.println(NEWLINE);
 		
@@ -362,7 +380,7 @@ public class DCTMRestClientSample {
 		RestObject newObjectWithContent = new PlainRestObject("object_name", "obj_with_content");
 		RestObject createdObjectWithContent = client.createObject(tempCabinet, newObjectWithContent, "I'm the content of the object", "format", "crtext");
 		System.out.println("http status: " + client.getStatus());
-		System.out.println("r_object_id=" + createdObjectWithContent.getProperties().get("r_object_id") + " object_name=" + createdObjectWithContent.getProperties().get("object_name"));
+		System.out.println("r_object_id=" + createdObjectWithContent.getObjectId() + " object_name=" + createdObjectWithContent.getObjectName());
 		System.out.println(NEWLINE);
 		
 		System.out.println("-------------delete the created object");
@@ -386,8 +404,8 @@ public class DCTMRestClientSample {
 		RestObject newObjectWithoutContent = new PlainRestObject("object_name", "obj_without_content");
 		RestObject createdObjectWithoutContent = client.createDocument(tempCabinet, newObjectWithoutContent, null);
 		System.out.println("http status: " + client.getStatus());
-		System.out.println("r_object_id=" + createdObjectWithoutContent.getProperties().get("r_object_id") +
-				" object_name=" + createdObjectWithoutContent.getProperties().get("object_name") +
+		System.out.println("r_object_id=" + createdObjectWithoutContent.getObjectId() +
+				" object_name=" + createdObjectWithoutContent.getObjectName() +
 				" r_object_type=" + createdObjectWithoutContent.getProperties().get("r_object_type"));
 		System.out.println(NEWLINE);
 		
@@ -395,7 +413,7 @@ public class DCTMRestClientSample {
 		RestObject updateObjectName = new PlainRestObject("object_name", "new_object_name");
 		RestObject updatedObjectWithObjectName = client.update(createdObjectWithoutContent, updateObjectName);
 		System.out.println("http status: " + client.getStatus());
-		System.out.println("r_object_id=" + updatedObjectWithObjectName.getProperties().get("r_object_id") + " object_name=" + updatedObjectWithObjectName.getProperties().get("object_name"));
+		System.out.println("r_object_id=" + updatedObjectWithObjectName.getObjectId() + " object_name=" + updatedObjectWithObjectName.getObjectName());
 		System.out.println(NEWLINE);
 		
 		System.out.println("-------------delete the created document");
@@ -407,8 +425,8 @@ public class DCTMRestClientSample {
 		RestObject newObjectWithContent = new PlainRestObject("object_name", "obj_with_content");
 		RestObject createdObjectWithContent = client.createDocument(tempCabinet, newObjectWithContent, "I'm the content of the object", "format", "crtext");
 		System.out.println("http status: " + client.getStatus());
-		System.out.println("r_object_id=" + createdObjectWithContent.getProperties().get("r_object_id") +
-				" object_name=" + createdObjectWithContent.getProperties().get("object_name") +
+		System.out.println("r_object_id=" + createdObjectWithContent.getObjectId() +
+				" object_name=" + createdObjectWithContent.getObjectName() +
 				" r_object_type=" + createdObjectWithContent.getProperties().get("r_object_type"));
 		System.out.println(NEWLINE);
 		
@@ -434,8 +452,8 @@ public class DCTMRestClientSample {
 		RestObject newObjectWithContent = new PlainRestObject("object_name", "obj_with_content");
 		RestObject createdObjectWithContent = client.createDocument(tempCabinet, newObjectWithContent, "I'm the content of the object", "format", "crtext");
 		System.out.println("http status: " + client.getStatus());
-		System.out.println("r_object_id=" + createdObjectWithContent.getProperties().get("r_object_id") +
-				" object_name=" + createdObjectWithContent.getProperties().get("object_name") +
+		System.out.println("r_object_id=" + createdObjectWithContent.getObjectId() +
+				" object_name=" + createdObjectWithContent.getObjectName() +
 				" r_object_type=" + createdObjectWithContent.getProperties().get("r_object_type"));
 		System.out.println(NEWLINE);
 		
@@ -482,13 +500,13 @@ public class DCTMRestClientSample {
 		RestObject newObjectWithoutContent = new PlainRestObject("object_name", "obj_without_content");
 		RestObject createdObjectWithoutContent = client.createDocument(tempCabinet, newObjectWithoutContent, null);
 		System.out.println("http status: " + client.getStatus());
-		System.out.println("r_object_id=" + createdObjectWithoutContent.getProperties().get("r_object_id") + " r_lock_owner=" + createdObjectWithoutContent.getProperties().get("r_lock_owner"));
+		System.out.println("r_object_id=" + createdObjectWithoutContent.getObjectId() + " r_lock_owner=" + createdObjectWithoutContent.getProperties().get("r_lock_owner"));
 		System.out.println(NEWLINE);
 		
 		System.out.println("-------------check out the created document");
 		RestObject checkedOutObject = client.checkout(createdObjectWithoutContent);
 		System.out.println("http status: " + client.getStatus());
-		System.out.println("r_object_id=" + checkedOutObject.getProperties().get("r_object_id") + " r_lock_owner=" + checkedOutObject.getProperties().get("r_lock_owner"));
+		System.out.println("r_object_id=" + checkedOutObject.getObjectId() + " r_lock_owner=" + checkedOutObject.getProperties().get("r_lock_owner"));
 		System.out.println(NEWLINE);
 		
 		System.out.println("-------------cancel check out the created document");
@@ -500,14 +518,14 @@ public class DCTMRestClientSample {
 		createdObjectWithoutContent = client.get(createdObjectWithoutContent);
 		checkedOutObject = client.checkout(createdObjectWithoutContent);
 		System.out.println("http status: " + client.getStatus());
-		System.out.println("r_object_id=" + checkedOutObject.getProperties().get("r_object_id") + " r_lock_owner=" + checkedOutObject.getProperties().get("r_lock_owner"));
+		System.out.println("r_object_id=" + checkedOutObject.getObjectId() + " r_lock_owner=" + checkedOutObject.getProperties().get("r_lock_owner"));
 		System.out.println(NEWLINE);
 		
 		System.out.println("-------------check in the created document next minor version with new name");
 		RestObject newObjectWithName = new PlainRestObject("object_name", "obj_without_content_checked_in");
 		RestObject checkedInObject = client.checkinNextMinor(checkedOutObject, newObjectWithName, null);
 		System.out.println("http status: " + client.getStatus());
-		System.out.println("r_object_id=" + checkedInObject.getProperties().get("r_object_id") +
+		System.out.println("r_object_id=" + checkedInObject.getObjectId() +
 				" r_lock_owner=" + checkedInObject.getProperties().get("r_lock_owner") +
 				" r_version_label=" + checkedInObject.getProperties().get("r_version_label"));
 		System.out.println(NEWLINE);
@@ -515,13 +533,13 @@ public class DCTMRestClientSample {
 		System.out.println("-------------check out the created document");
 		checkedOutObject = client.checkout(createdObjectWithoutContent);
 		System.out.println("http status: " + client.getStatus());
-		System.out.println("r_object_id=" + checkedOutObject.getProperties().get("r_object_id") + " r_lock_owner=" + checkedOutObject.getProperties().get("r_lock_owner"));
+		System.out.println("r_object_id=" + checkedOutObject.getObjectId() + " r_lock_owner=" + checkedOutObject.getProperties().get("r_lock_owner"));
 		System.out.println(NEWLINE);
 		
 		System.out.println("-------------check in the created document branch version with new binary content");
 		checkedInObject = client.checkinBranch(checkedOutObject, null, "new content");
 		System.out.println("http status: " + client.getStatus());
-		System.out.println("r_object_id=" + checkedInObject.getProperties().get("r_object_id") +
+		System.out.println("r_object_id=" + checkedInObject.getObjectId() +
 				" r_lock_owner=" + checkedInObject.getProperties().get("r_lock_owner") +
 				" r_version_label=" + checkedInObject.getProperties().get("r_version_label"));
 		System.out.println(NEWLINE);
@@ -529,14 +547,14 @@ public class DCTMRestClientSample {
 		System.out.println("-------------check out the checked in document");
 		checkedOutObject = client.checkout(checkedInObject);
 		System.out.println("http status: " + client.getStatus());
-		System.out.println("r_object_id=" + checkedOutObject.getProperties().get("r_object_id") + " r_lock_owner=" + checkedOutObject.getProperties().get("r_lock_owner"));
+		System.out.println("r_object_id=" + checkedOutObject.getObjectId() + " r_lock_owner=" + checkedOutObject.getProperties().get("r_lock_owner"));
 		System.out.println(NEWLINE);
 		
 		System.out.println("-------------check in the created document next major version with both new anme and new binary content");
 		newObjectWithName = new PlainRestObject("object_name", "new object name");
 		checkedInObject = client.checkinNextMajor(checkedOutObject, newObjectWithName, "new content");
 		System.out.println("http status: " + client.getStatus());
-		System.out.println("r_object_id=" + checkedInObject.getProperties().get("r_object_id") +
+		System.out.println("r_object_id=" + checkedInObject.getObjectId() +
 				" r_lock_owner=" + checkedInObject.getProperties().get("r_lock_owner") +
 				" r_version_label=" + checkedInObject.getProperties().get("r_version_label"));
 		System.out.println(NEWLINE);
@@ -560,7 +578,7 @@ public class DCTMRestClientSample {
 		Feed queryResult = client.dql("select * from dm_user", "items-per-page", "5");
 		for(Entry e : queryResult.getEntries()) {
 			RestObject o = e.getContentObject();
-			System.out.println("r_object_id=" + o.getProperties().get("r_object_id") + " user_name=" + o.getProperties().get("user_name"));
+			System.out.println("r_object_id=" + o.getObjectId() + " user_name=" + o.getProperties().get("user_name"));
 		}
 		System.out.println(queryResult.getHref(LinkRelation.PAGING_NEXT));
 		System.out.println(NEWLINE);
@@ -569,7 +587,7 @@ public class DCTMRestClientSample {
 		queryResult = client.nextPage(queryResult);
 		for(Entry e : queryResult.getEntries()) {
 			RestObject o = e.getContentObject();
-			System.out.println("r_object_id=" + o.getProperties().get("r_object_id") + " user_name=" + o.getProperties().get("user_name"));
+			System.out.println("r_object_id=" + o.getObjectId() + " user_name=" + o.getProperties().get("user_name"));
 		}
 		System.out.println(NEWLINE);
 		
@@ -592,4 +610,71 @@ public class DCTMRestClientSample {
 		System.out.println("finish DQL Query sample");
 		System.out.println(NEWLINE);
 	}
+	
+    /**
+     * samples to create/materialize/dematerialize/reparent lightweight object
+     */
+    private static void cmdrLightweightObject() {
+        System.out.println("start Lightweight Object Create/Materialize/Dematerialize/Reparent sample");
+        String shareableType = read("Please input the shareable type:");
+        String lightweightType = read("Please input the lightweight type:");
+        
+        RestObject tempCabinet = client.getCabinet("Temp");
+        
+        System.out.println("-------------create a shreable object under the Temp cabinet");
+        RestObject newShareableObject1 = new PlainRestObject("object_name", "shareable_object_1", "r_object_type", shareableType, "title", "shared title 1");
+        RestObject createdShareableObject1 = client.createObject(tempCabinet, newShareableObject1, null);
+        System.out.println("http status: " + client.getStatus());
+        System.out.println("r_object_id=" + createdShareableObject1.getObjectId() + " object_name=" + createdShareableObject1.getObjectName() + " r_object_type=" + createdShareableObject1.getObjectType());
+        System.out.println(NEWLINE);
+        
+        System.out.println("-------------create a lightweight object sharing the " + createdShareableObject1.getObjectName());
+        RestObject newLightweightObject1 = new PlainRestObject("object_name", "lightweight_object_1", "r_object_type", lightweightType);
+        RestObject createdLightweightObject1 = client.createObject(createdShareableObject1, LinkRelation.LIGHTWEIGHT_OBJECTS, newLightweightObject1, null);
+        System.out.println("http status: " + client.getStatus());
+        System.out.println("r_object_id=" + createdLightweightObject1.getObjectId() + " object_name=" + createdLightweightObject1.getObjectName() + " r_object_type=" + createdLightweightObject1.getObjectType());
+        System.out.println(NEWLINE);
+
+        System.out.println("-------------materialize the lightweight object " + createdLightweightObject1.getObjectName());
+        RestObject materializedObject = client.materialize(createdLightweightObject1);
+        System.out.println("http status: " + client.getStatus());
+        if(materializedObject.getHref(LinkRelation.DEMATERIALIZE) != null) {
+            System.out.println(createdLightweightObject1.getObjectName() + " materialized");
+        }
+        System.out.println(NEWLINE);
+        
+        System.out.println("-------------dematerialize the lightweight object " + createdLightweightObject1.getObjectName());
+        client.dematerialize(materializedObject);
+        RestObject dematerializedObject = client.get(createdLightweightObject1);
+        System.out.println("http status: " + client.getStatus());
+        if(materializedObject.getHref(LinkRelation.MATERIALIZE) != null) {
+            System.out.println(createdLightweightObject1.getObjectName() + " dematerialized");
+        }
+        System.out.println(NEWLINE);
+        
+        System.out.println("-------------create another shreable object under the Temp cabinet");
+        RestObject newShareableObject2 = new PlainRestObject("object_name", "shareable_object_2", "r_object_type", shareableType, "title", "shared title 2");
+        RestObject createdShareableObject2 = client.createObject(tempCabinet, newShareableObject2, null);
+        System.out.println("http status: " + client.getStatus());
+        System.out.println("r_object_id=" + createdShareableObject2.getObjectId() + " object_name=" + createdShareableObject2.getObjectName() + " r_object_type=" + createdShareableObject2.getObjectType());
+        System.out.println(NEWLINE);
+        
+        System.out.println("-------------reparent the lightweight to the new shareable object " + createdShareableObject2.getObjectName());
+        RestObject reparentedObject = client.reparent(dematerializedObject, createdShareableObject2);
+        System.out.println("http status: " + client.getStatus());
+        System.out.println("title=" + reparentedObject.getProperties().get("title"));
+        System.out.println(NEWLINE);
+        
+        System.out.println("-------------delete the lightweight object " + reparentedObject.getObjectName());
+        client.delete(reparentedObject);
+        
+        System.out.println("-------------delete the shareable object " + createdShareableObject2.getObjectName());
+        client.delete(createdShareableObject2);
+        
+        System.out.println("-------------delete the shareable object " + createdShareableObject1.getObjectName());
+        client.delete(createdShareableObject1);
+        
+        System.out.println("finish Lightweight Object Create/Materialize/Dematerialize/Reparent sample");
+        System.out.println(NEWLINE);
+    }
 }

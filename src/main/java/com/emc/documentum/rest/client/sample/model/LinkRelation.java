@@ -60,6 +60,12 @@ public enum LinkRelation {
     CHECKOUT("checkout", true),
     CANCEL_CHECKOUT("cancel-checkout", true),
     
+    //for lightweight object
+    MATERIALIZE("materialize", true),
+    DEMATERIALIZE("dematerialize", true),
+    LIGHTWEIGHT_OBJECTS("lightweight-objects", true),
+    SHARED_PARENT("shared-parent", true),
+    
     DQL("dql", true),
     CABINETS("cabinets", true),
     FORMATS("formats", true),
