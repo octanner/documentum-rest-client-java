@@ -26,4 +26,9 @@ public interface RestError {
      * @return the detailed error message
      */
     public String getDetails();
+    
+    /**
+     * @return the log id to match the server log
+     */
+    public String getId();
 }

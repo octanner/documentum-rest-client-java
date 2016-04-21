@@ -208,6 +208,7 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
             	Debug.error("code [" + error.getCode() + "]");
             	Debug.error("message [" + error.getMessage() + "]");
             	Debug.error("detail [" + error.getDetails() + "]");
+            	Debug.error("id [" + error.getId() + "]");
             }
             throw e;
         } finally {

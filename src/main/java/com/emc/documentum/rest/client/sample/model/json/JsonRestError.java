@@ -13,6 +13,7 @@ public class JsonRestError implements RestError {
 	private String code;
 	private String message;
 	private String details;
+	private String id;
 
 	@Override
 	public int getStatus() {
@@ -51,9 +52,19 @@ public class JsonRestError implements RestError {
 	}
 
 	@Override
+	public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    @Override
 	public boolean equals(Object obj) {
 		JsonRestError that = (JsonRestError)obj;
-		return Equals.equal(status, that.status) 
+		return Equals.equal(id, that.id)
+	        && Equals.equal(status, that.status) 
 			&& Equals.equal(code, that.code)
 			&& Equals.equal(message, that.message)
 			&& Equals.equal(details, that.details);
@@ -61,7 +72,6 @@ public class JsonRestError implements RestError {
 
     @Override
     public int hashCode() {
-        return Objects.hash(status, code, message);
+        return Objects.hash(id, status, code, message);
     }
-
 }
