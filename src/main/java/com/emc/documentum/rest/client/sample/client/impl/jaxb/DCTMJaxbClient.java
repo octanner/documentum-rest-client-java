@@ -21,9 +21,13 @@ import com.emc.documentum.rest.client.sample.model.Entry;
 import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.HomeDocument;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
+import com.emc.documentum.rest.client.sample.model.Linkable;
 import com.emc.documentum.rest.client.sample.model.PlainRestObject;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestObject;
+import com.emc.documentum.rest.client.sample.model.RestType;
+import com.emc.documentum.rest.client.sample.model.ValueAssistant;
+import com.emc.documentum.rest.client.sample.model.ValueAssistantRequest;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbCabinet;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbContent;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbDocument;
@@ -33,6 +37,9 @@ import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbHomeDocument;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbObject;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbRepository;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSysObject;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbType;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbValueAssistance;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbValueAssistantRequest;
 
 /**
  * the DCTMRestClient implementation by JAXB xml support
@@ -53,7 +60,7 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
 	}
 	
 	@Override
-	public Feed getRepositories() {
+	public Feed<Repository> getRepositories() {
 		if(repositories == null) {
 			String repositoriesUri = getHomeDocument().getHref(LinkRelation.REPOSITORIES);
 			repositories = get(repositoriesUri, true, JaxbFeed.class);
@@ -65,8 +72,8 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
 	public Repository getRepository() {
 		if(repository == null) {
 			boolean resetEnableStreaming = enableStreaming;
-			Feed repositories = getRepositories();
-			for(Entry e : repositories.getEntries()) {
+			Feed<Repository> repositories = getRepositories();
+			for(Entry<Repository> e : repositories.getEntries()) {
 				if(repositoryName.equals(e.getTitle())) {
 					repository = get(e.getContentSrc(), false, JaxbRepository.class);
 				}
@@ -79,12 +86,12 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
 	}
 	
 	@Override
-	public Feed dql(String dql, String... params) {
+	public Feed<RestObject> dql(String dql, String... params) {
 		return get(getRepository().getHref(LinkRelation.SELF), true, JaxbFeed.class, UriHelper.append(params, "dql", dql));
 	}
 	
 	@Override
-	public Feed getCabinets(String... params) {
+	public Feed<RestObject> getCabinets(String... params) {
 		Repository repository = getRepository();
 		String cabinetsUri = repository.getHref(LinkRelation.CABINETS);
 		return get(cabinetsUri, true, JaxbFeed.class, params);
@@ -112,17 +119,17 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
 	}
 	
 	@Override
-	public Feed getFolders(RestObject parent, String... params) {
+	public Feed<RestObject> getFolders(RestObject parent, String... params) {
 		return get(parent.getHref(LinkRelation.FOLDERS), true, JaxbFeed.class, params);
 	}
 	
 	@Override
-	public Feed getObjects(RestObject parent, String... params) {
+	public Feed<RestObject> getObjects(RestObject parent, String... params) {
 		return get(parent.getHref(LinkRelation.OBJECTS), true, JaxbFeed.class, params);
 	}
 	
 	@Override
-	public Feed getDocuments(RestObject parent, String... params) {
+	public Feed<RestObject> getDocuments(RestObject parent, String... params) {
 		return get(parent.getHref(LinkRelation.DOCUMENTS), true, JaxbFeed.class, params);
 	}
 	
@@ -187,7 +194,7 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
 	}
 	
 	@Override
-	public Feed getContents(RestObject object, String... params) {
+	public Feed<RestObject> getContents(RestObject object, String... params) {
 		return get(object.getHref(LinkRelation.CONTENTS), true, JaxbFeed.class, params);
 	}
 	
@@ -217,7 +224,7 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
 	}
 	
 	@Override
-	public Feed getVersions(RestObject object, String... params) {
+	public Feed<RestObject> getVersions(RestObject object, String... params) {
 		return get(object.getHref(LinkRelation.VERSIONS), true, JaxbFeed.class, params);
 	}
 	
@@ -241,26 +248,43 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
         }
     }
 	
-	@Override
-	public Feed nextPage(Feed feed) {
-		return page(feed.getHref(LinkRelation.PAGING_NEXT));
-	}
-	
-	@Override
-	public Feed previousPage(Feed feed) {
-		return page(feed.getHref(LinkRelation.PAGING_PREV));
-	}
+    @Override
+    public RestType getType(String name, String... params) {
+        return get(getRepository().getHref(LinkRelation.TYPES)+"/"+name, false, JaxbType.class, params);
+    }
+    
+    @Override
+    public Feed<RestType> getTypes(String... params) {
+        Repository repository = getRepository();
+        String typesUri = repository.getHref(LinkRelation.TYPES);
+        return get(typesUri, true, JaxbFeed.class, params);
+    }
+    
+    @Override
+    public ValueAssistant getValueAssistant(RestType type, ValueAssistantRequest request, String... params) {
+        return post(type.getHref(LinkRelation.ASSIS_VALUES), new JaxbValueAssistantRequest(request), JaxbValueAssistance.class, params);
+    }
 
-	@Override
-	public Feed firstPage(Feed feed) {
-		return page(feed.getHref(LinkRelation.PAGING_FIRST));
-	}
+    @Override
+    public <T extends Linkable> Feed<T> nextPage(Feed<T> feed) {
+        return page(feed.getHref(LinkRelation.PAGING_NEXT));
+    }
+    
+    @Override
+    public <T extends Linkable> Feed<T> previousPage(Feed<T> feed) {
+        return page(feed.getHref(LinkRelation.PAGING_PREV));
+    }
 
-	@Override
-	public Feed lastPage(Feed feed) {
-		return page(feed.getHref(LinkRelation.PAGING_LAST));
-	}
-	
+    @Override
+    public <T extends Linkable> Feed<T> firstPage(Feed<T> feed) {
+        return page(feed.getHref(LinkRelation.PAGING_FIRST));
+    }
+
+    @Override
+    public <T extends Linkable> Feed<T> lastPage(Feed<T> feed) {
+        return page(feed.getHref(LinkRelation.PAGING_LAST));
+    }
+    
 	private Feed page(String uri) {
 		Feed feed = null;
 		if(uri != null) {

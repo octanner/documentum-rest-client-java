@@ -22,12 +22,19 @@ import com.emc.documentum.rest.client.sample.model.Entry;
 import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.HomeDocument;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
+import com.emc.documentum.rest.client.sample.model.Linkable;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestObject;
-import com.emc.documentum.rest.client.sample.model.json.JsonFeed;
+import com.emc.documentum.rest.client.sample.model.RestType;
+import com.emc.documentum.rest.client.sample.model.ValueAssistant;
+import com.emc.documentum.rest.client.sample.model.ValueAssistantRequest;
+import com.emc.documentum.rest.client.sample.model.json.JsonFeeds;
 import com.emc.documentum.rest.client.sample.model.json.JsonHomeDocument;
 import com.emc.documentum.rest.client.sample.model.json.JsonObject;
 import com.emc.documentum.rest.client.sample.model.json.JsonRepository;
+import com.emc.documentum.rest.client.sample.model.json.JsonType;
+import com.emc.documentum.rest.client.sample.model.json.JsonValueAssistance;
+import com.emc.documentum.rest.client.sample.model.json.JsonValueAssistantRequest;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
@@ -49,10 +56,11 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
 	}
 	
 	@Override
-	public Feed getRepositories() {
+	public Feed<Repository> getRepositories() {
 		if(repositories == null) {
 			String repositoriesUri = getHomeDocument().getHref(LinkRelation.REPOSITORIES);
-			repositories = get(repositoriesUri, true, JsonFeed.class);
+			Feed<? extends Repository> feed = get(repositoriesUri, true, JsonFeeds.RepositoryFeed.class);
+			repositories = (Feed<Repository>)feed;
 		}
 		return repositories;
 	}
@@ -61,8 +69,8 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
 	public Repository getRepository() {
 		if(repository == null) {
 			boolean resetEnableStreaming = enableStreaming;
-			Feed repositories = getRepositories();
-			for(Entry e : repositories.getEntries()) {
+			Feed<Repository> repositories = getRepositories();
+			for(Entry<Repository> e : repositories.getEntries()) {
 				if(repositoryName.equals(e.getTitle())) {
 					repository = get(e.getContentSrc(), false, JsonRepository.class);
 				}
@@ -75,24 +83,26 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
 	}
 	
 	@Override
-	public Feed dql(String dql, String... params) {
-		return get(getRepository().getHref(LinkRelation.SELF), true, JsonFeed.class, UriHelper.append(params, "dql", dql));
+	public Feed<RestObject> dql(String dql, String... params) {
+	    Feed<? extends RestObject> feed = get(getRepository().getHref(LinkRelation.SELF), true, JsonFeeds.ObjectFeed.class, UriHelper.append(params, "dql", dql));
+	    return (Feed<RestObject>)feed;
 	}
 	
 	@Override
-	public Feed getCabinets(String... params) {
+	public Feed<RestObject> getCabinets(String... params) {
 		Repository repository = getRepository();
 		String cabinetsUri = repository.getHref(LinkRelation.CABINETS);
-		return get(cabinetsUri, true, JsonFeed.class, params);
+		Feed<? extends RestObject> feed = get(cabinetsUri, true, JsonFeeds.ObjectFeed.class, params);
+		return (Feed<RestObject>)feed;
 	}
 	
 	@Override
 	public RestObject getCabinet(String cabinet, String... params) {
 		RestObject obj = null; 
-		Feed feed = getCabinets("filter", "starts-with(object_name,'" + cabinet + "')");
-		List<Entry> entries = feed.getEntries();
+		Feed<RestObject> feed = getCabinets("filter", "starts-with(object_name,'" + cabinet + "')");
+		List<Entry<RestObject>> entries = feed.getEntries();
 		if(entries != null) {
-			for(Entry e : entries) {
+			for(Entry<RestObject> e : (List<Entry<RestObject>>)entries) {
 				if(cabinet.equals(e.getTitle())) {
 					obj = get(e.getContentSrc(), false, JsonObject.class);
 					break;
@@ -108,18 +118,21 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
 	}
 	
 	@Override
-	public Feed getFolders(RestObject parent, String... params) {
-		return get(parent.getHref(LinkRelation.FOLDERS), true, JsonFeed.class, params);
+	public Feed<RestObject> getFolders(RestObject parent, String... params) {
+	    Feed<? extends RestObject> feed = get(parent.getHref(LinkRelation.FOLDERS), true, JsonFeeds.ObjectFeed.class, params);
+        return (Feed<RestObject>)feed;
 	}
 	
 	@Override
-	public Feed getObjects(RestObject parent, String... params) {
-		return get(parent.getHref(LinkRelation.OBJECTS), true, JsonFeed.class, params);
+	public Feed<RestObject> getObjects(RestObject parent, String... params) {
+	    Feed<? extends RestObject> feed = get(parent.getHref(LinkRelation.OBJECTS), true, JsonFeeds.ObjectFeed.class, params);
+        return (Feed<RestObject>)feed;
 	}
 	
 	@Override
-	public Feed getDocuments(RestObject parent, String... params) {
-		return get(parent.getHref(LinkRelation.DOCUMENTS), true, JsonFeed.class, params);
+	public Feed<RestObject> getDocuments(RestObject parent, String... params) {
+	    Feed<? extends RestObject> feed = get(parent.getHref(LinkRelation.DOCUMENTS), true, JsonFeeds.ObjectFeed.class, params);
+        return (Feed<RestObject>)feed;
 	}
 	
 	@Override
@@ -183,8 +196,9 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
 	}
 	
 	@Override
-	public Feed getContents(RestObject object, String... params) {
-		return get(object.getHref(LinkRelation.CONTENTS), true, JsonFeed.class, params);
+	public Feed<RestObject> getContents(RestObject object, String... params) {
+	    Feed<? extends RestObject> feed = get(object.getHref(LinkRelation.CONTENTS), true, JsonFeeds.ObjectFeed.class, params);
+        return (Feed<RestObject>)feed;
 	}
 	
 	@Override
@@ -213,8 +227,9 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
 	}
 	
 	@Override
-	public Feed getVersions(RestObject object, String... params) {
-		return get(object.getHref(LinkRelation.VERSIONS), true, JsonFeed.class, params);
+	public Feed<RestObject> getVersions(RestObject object, String... params) {
+	    Feed<? extends RestObject> feed = get(object.getHref(LinkRelation.VERSIONS), true, JsonFeeds.ObjectFeed.class, params);
+		return (Feed<RestObject>)feed;
 	}
 	
 	@Override
@@ -233,31 +248,49 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
         parent.setHref(newParent.getHref(LinkRelation.SELF));
         return post(oldObject.getHref(LinkRelation.SHARED_PARENT), parent, JsonObject.class);
     }
+    
+    @Override
+    public RestType getType(String name, String... params) {
+        return get(getRepository().getHref(LinkRelation.TYPES)+"/"+name, false, JsonType.class, params);
+    }
+    
+    @Override
+    public Feed<RestType> getTypes(String... params) {
+        Repository repository = getRepository();
+        String typesUri = repository.getHref(LinkRelation.TYPES);
+        Feed<? extends RestType> feed = get(typesUri, true, JsonFeeds.TypeFeed.class, params);
+        return (Feed<RestType>)feed;
+    }
 
     @Override
-	public Feed nextPage(Feed feed) {
-		return page(feed.getHref(LinkRelation.PAGING_NEXT));
+    public ValueAssistant getValueAssistant(RestType type, ValueAssistantRequest request, String... params) {
+        return post(type.getHref(LinkRelation.ASSIS_VALUES), new JsonValueAssistantRequest(request), JsonValueAssistance.class, params);
+    }
+    
+    @Override
+	public <T extends Linkable> Feed<T> nextPage(Feed<T> feed) {
+		return page(feed.getHref(LinkRelation.PAGING_NEXT), feed.getClass());
 	}
 	
 	@Override
-	public Feed previousPage(Feed feed) {
-		return page(feed.getHref(LinkRelation.PAGING_PREV));
+	public <T extends Linkable> Feed<T> previousPage(Feed<T> feed) {
+		return page(feed.getHref(LinkRelation.PAGING_PREV), feed.getClass());
 	}
 
 	@Override
-	public Feed firstPage(Feed feed) {
-		return page(feed.getHref(LinkRelation.PAGING_FIRST));
+	public <T extends Linkable> Feed<T> firstPage(Feed<T> feed) {
+		return page(feed.getHref(LinkRelation.PAGING_FIRST), feed.getClass());
 	}
 
 	@Override
-	public Feed lastPage(Feed feed) {
-		return page(feed.getHref(LinkRelation.PAGING_LAST));
+	public <T extends Linkable> Feed<T> lastPage(Feed<T> feed) {
+		return page(feed.getHref(LinkRelation.PAGING_LAST), feed.getClass());
 	}
 	
-	private Feed page(String uri) {
-		Feed feed = null;
+	private <T extends Linkable> Feed<T> page(String uri, Class<? extends Feed> clazz) {
+		Feed<T> feed = null;
 		if(uri != null) {
-			feed = get(uri, true, JsonFeed.class);
+			feed = get(uri, true, clazz);
 		}
 		return feed;
 	}

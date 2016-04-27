@@ -11,8 +11,12 @@ import org.springframework.http.HttpStatus;
 import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.HomeDocument;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
+import com.emc.documentum.rest.client.sample.model.Linkable;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestObject;
+import com.emc.documentum.rest.client.sample.model.RestType;
+import com.emc.documentum.rest.client.sample.model.ValueAssistant;
+import com.emc.documentum.rest.client.sample.model.ValueAssistantRequest;
 
 /**
  * The sample REST client library 
@@ -46,7 +50,7 @@ public interface DCTMRestClient {
 	/**
 	 * @return the cached Repositories feed
 	 */
-	public Feed getRepositories();
+	public Feed<Repository> getRepositories();
 	
 	/**
 	 * @return the cached Repository object
@@ -59,13 +63,13 @@ public interface DCTMRestClient {
 	 * @param params the query parameters
 	 * @return the query feed response
 	 */
-	public Feed dql(String dql, String... params);
+	public Feed<RestObject> dql(String dql, String... params);
 	
 	/**
 	 * @param params
 	 * @return the cabinets feed based on query parameters
 	 */
-	public Feed getCabinets(String... params);
+	public Feed<RestObject> getCabinets(String... params);
 	
 	/**
 	 * @param cabinet the cabinet name
@@ -79,21 +83,21 @@ public interface DCTMRestClient {
 	 * @param params
 	 * @return the folders feed under the specified object
 	 */
-	public Feed getFolders(RestObject parent, String... params);
+	public Feed<RestObject> getFolders(RestObject parent, String... params);
 	
 	/**
 	 * @param parent the parent object, e.g. cabinet, folder
 	 * @param params
 	 * @return the documents (dm_document or its subtype) feed under the specified object
 	 */
-	public Feed getDocuments(RestObject parent, String... params);
+	public Feed<RestObject> getDocuments(RestObject parent, String... params);
 	
 	/**
 	 * @param parent the parent object, e.g. cabinet, folder
 	 * @param params
 	 * @return the sysobjects (dm_sysobject or its subtype) feed under the specified object
 	 */
-	public Feed getObjects(RestObject parent, String... params);
+	public Feed<RestObject> getObjects(RestObject parent, String... params);
 	
 	/**
 	 * @param object
@@ -208,38 +212,38 @@ public interface DCTMRestClient {
 	 * @param params
 	 * @return the content metadata collection
 	 */
-	public Feed getContents(RestObject object, String... params);
+	public Feed<RestObject> getContents(RestObject object, String... params);
 	
 	/**
 	 * @param feed the current page
 	 * @return the next page of the feed collection if it has
 	 */
-	public Feed nextPage(Feed feed);
+	public <T extends Linkable> Feed<T> nextPage(Feed<T> feed);
 	
 	/**
 	 * @param feed the current page
 	 * @return the previous page of the feed collection if it has
 	 */
-	public Feed previousPage(Feed feed);
+	public <T extends Linkable> Feed<T> previousPage(Feed<T> feed);
 
 	/**
 	 * @param feed the current page
 	 * @return the first page of the feed collection if it has
 	 */
-	public Feed firstPage(Feed feed);
+	public <T extends Linkable> Feed<T> firstPage(Feed<T> feed);
 
 	/**
 	 * @param feed the current page
 	 * @return the last page of the feed collection if it has
 	 */
-	public Feed lastPage(Feed feed);
+	public <T extends Linkable> Feed<T> lastPage(Feed<T> feed);
 	
 	/**
 	 * @param object
 	 * @param params
 	 * @return the version histories of the given object
 	 */
-	public Feed getVersions(RestObject object, String... params);
+	public Feed<RestObject> getVersions(RestObject object, String... params);
 	
 	/**
 	 * check out the given RestObject (sysobject, document and their subtype)
@@ -312,4 +316,27 @@ public interface DCTMRestClient {
      * @return reparented lightweight object
      */
     public RestObject reparent(RestObject oldObject, RestObject newParent);
+    
+    /**
+     * get the type info
+     * @param name the type name
+     * @param params
+     * @return the RestType
+     */
+    public RestType getType(String name, String... params);
+
+    /**
+     * @param params
+     * @return the types info in the repository
+     */
+    public Feed<RestType> getTypes(String... params);
+    
+    /**
+     * get value assistance of a type
+     * @param type
+     * @param request
+     * @param params
+     * @return
+     */
+    public ValueAssistant getValueAssistant(RestType type, ValueAssistantRequest request, String... params);
 }

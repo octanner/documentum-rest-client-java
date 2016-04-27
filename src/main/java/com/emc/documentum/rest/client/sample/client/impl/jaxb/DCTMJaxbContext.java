@@ -8,8 +8,6 @@ import javax.xml.bind.JAXBException;
 
 import org.w3c.dom.Node;
 
-import com.emc.documentum.rest.client.sample.model.RestObject;
-
 /**
  * the class to unmarshal the xml
  */
@@ -27,10 +25,10 @@ public final class DCTMJaxbContext {
 		context = c;
 	}
 	
-	public static RestObject unmarshal(Node node) {
-		RestObject obj = null;
+	public static Object unmarshal(Node node) {
+		Object obj = null;
 		try {
-			obj = (RestObject)context.createUnmarshaller().unmarshal(node);
+			obj = context.createUnmarshaller().unmarshal(node);
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		}

@@ -28,8 +28,9 @@ public enum LinkRelation {
     AUTHOR("authour"),
     CANONICAL("canonical"),
     PREDECESSOR_VERSION("predecessor-version"),
-    TYPE("type"),
+    TYPE("type", true),
     TYPES("types", true),
+    ASSIS_VALUES("assist-values", true),
 
     // Documentum specific link relations
     FOLDERS("folders", true),

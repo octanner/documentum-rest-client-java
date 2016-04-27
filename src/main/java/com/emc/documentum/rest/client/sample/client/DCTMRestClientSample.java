@@ -15,8 +15,11 @@ import com.emc.documentum.rest.client.sample.model.HomeDocument;
 import com.emc.documentum.rest.client.sample.model.Link;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
 import com.emc.documentum.rest.client.sample.model.PlainRestObject;
+import com.emc.documentum.rest.client.sample.model.PlainValueAssistantRequest;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestObject;
+import com.emc.documentum.rest.client.sample.model.RestType;
+import com.emc.documentum.rest.client.sample.model.ValueAssistant;
 
 
 /**
@@ -35,9 +38,9 @@ public class DCTMRestClientSample {
 		String bindingStr = read(sb.toString(), "XML");
 		DCTMRestClientBinding binding = DCTMRestClientBinding.valueOf(bindingStr.toUpperCase());
 		String contextRoot = read("Please input the REST context path:", "http://localhost:8080/dctm-rest");
-		String repository = read("Please input the repository name:");
-		String username = read("Please input the username:");
-		String password = read("Please input the password:");
+		String repository = read("Please input the repository name:", "REPO");
+		String username = read("Please input the username:", "dmadmin");
+		String password = read("Please input the password:", "password");
 		String useFormatExtension = read("Please input the whether add format extension .xml or .json for URI:", "false");
 		String debug = read("Please input whether print debug information:", "false");
 		
@@ -61,7 +64,9 @@ public class DCTMRestClientSample {
 		  .append("5 Content Management").append(NEWLINE)
 		  .append("6 Version Management").append(NEWLINE)
 		  .append("7 DQL Query").append(NEWLINE)
-          .append("8 Lightweight Object Create/Materialize/Dematerialize/Reparent (REST Services 7.3+)");
+          .append("8 Type(REST Services 7.x) and Value Assistance (REST Services 7.3+)").append(NEWLINE)
+          .append("9 Lightweight Object Type/Create/Materialize/Dematerialize/Reparent (REST Services 7.3+)").append(NEWLINE)
+          ;//.append("10 Aspect AspectType/Attach/Detach (REST Services 7.3+)");
 		
 		while(true) {
 			String sample = read(sb.toString());
@@ -95,8 +100,11 @@ public class DCTMRestClientSample {
 						dqlQuery();
 						break;
 					case 8:
-					    cmdrLightweightObject();
+					    type();
 					    break;
+                    case 9:
+                        cmdrLightweightObject();
+                        break;
 				    default:
 				        System.out.println("Unsupported " + op);
 				}
@@ -163,10 +171,10 @@ public class DCTMRestClientSample {
 		System.out.println(NEWLINE);
 		
 		System.out.println("-------------get repositories collection");
-		Feed repositories = client.getRepositories();
+		Feed<Repository> repositories = client.getRepositories();
 		System.out.println("There are " + repositories.getTotal() + " repositories in total.");
-		List<Entry> repositoryEntry = repositories.getEntries();
-		for(Entry e : repositoryEntry) {
+		List<Entry<Repository>> repositoryEntry = repositories.getEntries();
+		for(Entry<Repository> e : repositoryEntry) {
 			System.out.print(e.getTitle() + " -> " + e.getContentSrc());
 		}
 		System.out.println(NEWLINE);
@@ -183,8 +191,8 @@ public class DCTMRestClientSample {
 		System.out.println(NEWLINE);
 		
 		System.out.println("-------------get cabinets");
-		Feed cabinets = client.getCabinets();
-		for(Entry e : cabinets.getEntries()) {
+		Feed<RestObject> cabinets = client.getCabinets();
+		for(Entry<RestObject> e : cabinets.getEntries()) {
 			System.out.println(e.getTitle() + " -> " + e.getContentSrc());
 		}
 		System.out.println(NEWLINE);
@@ -192,28 +200,28 @@ public class DCTMRestClientSample {
 		System.out.println("-------------get cabinets by page with 2 cabinets per page");
 		cabinets = client.getCabinets("items-per-page", "2", "include-total", "true");
 		System.out.println("There are " + cabinets.getTotal() + " cabinets in total.");
-		for(Entry e : cabinets.getEntries()) {
+		for(Entry<RestObject> e : cabinets.getEntries()) {
 			System.out.println(e.getTitle() + " -> " + e.getContentSrc());
 		}
 		System.out.println(NEWLINE);
 
 		System.out.println("-------------get cabinets of the next page");
 		cabinets = client.nextPage(cabinets);
-		for(Entry e : cabinets.getEntries()) {
+		for(Entry<RestObject> e : cabinets.getEntries()) {
 			System.out.println(e.getTitle() + " -> " + e.getContentSrc());
 		}
 		System.out.println(NEWLINE);
 		
 		System.out.println("-------------get cabinets of the last page");
 		cabinets = client.lastPage(cabinets);
-		for(Entry e : cabinets.getEntries()) {
+		for(Entry<RestObject> e : cabinets.getEntries()) {
 			System.out.println(e.getTitle() + " -> " + e.getContentSrc());
 		}
 		System.out.println(NEWLINE);
 
 		System.out.println("-------------get cabinets of the previous page");
 		cabinets = client.previousPage(cabinets);
-		for(Entry e : cabinets.getEntries()) {
+		for(Entry<RestObject> e : cabinets.getEntries()) {
 			System.out.println(e.getTitle() + " -> " + e.getContentSrc());
 		}
 		System.out.println(NEWLINE);
@@ -224,29 +232,29 @@ public class DCTMRestClientSample {
 		System.out.println(NEWLINE);
 
 		System.out.println("-------------get folders under the Temp cabinet");
-		Feed folders = client.getFolders(tempCabinet);
-		for(Entry e : folders.getEntries()) {
+		Feed<RestObject> folders = client.getFolders(tempCabinet);
+		for(Entry<RestObject> e : folders.getEntries()) {
 			System.out.println(e.getTitle() + " -> " + e.getContentSrc());
 		}
 		System.out.println(NEWLINE);
 		
 		System.out.println("-------------get documents under the Temp cabinet");
-		Feed documents = client.getDocuments(tempCabinet);
-		for(Entry e : documents.getEntries()) {
+		Feed<RestObject> documents = client.getDocuments(tempCabinet);
+		for(Entry<RestObject> e : documents.getEntries()) {
 			System.out.println(e.getTitle() + " -> " + e.getContentSrc());
 		}
 		System.out.println(NEWLINE);
 		
 		System.out.println("-------------get sysobjects under the Temp cabinet");
-		Feed objects = client.getDocuments(tempCabinet);
-		for(Entry e : objects.getEntries()) {
+		Feed<RestObject> objects = client.getDocuments(tempCabinet);
+		for(Entry<RestObject> e : objects.getEntries()) {
 			System.out.println(e.getTitle() + " -> " + e.getContentSrc());
 		}
 		System.out.println(NEWLINE);
 		
 		System.out.println("-------------get cabinets with the content embedded in the feed entry");
 		cabinets = client.getCabinets("inline", "true");
-		for(Entry e : cabinets.getEntries()) {
+		for(Entry<RestObject> e : cabinets.getEntries()) {
 			RestObject o = e.getContentObject();
 			System.out.println("r_object_id=" + o.getObjectId() + " object_name=" + o.getObjectName());
 			System.out.println(LinkRelation.SELF.rel() + " -> " + o.getHref(LinkRelation.SELF));
@@ -255,7 +263,7 @@ public class DCTMRestClientSample {
 		
 		System.out.println("-------------get folders under the Temp cabinet with the content embedded in the feed entry");
 		folders = client.getFolders(tempCabinet, "inline", "true");
-		for(Entry e : folders.getEntries()) {
+		for(Entry<RestObject> e : folders.getEntries()) {
 			RestObject o = e.getContentObject();
 			System.out.println("r_object_id=" + o.getObjectId() + " object_name=" + o.getObjectName());
 			System.out.println(LinkRelation.SELF.rel() + " -> " + o.getHref(LinkRelation.SELF));
@@ -470,8 +478,8 @@ public class DCTMRestClientSample {
 		System.out.println(NEWLINE);
 		
 		System.out.println("-------------get primary content and rendition collection of the document");
-		Feed renditionList = client.getContents(createdObjectWithContent);
-    	for(Entry renditionEntry : renditionList.getEntries()) {
+		Feed<RestObject> renditionList = client.getContents(createdObjectWithContent);
+    	for(Entry<RestObject> renditionEntry : renditionList.getEntries()) {
     		System.out.println(renditionEntry.getTitle());
     		RestObject rendition = client.getContent(renditionEntry.getContentSrc());
     		System.out.println("the content link: " + rendition.getHref(LinkRelation.ENCLOSURE));
@@ -575,8 +583,8 @@ public class DCTMRestClientSample {
 		System.out.println("start DQL Query sample");
 		
 		System.out.println("-------------execute dql 'select * from dm_cabinet' with 5 items per page");
-		Feed queryResult = client.dql("select * from dm_user", "items-per-page", "5");
-		for(Entry e : queryResult.getEntries()) {
+		Feed<RestObject> queryResult = client.dql("select * from dm_user", "items-per-page", "5");
+		for(Entry<RestObject> e : queryResult.getEntries()) {
 			RestObject o = e.getContentObject();
 			System.out.println("r_object_id=" + o.getObjectId() + " user_name=" + o.getProperties().get("user_name"));
 		}
@@ -585,7 +593,7 @@ public class DCTMRestClientSample {
 		
 		System.out.println("-------------get the next page of dql 'select * from dm_cabinet' with 5 items per page");
 		queryResult = client.nextPage(queryResult);
-		for(Entry e : queryResult.getEntries()) {
+		for(Entry<RestObject> e : queryResult.getEntries()) {
 			RestObject o = e.getContentObject();
 			System.out.println("r_object_id=" + o.getObjectId() + " user_name=" + o.getProperties().get("user_name"));
 		}
@@ -593,7 +601,7 @@ public class DCTMRestClientSample {
 		
 		System.out.println("-------------execute dql 'select * from dm_format' with 5 items per page");
 		queryResult = client.dql("select name,description from dm_format", "items-per-page", "5");
-		for(Entry e : queryResult.getEntries()) {
+		for(Entry<RestObject> e : queryResult.getEntries()) {
 			RestObject o = e.getContentObject();
 			System.out.println("name=" + o.getProperties().get("name") + " description=" + o.getProperties().get("description"));
 		}
@@ -601,7 +609,7 @@ public class DCTMRestClientSample {
 
 		System.out.println("-------------get the next page of dql 'select * from dm_format' with 5 items per page");
 		queryResult = client.nextPage(queryResult);
-		for(Entry e : queryResult.getEntries()) {
+		for(Entry<RestObject> e : queryResult.getEntries()) {
 			RestObject o = e.getContentObject();
 			System.out.println("name=" + o.getProperties().get("name") + " description=" + o.getProperties().get("description"));
 		}
@@ -610,12 +618,102 @@ public class DCTMRestClientSample {
 		System.out.println("finish DQL Query sample");
 		System.out.println(NEWLINE);
 	}
-	
+
+   /**
+     * samples to get type and value assistance information 
+     */
+    private static void type() {
+        System.out.println("get type and value assistance information sample");
+        
+        System.out.println("-------------get types");
+        Feed<RestType> types = client.getTypes();
+        for(Entry<RestType> e : types.getEntries()) {
+            System.out.println(e.getTitle() + " -> " + e.getContentSrc());
+        }
+        System.out.println(NEWLINE);
+        
+        System.out.println("-------------get inline types");
+        types = client.getTypes("inline", "true", "items-per-page", "1");
+        for(Entry<RestType> e : types.getEntries()) {
+            System.out.println(e.getContentObject().getName() + " " + e.getContentObject().getCategory());
+        }
+        System.out.println(NEWLINE);
+        
+        System.out.println("-------------get type resource");
+        RestType type = client.getType("dm_document");
+        List<Link> list = type.getLinks();
+        for(Link l : list) {
+            System.out.println(l.getRel() + " -> " + l.getHref());
+        }
+        System.out.println(type.getName() + " " + type.getCategory() + " " + type.getParent()
+                + (type.getSharedParent() == null ? "" : type.getSharedParent()));
+        for(Map<String, Object> map : type.getProperties()) {
+            System.out.println(map.get("name") + ": " + map);
+        }
+        System.out.println(NEWLINE);
+        
+        System.out.println("-------------get type value assistance of the fixed list");
+        String typeWithFixedVAList = read("Please input the type name with the fixed value assistance list(no such type press 'return' directly to skip):", "");
+        if(!typeWithFixedVAList.isEmpty()) {
+            String attrWithFixedVAList = read("Please input the attribute name of " + typeWithFixedVAList + " with the fixed assistance list:");
+            RestType fixedVAListType = client.getType(typeWithFixedVAList);
+            ValueAssistant va = client.getValueAssistant(fixedVAListType, new PlainValueAssistantRequest(), "included-properties", attrWithFixedVAList);
+            for(ValueAssistant.Attribute a : va.getProperties()) {
+                System.out.println(a.name() + " " + (a.allowUserValues() ? "allows user values" : "disallows user values"));
+                for(ValueAssistant.Value v : a.values()) {
+                    System.out.println(v.value() + ", label=" + v.label());
+                }
+            }
+        }
+        System.out.println(NEWLINE);
+
+        System.out.println("-------------get type value assistance depencencies");
+        String typeWithDenpendency = read("Please input the type name with value assistance dependencies(no such type press 'return' directly to skip):", "");
+        if(!typeWithDenpendency.isEmpty()) {
+            RestType dependenciesVAType = client.getType(typeWithDenpendency);
+            System.out.println(dependenciesVAType.getName() + " " + dependenciesVAType.getCategory());
+            for(Map<String, Object> map : dependenciesVAType.getProperties()) {
+                System.out.println(map.get("name") + ": " + map.get("dependencies"));
+            }
+            
+            System.out.println("-------------get type value assistance query values with depencencies");
+            String attrWithDependencies = read("Please input the attribute name of " + typeWithDenpendency + " with the query dependencies:");
+            String dependency = read("Please input the dependency name of " + typeWithDenpendency + "." + attrWithDependencies + ":");
+            String dependencyValue = read("Please input the dependency value of " + dependency + ":");
+            ValueAssistant va = client.getValueAssistant(dependenciesVAType, new PlainValueAssistantRequest(dependency, dependencyValue), "included-properties", attrWithDependencies);
+            for(ValueAssistant.Attribute a : va.getProperties()) {
+                System.out.println(a.name() + " " + (a.allowUserValues() ? "allows user values" : "disallows user values"));
+                for(ValueAssistant.Value v : a.values()) {
+                    System.out.println(v.value() + ", label=" + v.label());
+                }
+            }
+        }
+        System.out.println(NEWLINE);
+
+        System.out.println("finish Type sample");
+        System.out.println(NEWLINE);
+    }
+    
     /**
      * samples to create/materialize/dematerialize/reparent lightweight object
      */
     private static void cmdrLightweightObject() {
         System.out.println("start Lightweight Object Create/Materialize/Dematerialize/Reparent sample");
+        
+        System.out.println("-------------get all shareable types");
+        Feed<RestType> shareableTypes = client.getTypes("filter", "type_category=2");
+        for(Entry<RestType> e : shareableTypes.getEntries()) {
+            System.out.println(e.getTitle() + " -> " + e.getContentSrc());
+        }
+        System.out.println(NEWLINE);
+        
+        System.out.println("-------------get all lightweight types");
+        Feed<RestType> lightweightTypes = client.getTypes("filter", "type_category=4");
+        for(Entry<RestType> e : lightweightTypes.getEntries()) {
+            System.out.println(e.getTitle() + " -> " + e.getContentSrc());
+        }
+        System.out.println(NEWLINE);
+        
         String shareableType = read("Please input the shareable type:");
         String lightweightType = read("Please input the lightweight type:");
         

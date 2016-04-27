@@ -47,7 +47,7 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
 	protected final String username;
 	protected final String password;
 	protected HomeDocument homeDocument;
-	protected Feed repositories;
+	protected Feed<Repository> repositories;
 	protected Repository repository;
 	protected boolean enableStreaming = false;
 	protected boolean debug;
@@ -263,7 +263,7 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     	sendRequest(uri, HttpMethod.DELETE, isXml()?Headers.ACCEPT_XML_HEADERS:Headers.ACCEPT_JSON_HEADERS, null, null, params);
     }
     
-    protected <T> T post(String uri, T body, Class<? extends T> responseBodyClass, String... params) {
+    protected <T> T post(String uri, Object body, Class<? extends T> responseBodyClass, String... params) {
     	return sendRequest(uri, HttpMethod.POST, isXml()?Headers.ACCEPT_XML_HEADERS_WITH_CONTENT:Headers.ACCEPT_JSON_HEADERS_WITH_CONTENT, body, responseBodyClass, params);
     }
     

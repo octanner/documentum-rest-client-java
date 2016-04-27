@@ -10,12 +10,13 @@ import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.Author;
 import com.emc.documentum.rest.client.sample.model.Entry;
 import com.emc.documentum.rest.client.sample.model.Feed;
+import com.emc.documentum.rest.client.sample.model.InlineLinkable;
 import com.emc.documentum.rest.client.sample.model.Link;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
-public class JsonFeed extends LinkableBase implements Feed {
+public class JsonFeed<T extends InlineLinkable> extends LinkableBase implements Feed<T> {
 	private String id;
 	private String title;
 	private String updated;
@@ -29,7 +30,7 @@ public class JsonFeed extends LinkableBase implements Feed {
 	@JsonProperty
 	private List<Link> links;
 	@JsonProperty
-	private List<Entry> entries;
+	private List<Entry<T>> entries;
 	
 	@Override
 	public String getId() {
@@ -89,11 +90,11 @@ public class JsonFeed extends LinkableBase implements Feed {
 	}
 
 	@Override
-	public List<Entry> getEntries() {
+	public List<Entry<T>> getEntries() {
 		return entries;
 	}
 
-	public void setEntries(List<Entry> entries) {
+	public void setEntries(List<Entry<T>> entries) {
 		this.entries = entries;
 	}
 
@@ -126,7 +127,7 @@ public class JsonFeed extends LinkableBase implements Feed {
 
 	@Override
 	public boolean equals(Object obj) {
-		JsonFeed that = (JsonFeed)obj;
+		JsonFeed<?> that = (JsonFeed<?>)obj;
 		return Equals.equal(id, that.id) 
 			&& Equals.equal(title, that.title)
 			&& Equals.equal(updated, that.updated)

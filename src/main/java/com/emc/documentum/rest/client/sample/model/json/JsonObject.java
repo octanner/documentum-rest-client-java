@@ -13,7 +13,7 @@ import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class JsonObject extends LinkableBase implements RestObject {
+public class JsonObject extends InlineLinkableBase implements RestObject {
 	private String name;
 	private String type;
 	private String definition;
@@ -117,11 +117,12 @@ public class JsonObject extends LinkableBase implements RestObject {
 			&& Equals.equal(type, that.type)
 			&& Equals.equal(definition, that.definition)
 			&& Equals.equal(properties, that.properties)
-			&& Equals.equal(href, that.href);
+			&& Equals.equal(href, that.href)
+			&& super.equals(obj);
 	}
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, type, definition, properties, href);
+        return Objects.hash(name, type, definition, properties, href, getContentType(), getSrc());
     }
 }

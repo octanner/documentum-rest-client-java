@@ -17,20 +17,20 @@ import com.emc.documentum.rest.client.sample.client.impl.jaxb.DCTMJaxbContext;
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.Author;
 import com.emc.documentum.rest.client.sample.model.Entry;
+import com.emc.documentum.rest.client.sample.model.Inlineable;
 import com.emc.documentum.rest.client.sample.model.Link;
-import com.emc.documentum.rest.client.sample.model.RestObject;
+import com.emc.documentum.rest.client.sample.model.Linkable;
 import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
 @XmlRootElement(name = "entry", namespace = XMLNamespace.ATOM_NAMESPACE)
-public class JaxbEntry extends LinkableBase implements Entry {
+public class JaxbEntry<T extends Linkable> extends LinkableBase implements Entry<T> {
 	private String id;
 	private String title;
 	private String updated;
 	private String summary;
 	private List<Author> authors;
 	private List<Link> links;
-	private Content content;
-	private RestObject contentObject;
+	private EntryContent<T> content;
 	private String published;
 	
 	@Override
@@ -79,11 +79,11 @@ public class JaxbEntry extends LinkableBase implements Entry {
 		this.links = links;
 	}
 
-	public Content getContent() {
+	public EntryContent<T> getContent() {
 		return content;
 	}
 
-	public void setContent(Content content) {
+	public void setContent(EntryContent<T> content) {
 		this.content= content;
 	}
 
@@ -104,7 +104,7 @@ public class JaxbEntry extends LinkableBase implements Entry {
 
 	@Override
 	public String getContentType() {
-		return content==null?null:content.getType();
+		return content==null?null:content.getContentType();
 	}
 
     @Override
@@ -116,15 +116,12 @@ public class JaxbEntry extends LinkableBase implements Entry {
     }
 
     @Override
-	public RestObject getContentObject() {
-		if(contentObject == null && content != null && content.getElement() != null) {
-			contentObject = DCTMJaxbContext.unmarshal(content.getElement());
-		}
-		return contentObject;
+	public T getContentObject() {
+        return content==null?null:content.getContent();
 	}
 	
 	@XmlRootElement(name="content")
-	public static class Content {
+	public static class EntryContent<T extends Linkable> implements Inlineable {
 	    private String src;
 	    private String type;
 		private Element element;
@@ -143,25 +140,31 @@ public class JaxbEntry extends LinkableBase implements Entry {
 		public void setSrc(String src) {
 			this.src = src;
 		}
-		@XmlAttribute
-		public String getType() {
+		@XmlAttribute(name="type")
+		public String getContentType() {
 			return type;
 		}
-		public void setType(String type) {
+		public void setContentType(String type) {
 			this.type = type;
 		}
 		
 		@Override
 		public boolean equals(Object obj) {
-			Content that = (Content)obj;
+		    EntryContent<?> that = (EntryContent<?>)obj;
 			return Equals.equal(src, that.src) 
 				&& Equals.equal(type, that.type);
 		}
+		
+        @SuppressWarnings("unchecked")
+        @Override
+        public T getContent() {
+            return element==null?null:(T)DCTMJaxbContext.unmarshal(element);
+        }
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		JaxbEntry that = (JaxbEntry)obj;
+		JaxbEntry<?> that = (JaxbEntry<?>)obj;
 		return Equals.equal(id, that.id) 
 			&& Equals.equal(title, that.title)
 			&& Equals.equal(updated, that.updated)

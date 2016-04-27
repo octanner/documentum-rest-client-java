@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * the class represents a feed collection
  */
-public interface Feed extends Linkable {
+public interface Feed<T extends Linkable> extends Linkable {
     /**
      * @return feed id
      */
@@ -37,7 +37,7 @@ public interface Feed extends Linkable {
     /**
      * @return Entry list of the feed
      */
-    List<Entry> getEntries();
+    List<Entry<T>> getEntries();
     
     /**
      * @return total count of the request feed, including all page of feed

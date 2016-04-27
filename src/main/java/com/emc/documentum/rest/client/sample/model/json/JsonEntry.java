@@ -9,11 +9,11 @@ import java.util.Objects;
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.Author;
 import com.emc.documentum.rest.client.sample.model.Entry;
+import com.emc.documentum.rest.client.sample.model.InlineLinkable;
 import com.emc.documentum.rest.client.sample.model.Link;
-import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class JsonEntry extends LinkableBase implements Entry {
+public class JsonEntry<T extends InlineLinkable> extends LinkableBase implements Entry<T> {
 	@JsonProperty
 	private String id;
 	@JsonProperty
@@ -27,7 +27,7 @@ public class JsonEntry extends LinkableBase implements Entry {
 	@JsonProperty
 	private List<Link> links;
 	@JsonProperty
-	private Content content;
+	private T content;
     @JsonProperty
 	private String published;
 	
@@ -76,11 +76,11 @@ public class JsonEntry extends LinkableBase implements Entry {
 		this.links = links;
 	}
 
-	public Content getContent() {
+	public T getContent() {
 		return content;
 	}
 
-	public void setContent(Content content) {
+	public void setContent(T content) {
 		this.content= content;
 	}
 
@@ -100,7 +100,7 @@ public class JsonEntry extends LinkableBase implements Entry {
 
 	@Override
 	public String getContentType() {
-		return content==null?null:content.getType();
+		return content==null?null:content.getContentType();
 	}
 
     @Override
@@ -113,39 +113,13 @@ public class JsonEntry extends LinkableBase implements Entry {
     }
 
     @Override
-	public RestObject getContentObject() {
+	public T getContentObject() {
 		return content;
-	}
-
-	public static class Content extends JsonObject {
-	    private String src;
-		@JsonProperty("content-type")
-	    private String contentType;
-		public String getSrc() {
-			return src;
-		}
-		public void setSrc(String src) {
-			this.src = src;
-		}
-		public String getContentType() {
-			return contentType;
-		}
-		public void setContentType(String contentType) {
-			this.contentType = contentType;
-		}
-		
-		@Override
-		public boolean equals(Object obj) {
-			Content that = (Content)obj;
-			return super.equals(obj)
-				&& Equals.equal(src, that.src) 
-				&& Equals.equal(contentType, that.contentType);
-		}
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		JsonEntry that = (JsonEntry)obj;
+		JsonEntry<?> that = (JsonEntry<?>)obj;
 		return Equals.equal(id, that.id) 
 			&& Equals.equal(title, that.title)
 			&& Equals.equal(updated, that.updated)

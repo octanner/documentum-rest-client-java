@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
  * the class represents the entry of a feed
  */
 @JsonTypeInfo(use=Id.CLASS, defaultImpl=JsonEntry.class)
-public interface Entry extends Linkable {
+public interface Entry<T extends Linkable> extends Linkable {
     
     /**
      * @return entry id
@@ -59,7 +59,7 @@ public interface Entry extends Linkable {
     
     /**
      * for entry with inline content
-     * @return the RestObject embedded in the entry
+     * @return the T object embedded in the entry
      */
-    RestObject getContentObject();
+    T getContentObject();
 }

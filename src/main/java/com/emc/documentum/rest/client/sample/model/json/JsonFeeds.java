@@ -1,0 +1,12 @@
+package com.emc.documentum.rest.client.sample.model.json;
+
+public class JsonFeeds {
+    public static class ObjectFeed extends JsonFeed<JsonObject>{
+    }
+    
+    public static class RepositoryFeed extends JsonFeed<JsonRepository>{
+    }
+
+    public static class TypeFeed extends JsonFeed<JsonType>{
+    }
+}

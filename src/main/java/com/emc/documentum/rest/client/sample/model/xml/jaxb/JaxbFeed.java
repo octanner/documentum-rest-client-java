@@ -14,10 +14,11 @@ import com.emc.documentum.rest.client.sample.model.Author;
 import com.emc.documentum.rest.client.sample.model.Entry;
 import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.Link;
+import com.emc.documentum.rest.client.sample.model.Linkable;
 import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
 @XmlRootElement(name="feed", namespace=XMLNamespace.ATOM_NAMESPACE)
-public class JaxbFeed extends LinkableBase implements Feed {
+public class JaxbFeed<T extends Linkable> extends LinkableBase implements Feed<T> {
 	private String id;
 	private String title;
 	private String updated;
@@ -27,7 +28,7 @@ public class JaxbFeed extends LinkableBase implements Feed {
 	private Integer total;
 	private List<Author> authors;
 	private List<Link> links;
-	private List<Entry> entries;
+	private List<Entry<T>> entries;
 	
 	@Override
 	public String getId() {
@@ -87,11 +88,11 @@ public class JaxbFeed extends LinkableBase implements Feed {
 
 	@Override
 	@XmlElement(name="entry", type=JaxbEntry.class)
-	public List<Entry> getEntries() {
+	public List<Entry<T>> getEntries() {
 		return entries;
 	}
 
-	public void setEntries(List<Entry> entries) {
+	public void setEntries(List<Entry<T>> entries) {
 		this.entries = entries;
 	}
 
@@ -127,7 +128,7 @@ public class JaxbFeed extends LinkableBase implements Feed {
 
 	@Override
 	public boolean equals(Object obj) {
-		JaxbFeed that = (JaxbFeed)obj;
+		JaxbFeed<?> that = (JaxbFeed<?>)obj;
 		return Equals.equal(id, that.id) 
 			&& Equals.equal(title, that.title)
 			&& Equals.equal(updated, that.updated)

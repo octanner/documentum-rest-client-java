@@ -11,7 +11,7 @@ import com.emc.documentum.rest.client.sample.model.Link;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class JsonRepository extends LinkableBase implements Repository {
+public class JsonRepository extends InlineLinkableBase implements Repository {
 	private int id;
 	private String name;
 	private String description;
@@ -121,11 +121,12 @@ public class JsonRepository extends LinkableBase implements Repository {
 				&& Equals.equal(name, that.name)
 				&& Equals.equal(description, that.description)
 				&& Equals.equal(servers, that.servers)
-				&& Equals.equal(links, that.links);
+				&& Equals.equal(links, that.links)
+				&& super.equals(obj);
 	}
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, servers);
+        return Objects.hash(id, name, servers, getSrc(), getContentType());
     }
 }
