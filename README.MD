@@ -29,18 +29,18 @@ for JSON.
 >       mvn clean install
 
 2. There will be several files built in target directory:
-* *rest-api-client-sample-7.1.jar* --> the sample client jar file
+* *rest-api-client-sample-7.3.jar* --> the sample client jar file
 * *lib* -> the lib directory contains all other required third party library
-* *rest-api-client-sample-7.1-all-in-one.jar* -> the sample client jar file, with all other third party classes embedded
-* *rest-api-client-sample-7.1-javadoc.jar* -> javadoc of the sample client
-* *rest-api-client-sample-7.1-sources.jar* -> source code of the sample client
+* *rest-api-client-sample-7.3-all-in-one.jar* -> the sample client jar file, with all other third party classes embedded
+* *rest-api-client-sample-7.3-javadoc.jar* -> javadoc of the sample client
+* *rest-api-client-sample-7.3-sources.jar* -> source code of the sample client
    
 3. Run the project
-* execute rest-api-client-sample-7.1.jar, with lib directory at the same place
->     java -jar rest-api-client-sample-7.1.jar
+* execute rest-api-client-sample-7.3.jar, with lib directory at the same place
+>     java -jar rest-api-client-sample-7.3.jar
    
-* or execute rest-api-client-sample-7.1-all-in-one.jar directly
->     java -jar rest-api-client-sample-7.1-all-in-one.jar
+* or execute rest-api-client-sample-7.3-all-in-one.jar directly
+>     java -jar rest-api-client-sample-7.3-all-in-one.jar
    
 4. After the program is started, please input the required information prompted by the sample client. After that, you
 will see a list of commands:
@@ -53,5 +53,6 @@ will see a list of commands:
 >    	  5 Content Management
 >    	  6 Version Management
 >    	  7 DQL Query
+>         ...
 
 5. Then input the number of the sample you want to execute.
