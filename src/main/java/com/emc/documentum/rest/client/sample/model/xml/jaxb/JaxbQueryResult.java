@@ -10,16 +10,16 @@ import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
 @XmlRootElement(name="query-result", namespace=XMLNamespace.DM_NAMESPACE)
 public class JaxbQueryResult extends JaxbObject {
-	public JaxbQueryResult() {
-		super();
-	}
+    public JaxbQueryResult() {
+        super();
+    }
 
-	public JaxbQueryResult(RestObject object) {
-		super(object);
-	}
+    public JaxbQueryResult(RestObject object) {
+        super(object);
+    }
 
-	@Override
-	public String getName() {
-		return "query-result";
-	}
+    @Override
+    public String getName() {
+        return "query-result";
+    }
 }

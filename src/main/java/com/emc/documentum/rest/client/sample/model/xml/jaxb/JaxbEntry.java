@@ -24,88 +24,88 @@ import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
 @XmlRootElement(name = "entry", namespace = XMLNamespace.ATOM_NAMESPACE)
 public class JaxbEntry<T extends Linkable> extends LinkableBase implements Entry<T> {
-	private String id;
-	private String title;
-	private String updated;
-	private String summary;
-	private List<Author> authors;
-	private List<Link> links;
-	private EntryContent<T> content;
-	private String published;
-	
-	@Override
-	public String getId() {
-		return id;
-	}
+    private String id;
+    private String title;
+    private String updated;
+    private String summary;
+    private List<Author> authors;
+    private List<Link> links;
+    private EntryContent<T> content;
+    private String published;
+    
+    @Override
+    public String getId() {
+        return id;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	@Override
-	public String getTitle() {
-		return title;
-	}
+    @Override
+    public String getTitle() {
+        return title;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-	@Override
-	public String getUpdated() {
-		return updated;
-	}
+    @Override
+    public String getUpdated() {
+        return updated;
+    }
 
-	public void setUpdated(String updated) {
-		this.updated = updated;
-	}
+    public void setUpdated(String updated) {
+        this.updated = updated;
+    }
 
-	@Override
-	public String getSummary() {
-		return summary;
-	}
+    @Override
+    public String getSummary() {
+        return summary;
+    }
 
-	public void setSummary(String summary) {
-		this.summary = summary;
-	}
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
 
-	@Override
-	@XmlElement(name="link", type=JaxbLink.class, namespace=XMLNamespace.ATOM_NAMESPACE)
-	public List<Link> getLinks() {
-		return links;
-	}
+    @Override
+    @XmlElement(name="link", type=JaxbLink.class, namespace=XMLNamespace.ATOM_NAMESPACE)
+    public List<Link> getLinks() {
+        return links;
+    }
 
-	public void setLinks(List<Link> links) {
-		this.links = links;
-	}
+    public void setLinks(List<Link> links) {
+        this.links = links;
+    }
 
-	public EntryContent<T> getContent() {
-		return content;
-	}
+    public EntryContent<T> getContent() {
+        return content;
+    }
 
-	public void setContent(EntryContent<T> content) {
-		this.content= content;
-	}
+    public void setContent(EntryContent<T> content) {
+        this.content= content;
+    }
 
-	@Override
-	@XmlElement(name="author", type=JaxbAuthor.class)
-	public List<Author> getAuthors() {
-		return authors;
-	}
+    @Override
+    @XmlElement(name="author", type=JaxbAuthor.class)
+    public List<Author> getAuthors() {
+        return authors;
+    }
 
-	public void setAuthors(List<Author> authors) {
-		this.authors = authors;
-	}
+    public void setAuthors(List<Author> authors) {
+        this.authors = authors;
+    }
 
-	@Override
-	public String getContentSrc() {
-		return content==null?null:content.getSrc();
-	}
+    @Override
+    public String getContentSrc() {
+        return content==null?null:content.getSrc();
+    }
 
-	@Override
-	public String getContentType() {
-		return content==null?null:content.getContentType();
-	}
+    @Override
+    public String getContentType() {
+        return content==null?null:content.getContentType();
+    }
 
     @Override
     public String getPublished() {
@@ -116,64 +116,64 @@ public class JaxbEntry<T extends Linkable> extends LinkableBase implements Entry
     }
 
     @Override
-	public T getContentObject() {
+    public T getContentObject() {
         return content==null?null:content.getContent();
-	}
-	
-	@XmlRootElement(name="content")
-	public static class EntryContent<T extends Linkable> implements Inlineable {
-	    private String src;
-	    private String type;
-		private Element element;
-		
-		@XmlAnyElement
-		public Element getElement() {
-			return element;
-		}
-		public void setElement(Element element) {
-			this.element = element;
-		}
-	    @XmlAttribute
-		public String getSrc() {
-			return src;
-		}
-		public void setSrc(String src) {
-			this.src = src;
-		}
-		@XmlAttribute(name="type")
-		public String getContentType() {
-			return type;
-		}
-		public void setContentType(String type) {
-			this.type = type;
-		}
-		
-		@Override
-		public boolean equals(Object obj) {
-		    EntryContent<?> that = (EntryContent<?>)obj;
-			return Equals.equal(src, that.src) 
-				&& Equals.equal(type, that.type);
-		}
-		
+    }
+    
+    @XmlRootElement(name="content")
+    public static class EntryContent<T extends Linkable> implements Inlineable {
+        private String src;
+        private String type;
+        private Element element;
+        
+        @XmlAnyElement
+        public Element getElement() {
+            return element;
+        }
+        public void setElement(Element element) {
+            this.element = element;
+        }
+        @XmlAttribute
+        public String getSrc() {
+            return src;
+        }
+        public void setSrc(String src) {
+            this.src = src;
+        }
+        @XmlAttribute(name="type")
+        public String getContentType() {
+            return type;
+        }
+        public void setContentType(String type) {
+            this.type = type;
+        }
+        
+        @Override
+        public boolean equals(Object obj) {
+            EntryContent<?> that = (EntryContent<?>)obj;
+            return Equals.equal(src, that.src) 
+                && Equals.equal(type, that.type);
+        }
+        
         @SuppressWarnings("unchecked")
         @Override
         public T getContent() {
             return element==null?null:(T)DCTMJaxbContext.unmarshal(element);
         }
-	}
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		JaxbEntry<?> that = (JaxbEntry<?>)obj;
-		return Equals.equal(id, that.id) 
-			&& Equals.equal(title, that.title)
-			&& Equals.equal(updated, that.updated)
-			&& Equals.equal(summary, that.summary)
-			&& Equals.equal(content, that.content)
-			&& Equals.equal(links, that.links)
-			&& Equals.equal(authors, that.authors)
+    @Override
+    public boolean equals(Object obj) {
+        JaxbEntry<?> that = (JaxbEntry<?>)obj;
+        return Equals.equal(id, that.id) 
+            && Equals.equal(title, that.title)
+            && Equals.equal(updated, that.updated)
+            && Equals.equal(summary, that.summary)
+            && Equals.equal(content, that.content)
+            && Equals.equal(links, that.links)
+            && Equals.equal(authors, that.authors)
             && Equals.equal(published, that.published);
-	}
+    }
 
     @Override
     public int hashCode() {

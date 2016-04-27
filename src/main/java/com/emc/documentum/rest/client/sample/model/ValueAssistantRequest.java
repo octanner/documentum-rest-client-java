@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public interface ValueAssistantRequest {
     /**
-	 * @return value assistance request
-	 */
-	Map<String, Object> getProperties();
+     * @return value assistance request
+     */
+    Map<String, Object> getProperties();
 }

@@ -18,35 +18,35 @@ public class JaxbAuthor implements Author {
     private String name;
     private String uri;
     private String email;
-	@Override
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	@Override
-	public String getUri() {
-		return uri;
-	}
-	public void setUri(String uri) {
-		this.uri = uri;
-	}
-	@Override
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    @Override
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    @Override
+    public String getUri() {
+        return uri;
+    }
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+    @Override
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		JaxbAuthor that = (JaxbAuthor) obj;
-		return Equals.equal(name, that.name) && Equals.equal(uri, that.uri)
-				&& Equals.equal(email, that.email);
-	}
-	
+    @Override
+    public boolean equals(Object obj) {
+        JaxbAuthor that = (JaxbAuthor) obj;
+        return Equals.equal(name, that.name) && Equals.equal(uri, that.uri)
+                && Equals.equal(email, that.email);
+    }
+    
     @Override
     public int hashCode() {
         return Objects.hash(name, email, uri);

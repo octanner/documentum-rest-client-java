@@ -9,50 +9,50 @@ import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.RestError;
 
 public class JsonRestError implements RestError {
-	private int status;
-	private String code;
-	private String message;
-	private String details;
-	private String id;
+    private int status;
+    private String code;
+    private String message;
+    private String details;
+    private String id;
 
-	@Override
-	public int getStatus() {
-		return status;
-	}
+    @Override
+    public int getStatus() {
+        return status;
+    }
 
-	public void setStatus(int status) {
-		this.status = status;
-	}
+    public void setStatus(int status) {
+        this.status = status;
+    }
 
-	@Override
-	public String getCode() {
-		return code;
-	}
+    @Override
+    public String getCode() {
+        return code;
+    }
 
-	public void setCode(String code) {
-		this.code = code;
-	}
+    public void setCode(String code) {
+        this.code = code;
+    }
 
-	@Override
-	public String getMessage() {
-		return message;
-	}
+    @Override
+    public String getMessage() {
+        return message;
+    }
 
-	public void setMessage(String message) {
-		this.message = message;
-	}
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
-	@Override
-	public String getDetails() {
-		return details;
-	}
+    @Override
+    public String getDetails() {
+        return details;
+    }
 
-	public void setDetails(String details) {
-		this.details = details;
-	}
+    public void setDetails(String details) {
+        this.details = details;
+    }
 
-	@Override
-	public String getId() {
+    @Override
+    public String getId() {
         return id;
     }
 
@@ -61,14 +61,14 @@ public class JsonRestError implements RestError {
     }
 
     @Override
-	public boolean equals(Object obj) {
-		JsonRestError that = (JsonRestError)obj;
-		return Equals.equal(id, that.id)
-	        && Equals.equal(status, that.status) 
-			&& Equals.equal(code, that.code)
-			&& Equals.equal(message, that.message)
-			&& Equals.equal(details, that.details);
-	}
+    public boolean equals(Object obj) {
+        JsonRestError that = (JsonRestError)obj;
+        return Equals.equal(id, that.id)
+            && Equals.equal(status, that.status) 
+            && Equals.equal(code, that.code)
+            && Equals.equal(message, that.message)
+            && Equals.equal(details, that.details);
+    }
 
     @Override
     public int hashCode() {

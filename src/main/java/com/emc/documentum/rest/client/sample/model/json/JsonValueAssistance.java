@@ -17,12 +17,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class JsonValueAssistance extends LinkableBase implements ValueAssistant {
     @JsonIgnore
     private List<Attribute> properties;
+    @SuppressWarnings("rawtypes")
     @JsonProperty("properties")
     private Map<String, Map> propertiesMap;
     private List<Link> links;
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-	public List<Attribute> getProperties() {
+    public List<Attribute> getProperties() {
         if(properties == null && propertiesMap != null) {
             properties = new ArrayList<>();
             for(Map.Entry<String, Map> entry : propertiesMap.entrySet()) {
@@ -34,21 +36,22 @@ public class JsonValueAssistance extends LinkableBase implements ValueAssistant 
                 properties.add(a);
             }
         }
-		return properties;
-	}
+        return properties;
+    }
 
+    @SuppressWarnings("rawtypes")
     public void setPropertiesMap(Map<String, Map> propertiesMap) {
         this.propertiesMap = propertiesMap;
     }
 
     @Override
-	public List<Link> getLinks() {
-		return links;
-	}
+    public List<Link> getLinks() {
+        return links;
+    }
 
-	public void setLinks(List<Link> links) {
-		this.links = links;
-	}
+    public void setLinks(List<Link> links) {
+        this.links = links;
+    }
     
     private static class JsonAssistantAttribute implements Attribute {
         private final String name;

@@ -18,9 +18,9 @@ public class JsonType extends InlineLinkableBase implements RestType {
     private String sharedParent;
     private String category;
     private List<Map<String, Object>> properties;
-	private List<Link> links;
+    private List<Link> links;
 
-	@Override
+    @Override
     public String getName() {
         return name;
     }
@@ -66,34 +66,34 @@ public class JsonType extends InlineLinkableBase implements RestType {
     }
 
     @Override
-	public List<Map<String, Object>> getProperties() {
-		return properties;
-	}
+    public List<Map<String, Object>> getProperties() {
+        return properties;
+    }
 
-	public void setProperties(List<Map<String, Object>> properties) {
-		this.properties = properties;
-	}
-	
-	@Override
-	public List<Link> getLinks() {
-		return links;
-	}
+    public void setProperties(List<Map<String, Object>> properties) {
+        this.properties = properties;
+    }
+    
+    @Override
+    public List<Link> getLinks() {
+        return links;
+    }
 
-	public void setLinks(List<Link> links) {
-		this.links = links;
-	}
+    public void setLinks(List<Link> links) {
+        this.links = links;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		JsonType that = (JsonType)obj;
-		return Equals.equal(name, that.name) 
-			&& Equals.equal(label, that.label)
-			&& Equals.equal(parent, that.parent)
+    @Override
+    public boolean equals(Object obj) {
+        JsonType that = (JsonType)obj;
+        return Equals.equal(name, that.name) 
+            && Equals.equal(label, that.label)
+            && Equals.equal(parent, that.parent)
             && Equals.equal(sharedParent, that.sharedParent)
             && Equals.equal(category, that.category)
-			&& Equals.equal(properties, that.properties)
-			&& super.equals(obj);
-	}
+            && Equals.equal(properties, that.properties)
+            && super.equals(obj);
+    }
 
     @Override
     public int hashCode() {

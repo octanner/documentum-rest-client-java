@@ -20,12 +20,12 @@ import com.emc.documentum.rest.client.sample.model.json.JsonRestError;
  * the error response handler to process json error response by Jackson
  */
 public class DCTMJacksonErrorHandler implements ResponseErrorHandler {
-	private final List<HttpMessageConverter<?>> converters;
-	
-	public DCTMJacksonErrorHandler(List<HttpMessageConverter<?>> converters) {
-		this.converters = converters;
-	}
-	
+    private final List<HttpMessageConverter<?>> converters;
+    
+    public DCTMJacksonErrorHandler(List<HttpMessageConverter<?>> converters) {
+        this.converters = converters;
+    }
+    
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
         return response.getStatusCode().series() == HttpStatus.Series.CLIENT_ERROR ||
@@ -33,15 +33,15 @@ public class DCTMJacksonErrorHandler implements ResponseErrorHandler {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-	@Override
+    @Override
     public void handleError(ClientHttpResponse response) throws IOException {
         MediaType mediaType = response.getHeaders().getContentType();
         RestError error = null;
         for(HttpMessageConverter converter : converters) {
-        	if(converter.canRead(JsonRestError.class, mediaType)) {
-        		error = (RestError)converter.read(JsonRestError.class, response);
-        		break;
-        	}
+            if(converter.canRead(JsonRestError.class, mediaType)) {
+                error = (RestError)converter.read(JsonRestError.class, response);
+                break;
+            }
         }
         throw new DCTMRestErrorException(response.getHeaders(), response.getStatusCode(), error);
     }

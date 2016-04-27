@@ -30,63 +30,63 @@ public class JaxbValueAssistance extends LinkableBase implements ValueAssistant 
     private List<Link> links;
 
     @Override
-	@XmlTransient
-	public List<Attribute> getProperties() {
-		if(properties == null) {
-			properties = new ArrayList<Attribute>();
-			if(valueAssistantProperties != null && valueAssistantProperties.getElements() != null) {
-				for(Element e : valueAssistantProperties.getElements()) {
-				    JaxbAssistantAttribute a = new JaxbAssistantAttribute(e.getLocalName());
-				    if(e.hasAttribute("allow-user-values")) {
-				        a.allowUserValues(Boolean.parseBoolean(e.getAttribute("allow-user-values")));
-				    }
-				    NodeList values = e.getElementsByTagName("value");
-				    for(int i=0;i<values.getLength();++i) {
-				        Node node = values.item(i);
-				        a.addValue(new JaxbValue(node.getTextContent(), node.getAttributes().getNamedItem("label").getTextContent()));
-				    }
-					properties.add(a);
-				}
-			}
-		}
-		return properties;
-	}
+    @XmlTransient
+    public List<Attribute> getProperties() {
+        if(properties == null) {
+            properties = new ArrayList<Attribute>();
+            if(valueAssistantProperties != null && valueAssistantProperties.getElements() != null) {
+                for(Element e : valueAssistantProperties.getElements()) {
+                    JaxbAssistantAttribute a = new JaxbAssistantAttribute(e.getLocalName());
+                    if(e.hasAttribute("allow-user-values")) {
+                        a.allowUserValues(Boolean.parseBoolean(e.getAttribute("allow-user-values")));
+                    }
+                    NodeList values = e.getElementsByTagName("value");
+                    for(int i=0;i<values.getLength();++i) {
+                        Node node = values.item(i);
+                        a.addValue(new JaxbValue(node.getTextContent(), node.getAttributes().getNamedItem("label").getTextContent()));
+                    }
+                    properties.add(a);
+                }
+            }
+        }
+        return properties;
+    }
 
-	@XmlElement(name="properties")
-	protected ValueAssistantProperties getValueAssistantProperties() {
-		return valueAssistantProperties;
-	}
+    @XmlElement(name="properties")
+    protected ValueAssistantProperties getValueAssistantProperties() {
+        return valueAssistantProperties;
+    }
 
-	protected void setValueAssistantProperties(ValueAssistantProperties valueAssistantProperties) {
-		this.valueAssistantProperties = valueAssistantProperties;
-	}
-	
-	@Override
-	@XmlElementWrapper(name = "links")
-	@XmlElement(name = "link", type = JaxbLink.class, namespace = XMLNamespace.DM_NAMESPACE)
-	public List<Link> getLinks() {
-		return links;
-	}
+    protected void setValueAssistantProperties(ValueAssistantProperties valueAssistantProperties) {
+        this.valueAssistantProperties = valueAssistantProperties;
+    }
+    
+    @Override
+    @XmlElementWrapper(name = "links")
+    @XmlElement(name = "link", type = JaxbLink.class, namespace = XMLNamespace.DM_NAMESPACE)
+    public List<Link> getLinks() {
+        return links;
+    }
 
-	public void setLinks(List<Link> links) {
-		this.links = links;
-	}
+    public void setLinks(List<Link> links) {
+        this.links = links;
+    }
 
-	@XmlRootElement(name = "properties")
-	static class ValueAssistantProperties {
-		private List<Element> elements;
-		
-		@XmlAnyElement
-		public List<Element> getElements() {
-			return elements;
-		}
+    @XmlRootElement(name = "properties")
+    static class ValueAssistantProperties {
+        private List<Element> elements;
+        
+        @XmlAnyElement
+        public List<Element> getElements() {
+            return elements;
+        }
 
-		public void setElements(List<Element> elements) {
-			this.elements = elements;
-		}
-	}
-	
-	private static class JaxbAssistantAttribute implements Attribute {
+        public void setElements(List<Element> elements) {
+            this.elements = elements;
+        }
+    }
+    
+    private static class JaxbAssistantAttribute implements Attribute {
         private final String name;
         private boolean allowUserValues;
         private List<Value> values = new ArrayList<>();
@@ -165,10 +165,10 @@ public class JaxbValueAssistance extends LinkableBase implements ValueAssistant 
     }
     
     @Override
-	public boolean equals(Object obj) {
-		JaxbValueAssistance that = (JaxbValueAssistance) obj;
-		return Equals.equal(properties, that.properties);
-	}
+    public boolean equals(Object obj) {
+        JaxbValueAssistance that = (JaxbValueAssistance) obj;
+        return Equals.equal(properties, that.properties);
+    }
 
     @Override
     public int hashCode() {

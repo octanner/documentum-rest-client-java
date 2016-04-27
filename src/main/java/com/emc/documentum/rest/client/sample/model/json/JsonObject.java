@@ -14,28 +14,28 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class JsonObject extends InlineLinkableBase implements RestObject {
-	private String name;
-	private String type;
-	private String definition;
-	private Map<String, Object> properties;
-	private String href;
-	@JsonProperty
-	private List<Link> links;
-	
-	public JsonObject() {
-	}
-	
-	public JsonObject(RestObject object) {
-		this.name = object.getName();
-		this.type = object.getType();
-		this.definition = object.getDefinition();
-		this.properties = object.getProperties();
-		this.links = object.getLinks();
-		this.href = object.getHref();
-	}
-	
-	@Override
-	@JsonIgnore
+    private String name;
+    private String type;
+    private String definition;
+    private Map<String, Object> properties;
+    private String href;
+    @JsonProperty
+    private List<Link> links;
+    
+    public JsonObject() {
+    }
+    
+    public JsonObject(RestObject object) {
+        this.name = object.getName();
+        this.type = object.getType();
+        this.definition = object.getDefinition();
+        this.properties = object.getProperties();
+        this.links = object.getLinks();
+        this.href = object.getHref();
+    }
+    
+    @Override
+    @JsonIgnore
     public String getObjectId() {
         return properties==null?null:(String)properties.get("r_object_id");
     }
@@ -53,33 +53,33 @@ public class JsonObject extends InlineLinkableBase implements RestObject {
     }
 
     @Override
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	@Override
-	public String getType() {
-		return type;
-	}
+    @Override
+    public String getType() {
+        return type;
+    }
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    public void setType(String type) {
+        this.type = type;
+    }
 
-	@Override
-	public String getDefinition() {
-		return definition;
-	}
+    @Override
+    public String getDefinition() {
+        return definition;
+    }
 
-	public void setDefinition(String definition) {
-		this.definition = definition;
-	}
+    public void setDefinition(String definition) {
+        this.definition = definition;
+    }
 
-	public String getHref() {
+    public String getHref() {
         return href;
     }
 
@@ -88,38 +88,38 @@ public class JsonObject extends InlineLinkableBase implements RestObject {
     }
 
     @Override
-	public Map<String, Object> getProperties() {
-		return properties;
-	}
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
 
-	public void setProperties(Map<String, Object> properties) {
-		this.properties = properties;
-	}
-	
-	@Override
-	public String getPropertiesType() {
-		return null;
-	}
+    public void setProperties(Map<String, Object> properties) {
+        this.properties = properties;
+    }
+    
+    @Override
+    public String getPropertiesType() {
+        return null;
+    }
 
-	@Override
-	public List<Link> getLinks() {
-		return links;
-	}
+    @Override
+    public List<Link> getLinks() {
+        return links;
+    }
 
-	public void setLinks(List<Link> links) {
-		this.links = links;
-	}
+    public void setLinks(List<Link> links) {
+        this.links = links;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		JsonObject that = (JsonObject)obj;
-		return Equals.equal(name, that.name) 
-			&& Equals.equal(type, that.type)
-			&& Equals.equal(definition, that.definition)
-			&& Equals.equal(properties, that.properties)
-			&& Equals.equal(href, that.href)
-			&& super.equals(obj);
-	}
+    @Override
+    public boolean equals(Object obj) {
+        JsonObject that = (JsonObject)obj;
+        return Equals.equal(name, that.name) 
+            && Equals.equal(type, that.type)
+            && Equals.equal(definition, that.definition)
+            && Equals.equal(properties, that.properties)
+            && Equals.equal(href, that.href)
+            && super.equals(obj);
+    }
 
     @Override
     public int hashCode() {

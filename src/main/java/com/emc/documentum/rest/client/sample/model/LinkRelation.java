@@ -30,8 +30,10 @@ public enum LinkRelation {
     PREDECESSOR_VERSION("predecessor-version"),
     TYPE("type", true),
     TYPES("types", true),
+    ASPECT_TYPES("aspect-types", true),
     ASSIS_VALUES("assist-values", true),
-
+    OBJECT_ASPECTS("object-aspects", true),
+    
     // Documentum specific link relations
     FOLDERS("folders", true),
     DOCUMENTS("documents", true),

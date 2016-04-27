@@ -8,18 +8,18 @@ import javax.xml.bind.annotation.XmlRootElement;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
-@XmlRootElement(name="folder", namespace=XMLNamespace.DM_NAMESPACE)
-public class JaxbFolder extends JaxbObject {
-    public JaxbFolder() {
+@XmlRootElement(name="aspect-type", namespace=XMLNamespace.DM_NAMESPACE)
+public class JaxbAspectType extends JaxbObject {
+    public JaxbAspectType() {
         super();
     }
 
-    public JaxbFolder(RestObject object) {
+    public JaxbAspectType(RestObject object) {
         super(object);
     }
 
     @Override
     public String getName() {
-        return "folder";
+        return "aspect-type";
     }
 }

@@ -10,16 +10,16 @@ import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
 @XmlRootElement(name="object", namespace=XMLNamespace.DM_NAMESPACE)
 public class JaxbSysObject extends JaxbObject {
-	public JaxbSysObject() {
-		super();
-	}
+    public JaxbSysObject() {
+        super();
+    }
 
-	public JaxbSysObject(RestObject object) {
-		super(object);
-	}
+    public JaxbSysObject(RestObject object) {
+        super(object);
+    }
 
-	@Override
-	public String getName() {
-		return "object";
-	}
+    @Override
+    public String getName() {
+        return "object";
+    }
 }

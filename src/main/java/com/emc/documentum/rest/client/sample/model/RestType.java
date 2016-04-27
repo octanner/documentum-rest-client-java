@@ -36,7 +36,7 @@ public interface RestType extends Linkable {
     String getCategory();
     
     /**
-	 * @return all attributes of item
-	 */
+     * @return all attributes of item
+     */
     List<Map<String, Object>> getProperties();
 }

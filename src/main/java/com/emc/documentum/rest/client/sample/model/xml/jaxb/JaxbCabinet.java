@@ -10,16 +10,16 @@ import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
 @XmlRootElement(name="cabinet", namespace=XMLNamespace.DM_NAMESPACE)
 public class JaxbCabinet extends JaxbObject {
-	public JaxbCabinet() {
-		super();
-	}
+    public JaxbCabinet() {
+        super();
+    }
 
-	public JaxbCabinet(RestObject object) {
-		super(object);
-	}
+    public JaxbCabinet(RestObject object) {
+        super(object);
+    }
 
-	@Override
-	public String getName() {
-		return "cabinet";
-	}
+    @Override
+    public String getName() {
+        return "cabinet";
+    }
 }

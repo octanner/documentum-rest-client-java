@@ -14,9 +14,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
  */
 @JsonTypeInfo(use=Id.CLASS, defaultImpl=JsonLink.class)
 public interface Link {
-	/**
-	 * @return the link relation of the link
-	 */
+    /**
+     * @return the link relation of the link
+     */
     public String getRel();
     
     /**

@@ -13,10 +13,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
  */
 @JsonTypeInfo(use=Id.CLASS, defaultImpl=JsonAuthor.class)
 public interface Author {
-	
-	/**
-	 * @return author name
-	 */
+    
+    /**
+     * @return author name
+     */
     public String getName();
     
     /**
