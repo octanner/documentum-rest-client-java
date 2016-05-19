@@ -73,7 +73,7 @@ public class DCTMRestClientSample {
           .append("8 Type(REST Services 7.x) and Value Assistance (REST Services 7.3+)").append(NEWLINE)
           .append("9 Lightweight Object Type/Create/Materialize/Dematerialize/Reparent (REST Services 7.3+)").append(NEWLINE)
           .append("10 Aspect AspectType/Attach/Detach (REST Services 7.3+)").append(NEWLINE)
-          .append("11 Get Group(s)/User(s) (REST Services 7.x) and Create/Update/Delete User/Group Add/Remove User to/from Group (REST Services 7.3+)").append(NEWLINE);
+          .append("11 Get Group(s)/User(s)/Default Folder (REST Services 7.x) and Create/Update/Delete User/Group Add/Remove User to/from Group (REST Services 7.3+)").append(NEWLINE);
         
         while(true) {
             String sample = read(sb.toString());
@@ -875,10 +875,10 @@ public class DCTMRestClientSample {
         System.out.println(NEWLINE);
 
         System.out.println("-------------update the user " + newUser);
-        RestObject udpatedUser = client.update(createdUser, new PlainRestObject("user_address", "updated " + newUser + "@test.com"));
-        System.out.println("user name:" + udpatedUser.getProperties().get("user_name") + ", login name:"
-                + udpatedUser.getProperties().get("user_login_name") + ", privileges:"
-                + udpatedUser.getProperties().get("user_privileges") + ", address:" + udpatedUser.getProperties().get("user_address")); 
+        RestObject updatedUser = client.update(createdUser, new PlainRestObject("user_address", "updated " + newUser + "@test.com"));
+        System.out.println("user name:" + updatedUser.getProperties().get("user_name") + ", login name:"
+                + updatedUser.getProperties().get("user_login_name") + ", privileges:"
+                + updatedUser.getProperties().get("user_privileges") + ", address:" + updatedUser.getProperties().get("user_address")); 
         System.out.println(NEWLINE);
 
         String newGroup = "group_" + Randoms.nextString(10);
@@ -904,7 +904,7 @@ public class DCTMRestClientSample {
         System.out.println(NEWLINE);
 
         System.out.println("-------------add the user " + newUser + " to the group " + newGroup);
-        client.addUserToGroup(updatedGroup, udpatedUser);
+        client.addUserToGroup(updatedGroup, updatedUser);
         System.out.println("http status: " + client.getStatus());        
         System.out.println(NEWLINE);
         
@@ -914,6 +914,12 @@ public class DCTMRestClientSample {
         for(Entry<RestObject> e : groupUsers.getEntries()) {
             System.out.println(e.getTitle() + " -> " + e.getContentSrc());
         }
+        System.out.println(NEWLINE);
+        
+        System.out.println("-------------get the user " + newUser + "'s default folder");
+        RestObject defaultFolder = client.getFolder(updatedUser.getHref(LinkRelation.DEFAULT_FOLDER));
+        System.out.println("r_object_id=" + defaultFolder.getObjectId() + " object_name=" + defaultFolder.getObjectName());
+        System.out.println(NEWLINE);
 
         System.out.println("-------------remove the user " + newUser + " from the group " + newGroup);
         client.delete(groupUsers.getEntries().get(0));
@@ -921,7 +927,7 @@ public class DCTMRestClientSample {
         System.out.println(NEWLINE);
         
         System.out.println("-------------delete user " + newUser);
-        client.delete(udpatedUser);
+        client.delete(updatedUser);
         System.out.println("http status: " + client.getStatus());        
         System.out.println(NEWLINE);
         
