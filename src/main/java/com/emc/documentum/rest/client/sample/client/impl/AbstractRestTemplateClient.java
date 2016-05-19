@@ -259,6 +259,10 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     protected <T> T get(String uri, boolean isCollection, Class<? extends T> responseBodyClass, String... params) {
         return get(uri, isXml()?(isCollection?Headers.ACCEPT_ATOM_HEADERS:Headers.ACCEPT_XML_HEADERS):Headers.ACCEPT_JSON_HEADERS, responseBodyClass, params);
     }
+    
+    public <T> T get(String uri, Class<T> clazz, String... params) {
+        return get(uri, false, clazz, params);
+    }
 
     protected void delete(String uri, String... params) {
         sendRequest(uri, HttpMethod.DELETE, isXml()?Headers.ACCEPT_XML_HEADERS:Headers.ACCEPT_JSON_HEADERS, null, null, params);

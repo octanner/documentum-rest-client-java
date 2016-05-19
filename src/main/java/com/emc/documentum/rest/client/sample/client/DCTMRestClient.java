@@ -113,6 +113,14 @@ public interface DCTMRestClient {
     public RestObject get(RestObject object, String... params);
     
     /**
+     * @param uri
+     * @param clazz
+     * @param params
+     * @return the single object
+     */
+    public <T> T get(String uri, Class<T> clazz, String... params);
+    
+    /**
      * create a folder under specified folder/cabinet
      * @param parent the folder/cabinet where the new folder will be created under
      * @param newFolder the new folder with its properties
@@ -183,11 +191,11 @@ public interface DCTMRestClient {
     public RestObject update(RestObject oldObject, RestObject newObject, String... params);
     
     /**
-     * delete the RestObject
-     * @param object the previously fetched RestObject
+     * delete the resource
+     * @param linkable
      * @param params
      */
-    public void delete(RestObject object, String... params);
+    public void delete(Linkable linkable, String... params);
     
     /**
      * create a content (primary content or rendition) to a RestObject
@@ -219,6 +227,66 @@ public interface DCTMRestClient {
      * @return the content metadata collection
      */
     public Feed<RestObject> getContents(RestObject object, String... params);
+    
+    /**
+     * get users of the repository
+     * @param params
+     * @return
+     */
+    public Feed<RestObject> getUsers(String... params);
+    
+    /**
+     * get users of a parent
+     * @param parent
+     * @param rel
+     * @param params
+     * @return
+     */
+    public Feed<RestObject> getUsers(Linkable parent, String... params);
+
+    /**
+     * get groups of the repository
+     * @param params
+     * @return
+     */
+    public Feed<RestObject> getGroups(String... params);
+    
+    /**
+     * get sigle user
+     * @param userUri
+     * @param params
+     * @return
+     */
+    public RestObject getUser(String userUri, String... params);
+    
+    /**
+     * get single group
+     * @param groupUri
+     * @param params
+     * @return
+     */
+    public RestObject getGroup(String groupUri, String... params);
+    
+    /**
+     * create an user
+     * @param userToCreate
+     * @return
+     */
+    public RestObject createUser(RestObject userToCreate);
+    
+    /**
+     * create a group
+     * @param groupToCreate
+     * @return
+     */
+    public RestObject createGroup(RestObject groupToCreate);
+    
+    /**
+     * add the user to a group
+     * @param group
+     * @param user
+     */
+    public void addUserToGroup(RestObject group, RestObject user);
     
     /**
      * @param feed the current page

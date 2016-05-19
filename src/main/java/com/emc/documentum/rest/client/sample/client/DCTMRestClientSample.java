@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.emc.documentum.rest.client.sample.client.util.Randoms;
 import com.emc.documentum.rest.client.sample.model.Entry;
 import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.HomeDocument;
@@ -71,7 +72,8 @@ public class DCTMRestClientSample {
           .append("7 DQL Query").append(NEWLINE)
           .append("8 Type(REST Services 7.x) and Value Assistance (REST Services 7.3+)").append(NEWLINE)
           .append("9 Lightweight Object Type/Create/Materialize/Dematerialize/Reparent (REST Services 7.3+)").append(NEWLINE)
-          .append("10 Aspect AspectType/Attach/Detach (REST Services 7.3+)");
+          .append("10 Aspect AspectType/Attach/Detach (REST Services 7.3+)").append(NEWLINE)
+          .append("11 Get Group(s)/User(s) (REST Services 7.x) and Create/Update/Delete User/Group Add/Remove User to/from Group (REST Services 7.3+)").append(NEWLINE);
         
         while(true) {
             String sample = read(sb.toString());
@@ -112,6 +114,9 @@ public class DCTMRestClientSample {
                         break;
                     case 10:
                         aspect();
+                        break;
+                    case 11:
+                        userGroup();
                         break;
                     default:
                         System.out.println("Unsupported " + op);
@@ -631,7 +636,7 @@ public class DCTMRestClientSample {
      * samples to get type and value assistance information 
      */
     private static void type() {
-        System.out.println("get type and value assistance information sample");
+        System.out.println("get Type and Value Assistance sample");
         
         System.out.println("-------------get types");
         Feed<RestType> types = client.getTypes();
@@ -698,7 +703,7 @@ public class DCTMRestClientSample {
         }
         System.out.println(NEWLINE);
 
-        System.out.println("finish Type sample");
+        System.out.println("finish Type and Value Assistance sample");
         System.out.println(NEWLINE);
     }
     
@@ -824,6 +829,108 @@ public class DCTMRestClientSample {
         System.out.println("http status: " + client.getStatus());
         
         System.out.println("finish AspectType/Attach/Detach sample");
+        System.out.println(NEWLINE);
+    }
+
+    /**
+     * samples to manipulate the user and group
+     */
+    private static void userGroup() {
+        System.out.println("start User(s)/Group(s) sample");
+        
+        System.out.println("-------------get all users");
+        Feed<RestObject> users = client.getUsers();
+        for(Entry<RestObject> e : users.getEntries()) {
+            System.out.println(e.getTitle() + " -> " + e.getContentSrc());
+        }
+        System.out.println(NEWLINE);
+
+        System.out.println("-------------get a single user");
+        RestObject user = client.getUser(users.getEntries().get(0).getContentSrc());
+        System.out.println("user name:" + user.getProperties().get("user_name") + ", login name:"
+                + user.getProperties().get("user_login_name") + ", privileges:"
+                + user.getProperties().get("user_privileges") + ", address:" + user.getProperties().get("user_address")); 
+        System.out.println(NEWLINE);
+        
+        System.out.println("-------------get all groups");
+        Feed<RestObject> groups = client.getGroups();
+        for(Entry<RestObject> e : groups.getEntries()) {
+            System.out.println(e.getTitle() + " -> " + e.getContentSrc());
+        }
+        System.out.println(NEWLINE);
+
+        System.out.println("-------------get a single group");
+        RestObject group = client.getGroup(groups.getEntries().get(0).getContentSrc());
+        System.out.println("group name:" + group.getProperties().get("group_name") + ", owner:"
+                + group.getProperties().get("owner_name") + ", display name:"
+                + group.getProperties().get("group_display_name")); 
+        System.out.println(NEWLINE);
+
+        String newUser = "user_" + Randoms.nextString(10);
+        System.out.println("-------------create the user " + newUser);
+        RestObject createdUser = client.createUser(new PlainRestObject("user_name", newUser, "user_login_name", newUser, "user_address", newUser + "@test.com"));
+        System.out.println("user name:" + createdUser.getProperties().get("user_name") + ", login name:"
+                + createdUser.getProperties().get("user_login_name") + ", privileges:"
+                + createdUser.getProperties().get("user_privileges") + ", address:" + createdUser.getProperties().get("user_address")); 
+        System.out.println(NEWLINE);
+
+        System.out.println("-------------update the user " + newUser);
+        RestObject udpatedUser = client.update(createdUser, new PlainRestObject("user_address", "updated " + newUser + "@test.com"));
+        System.out.println("user name:" + udpatedUser.getProperties().get("user_name") + ", login name:"
+                + udpatedUser.getProperties().get("user_login_name") + ", privileges:"
+                + udpatedUser.getProperties().get("user_privileges") + ", address:" + udpatedUser.getProperties().get("user_address")); 
+        System.out.println(NEWLINE);
+
+        String newGroup = "group_" + Randoms.nextString(10);
+        System.out.println("-------------create the group " + newGroup);
+        RestObject createdGroup = client.createGroup(new PlainRestObject("group_name", newGroup));
+        System.out.println("group name:" + createdGroup.getProperties().get("group_name") + ", owner:"
+                + createdGroup.getProperties().get("owner_name") + ", display name:"
+                + createdGroup.getProperties().get("group_display_name"));
+        System.out.println(NEWLINE);
+
+        System.out.println("-------------update the group " + newGroup);
+        RestObject updatedGroup = client.update(createdGroup, new PlainRestObject("group_display_name", "updated " + newGroup));
+        System.out.println("group name:" + updatedGroup.getProperties().get("group_name") + ", owner:"
+                + updatedGroup.getProperties().get("owner_name") + ", display name:"
+                + updatedGroup.getProperties().get("group_display_name"));
+        System.out.println(NEWLINE);
+
+        System.out.println("-------------get the group " + newGroup + " member users");
+        Feed<RestObject> groupUsers = client.getUsers(updatedGroup);
+        if(groupUsers.getEntries() == null) {
+            System.out.println("there are 0 users in the group " + newGroup);
+        }
+        System.out.println(NEWLINE);
+
+        System.out.println("-------------add the user " + newUser + " to the group " + newGroup);
+        client.addUserToGroup(updatedGroup, udpatedUser);
+        System.out.println("http status: " + client.getStatus());        
+        System.out.println(NEWLINE);
+        
+        System.out.println("-------------get the group " + newGroup + " member users");
+        groupUsers = client.getUsers(updatedGroup);
+        System.out.println("there are " + groupUsers.getEntries().size() + " users in the group " + newGroup);
+        for(Entry<RestObject> e : groupUsers.getEntries()) {
+            System.out.println(e.getTitle() + " -> " + e.getContentSrc());
+        }
+
+        System.out.println("-------------remove the user " + newUser + " from the group " + newGroup);
+        client.delete(groupUsers.getEntries().get(0));
+        System.out.println("http status: " + client.getStatus());
+        System.out.println(NEWLINE);
+        
+        System.out.println("-------------delete user " + newUser);
+        client.delete(udpatedUser);
+        System.out.println("http status: " + client.getStatus());        
+        System.out.println(NEWLINE);
+        
+        System.out.println("-------------delete group " + newGroup);
+        client.delete(updatedGroup);
+        System.out.println("http status: " + client.getStatus());        
+        System.out.println(NEWLINE);
+        
+        System.out.println("finish User(s)/Group(s) sample");
         System.out.println(NEWLINE);
     }
 }

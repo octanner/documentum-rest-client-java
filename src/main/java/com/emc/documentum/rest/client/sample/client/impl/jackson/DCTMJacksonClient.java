@@ -186,8 +186,8 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     }
     
     @Override
-    public void delete(RestObject object, String... params) {
-        delete(object.getHref(LinkRelation.DELETE), params);
+    public void delete(Linkable linkable, String... params) {
+        delete(linkable.getHref(LinkRelation.DELETE), params);
     }
     
     @Override
@@ -299,7 +299,51 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     public void detach(ObjectAspects objectAspects, String aspect) {
         delete(objectAspects.getHref(LinkRelation.DELETE, aspect));
     }
+    
+    @Override
+    public Feed<RestObject> getUsers(String... params) {
+        return getUsers(getRepository(), params);
+    }
+    
+    @Override
+    public Feed<RestObject> getUsers(Linkable parent, String... params) {
+        Feed<? extends RestObject> feed = get(parent.getHref(LinkRelation.USERS), true, JsonFeeds.ObjectFeed.class, params);
+        return (Feed<RestObject>)feed;
+    }
 
+    @Override
+    public Feed<RestObject> getGroups(String... params) {
+        Feed<? extends RestObject> feed = get(getRepository().getHref(LinkRelation.GROUPS), true, JsonFeeds.ObjectFeed.class, params);
+        return (Feed<RestObject>)feed;
+    }
+    
+    @Override
+    public RestObject getUser(String userUri, String... params) {
+        return get(userUri, false, JsonObject.class, params);
+    }
+    
+    @Override
+    public RestObject getGroup(String groupUri, String... params) {
+        return get(groupUri, false, JsonObject.class, params);
+    }
+
+    @Override
+    public RestObject createUser(RestObject userToCreate) {
+        return post(getRepository().getHref(LinkRelation.USERS), new JsonObject(userToCreate), JsonObject.class);
+    }
+    
+    @Override
+    public RestObject createGroup(RestObject groupToCreate) {
+        return post(getRepository().getHref(LinkRelation.GROUPS), new JsonObject(groupToCreate), JsonObject.class);
+    }
+
+    @Override
+    public void addUserToGroup(RestObject group, RestObject user) {
+        JsonObject groupUser = new JsonObject();
+        groupUser.setHref(user.getHref(LinkRelation.SELF));
+        post(group.getHref(LinkRelation.USERS), groupUser, null);
+    }
+    
     @Override
     public <T extends Linkable> Feed<T> nextPage(Feed<T> feed) {
         return page(feed.getHref(LinkRelation.PAGING_NEXT), feed.getClass());

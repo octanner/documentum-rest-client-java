@@ -35,6 +35,7 @@ import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbContent;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbDocument;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbFeed;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbFolder;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbGroup;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbHomeDocument;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbObject;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbObjectAspects;
@@ -42,6 +43,7 @@ import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbProductInfo;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbRepository;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSysObject;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbType;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbUser;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbValueAssistance;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbValueAssistantRequest;
 
@@ -186,8 +188,8 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     }
     
     @Override
-    public void delete(RestObject object, String... params) {
-        delete(object.getHref(LinkRelation.DELETE), params);
+    public void delete(Linkable linkable, String... params) {
+        delete(linkable.getHref(LinkRelation.DELETE), params);
     }
     
     @Override
@@ -299,6 +301,48 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
         delete(objectAspects.getHref(LinkRelation.DELETE, aspect));
     }
     
+    @Override
+    public Feed<RestObject> getUsers(String... params) {
+        return getUsers(getRepository(), params);
+    }
+    
+    @Override
+    public Feed<RestObject> getUsers(Linkable parent, String... params) {
+        return get(parent.getHref(LinkRelation.USERS), true, JaxbFeed.class, params);
+    }
+
+    @Override
+    public Feed<RestObject> getGroups(String... params) {
+        return get(getRepository().getHref(LinkRelation.GROUPS), true, JaxbFeed.class, params);
+    }
+
+    @Override
+    public RestObject getUser(String userUri, String... params) {
+        return get(userUri, false, JaxbUser.class, params);
+    }
+    
+    @Override
+    public RestObject getGroup(String groupUri, String... params) {
+        return get(groupUri, false, JaxbGroup.class, params);
+    }
+    
+    @Override
+    public RestObject createUser(RestObject userToCreate) {
+        return post(getRepository().getHref(LinkRelation.USERS), new JaxbUser(userToCreate), JaxbUser.class);
+    }
+    
+    @Override
+    public RestObject createGroup(RestObject groupToCreate) {
+        return post(getRepository().getHref(LinkRelation.GROUPS), new JaxbGroup(groupToCreate), JaxbGroup.class);
+    }
+    
+    @Override
+    public void addUserToGroup(RestObject group, RestObject user) {
+        JaxbUser groupUser = new JaxbUser();
+        groupUser.setHref(user.getHref(LinkRelation.SELF));
+        post(group.getHref(LinkRelation.USERS), groupUser, null);
+    }
+
     @Override
     public <T extends Linkable> Feed<T> nextPage(Feed<T> feed) {
         return page(feed.getHref(LinkRelation.PAGING_NEXT));
