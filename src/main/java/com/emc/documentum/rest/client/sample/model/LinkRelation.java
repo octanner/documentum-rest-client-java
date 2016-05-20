@@ -44,11 +44,12 @@ public enum LinkRelation {
     PRIMARY_CONTENT("primary-content", true),
     CHECKED_OUT_OBJECTS("checked-out-objects", true),
     DEFAULT_FOLDER("default-folder", true),
+    RELATIONS("relations", true),
+    RELATION_TYPES("relation-types", true),
  
     //Home Document link relations
     REPOSITORIES("repositories", true),
     ABOUT("about", false),
-    RELATIONS("relations", true),
     
     //User/Group link relation
     USERS("users", true),

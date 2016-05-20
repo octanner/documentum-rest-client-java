@@ -264,7 +264,7 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
         return get(uri, false, clazz, params);
     }
 
-    protected void delete(String uri, String... params) {
+    public void delete(String uri, String... params) {
         sendRequest(uri, HttpMethod.DELETE, isXml()?Headers.ACCEPT_XML_HEADERS:Headers.ACCEPT_JSON_HEADERS, null, null, params);
     }
     

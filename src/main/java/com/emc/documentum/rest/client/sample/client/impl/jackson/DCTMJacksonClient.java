@@ -343,7 +343,34 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
         groupUser.setHref(user.getHref(LinkRelation.SELF));
         post(group.getHref(LinkRelation.USERS), groupUser, null);
     }
+     
+    @Override
+    public Feed<RestObject> getRelationTypes(String... params) {
+        Feed<? extends RestObject> feed = get(getRepository().getHref(LinkRelation.RELATION_TYPES), true, JsonFeeds.ObjectFeed.class, params);
+        return (Feed<RestObject>)feed;
+    }
     
+    @Override
+    public RestObject getRelationType(String uri, String... params) {
+        return get(uri, false, JsonObject.class, params);
+    }
+    
+    @Override
+    public Feed<RestObject> getRelations(String... params) {
+        Feed<? extends RestObject> feed = get(getRepository().getHref(LinkRelation.RELATIONS), true, JsonFeeds.ObjectFeed.class, params);
+        return (Feed<RestObject>)feed;
+    }
+    
+    @Override
+    public RestObject getRelation(String uri, String... params) {
+        return get(uri, false, JsonObject.class, params);
+    }
+    
+    @Override
+    public RestObject createRelation(RestObject object) {
+        return post(getRepository().getHref(LinkRelation.RELATIONS), new JsonObject(object), JsonObject.class);
+    }
+
     @Override
     public <T extends Linkable> Feed<T> nextPage(Feed<T> feed) {
         return page(feed.getHref(LinkRelation.PAGING_NEXT), feed.getClass());

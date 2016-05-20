@@ -198,6 +198,13 @@ public interface DCTMRestClient {
     public void delete(Linkable linkable, String... params);
     
     /**
+     * delete thr uri
+     * @param uri
+     * @param params
+     */
+    public void delete(String uri, String... params);
+    
+    /**
      * create a content (primary content or rendition) to a RestObject
      * @param object the previously fetched RestObject
      * @param content the binary content, it can be byte array, String, javax.xml.transform.Source, org.springframework.core.io.Resource, JAXB object, and Jackson json object
@@ -252,7 +259,7 @@ public interface DCTMRestClient {
     public Feed<RestObject> getGroups(String... params);
     
     /**
-     * get sigle user
+     * get single user
      * @param userUri
      * @param params
      * @return
@@ -442,4 +449,41 @@ public interface DCTMRestClient {
      * @param aspect
      */
     public void detach(ObjectAspects objectAspects, String aspect);
+
+    /**
+     * get relation types of the repository
+     * @param params
+     * @return
+     */
+    public Feed<RestObject> getRelationTypes(String... params);
+    
+    /**
+     * get single relation type
+     * @param uri
+     * @param params
+     * @return
+     */
+    public RestObject getRelationType(String uri, String... params);
+
+    /**
+     * get relations of the repository
+     * @param params
+     * @return
+     */
+    public Feed<RestObject> getRelations(String... params);
+    
+    /**
+     * get single relation
+     * @param uri
+     * @param params
+     * @return
+     */
+    public RestObject getRelation(String uri, String... params);
+    
+    /**
+     * create a relation
+     * @param object
+     * @return
+     */
+    public RestObject createRelation(RestObject object);
 }

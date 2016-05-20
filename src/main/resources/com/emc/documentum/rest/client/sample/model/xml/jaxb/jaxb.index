@@ -14,5 +14,7 @@ JaxbQueryResult
 JaxbRepository
 JaxbSysObject
 JaxbType
+JaxbRelation
+JaxbRelationType
 JaxbRestError
 JaxbUser

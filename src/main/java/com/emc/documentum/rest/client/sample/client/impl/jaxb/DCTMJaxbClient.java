@@ -40,6 +40,8 @@ import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbHomeDocument;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbObject;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbObjectAspects;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbProductInfo;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbRelation;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbRelationType;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbRepository;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSysObject;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbType;
@@ -343,6 +345,33 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
         post(group.getHref(LinkRelation.USERS), groupUser, null);
     }
 
+    @Override
+    public Feed<RestObject> getRelationTypes(String... params) {
+        Feed<? extends RestObject> feed = get(getRepository().getHref(LinkRelation.RELATION_TYPES), true, JaxbFeed.class, params);
+        return (Feed<RestObject>)feed;
+    }
+    
+    @Override
+    public RestObject getRelationType(String uri, String... params) {
+        return get(uri, false, JaxbRelationType.class, params);
+    }
+
+    @Override
+    public Feed<RestObject> getRelations(String... params) {
+        Feed<? extends RestObject> feed = get(getRepository().getHref(LinkRelation.RELATION_TYPES), true, JaxbFeed.class, params);
+        return (Feed<RestObject>)feed;
+    }
+    
+    @Override
+    public RestObject getRelation(String uri, String... params) {
+        return get(uri, false, JaxbRelation.class, params);
+    }
+    
+    @Override
+    public RestObject createRelation(RestObject object) {
+        return post(getRepository().getHref(LinkRelation.RELATIONS), new JaxbRelation(object), JaxbRelation.class);
+    }
+    
     @Override
     public <T extends Linkable> Feed<T> nextPage(Feed<T> feed) {
         return page(feed.getHref(LinkRelation.PAGING_NEXT));
