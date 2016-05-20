@@ -35,8 +35,10 @@ import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbContent;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbDocument;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbFeed;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbFolder;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbFormat;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbGroup;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbHomeDocument;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbNetworkLocation;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbObject;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbObjectAspects;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbProductInfo;
@@ -370,6 +372,28 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     @Override
     public RestObject createRelation(RestObject object) {
         return post(getRepository().getHref(LinkRelation.RELATIONS), new JaxbRelation(object), JaxbRelation.class);
+    }
+    
+    @Override
+    public Feed<RestObject> getFormats(String... params) {
+        Feed<? extends RestObject> feed = get(getRepository().getHref(LinkRelation.FORMATS), true, JaxbFeed.class, params);
+        return (Feed<RestObject>)feed;
+    }
+    
+    @Override
+    public RestObject getFormat(String uri, String... params) {
+        return get(uri, false, JaxbFormat.class, params);
+    }
+    
+    @Override
+    public Feed<RestObject> getNetworkLocations(String... params) {
+        Feed<? extends RestObject> feed = get(getRepository().getHref(LinkRelation.NETWORK_LOCATIONS), true, JaxbFeed.class, params);
+        return (Feed<RestObject>)feed;
+    }
+    
+    @Override
+    public RestObject getNetworkLocation(String uri, String... params) {
+        return get(uri, false, JaxbNetworkLocation.class, params);
     }
     
     @Override

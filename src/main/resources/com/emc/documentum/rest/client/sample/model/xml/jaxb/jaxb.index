@@ -1,4 +1,4 @@
-#Copyright (c) 2014. EMC Corporation. All Rights Reserved.
+#Copyright (c) 2016. EMC Corporation. All Rights Reserved.
 JaxbAspectType
 JaxbAuthor
 JaxbCabinet
@@ -7,9 +7,11 @@ JaxbDocument
 JaxbEntry
 JaxbFeed
 JaxbFolder
+JaxbFormat
 JaxbGroup
 JaxbHomeDocument
 JaxbLink
+JaxbNetworkLocation
 JaxbQueryResult
 JaxbRepository
 JaxbSysObject

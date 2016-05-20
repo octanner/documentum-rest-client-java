@@ -370,6 +370,28 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     public RestObject createRelation(RestObject object) {
         return post(getRepository().getHref(LinkRelation.RELATIONS), new JsonObject(object), JsonObject.class);
     }
+    
+    @Override
+    public Feed<RestObject> getFormats(String... params) {
+        Feed<? extends RestObject> feed = get(getRepository().getHref(LinkRelation.FORMATS), true, JsonFeeds.ObjectFeed.class, params);
+        return (Feed<RestObject>)feed;
+    }
+    
+    @Override
+    public RestObject getFormat(String uri, String... params) {
+        return get(uri, false, JsonObject.class, params);
+    }
+
+    @Override
+    public Feed<RestObject> getNetworkLocations(String... params) {
+        Feed<? extends RestObject> feed = get(getRepository().getHref(LinkRelation.NETWORK_LOCATIONS), true, JsonFeeds.ObjectFeed.class, params);
+        return (Feed<RestObject>)feed;
+    }
+    
+    @Override
+    public RestObject getNetworkLocation(String uri, String... params) {
+        return get(uri, false, JsonObject.class, params);
+    }
 
     @Override
     public <T extends Linkable> Feed<T> nextPage(Feed<T> feed) {

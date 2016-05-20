@@ -486,4 +486,34 @@ public interface DCTMRestClient {
      * @return
      */
     public RestObject createRelation(RestObject object);
+    
+    /**
+     * get formats of the repository
+     * @param params
+     * @return
+     */
+    public Feed<RestObject> getFormats(String... params);
+    
+    /**
+     * get single format
+     * @param uri
+     * @param params
+     * @return
+     */
+    public RestObject getFormat(String uri, String... params);
+
+    /**
+     * get network locations of the repository
+     * @param params
+     * @return
+     */
+    public Feed<RestObject> getNetworkLocations(String... params);
+    
+    /**
+     * get single network location
+     * @param uri
+     * @param params
+     * @return
+     */
+    public RestObject getNetworkLocation(String uri, String... params);
 }

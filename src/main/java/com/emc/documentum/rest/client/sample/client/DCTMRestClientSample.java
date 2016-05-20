@@ -41,9 +41,9 @@ public class DCTMRestClientSample {
         String bindingStr = read(sb.toString(), "XML");
         DCTMRestClientBinding binding = DCTMRestClientBinding.valueOf(bindingStr.toUpperCase());
         String contextRoot = read("Please input the REST context path:", "http://localhost:8080/dctm-rest");
-        String repository = read("Please input the repository name:");
-        String username = read("Please input the username:");
-        String password = read("Please input the password:");
+        String repository = read("Please input the repository name:", "REPO");
+        String username = read("Please input the username:", "dmadmin");
+        String password = read("Please input the password:", "password");
         String useFormatExtension = read("Please input the whether add format extension .xml or .json for URI:", "false");
         String debug = read("Please input whether print debug information:", "false");
         
@@ -75,7 +75,9 @@ public class DCTMRestClientSample {
           .append("9 Lightweight Object Type/Create/Materialize/Dematerialize/Reparent (REST Services 7.3+)").append(NEWLINE)
           .append("10 Aspect AspectType/Attach/Detach (REST Services 7.3+)").append(NEWLINE)
           .append("11 Get Group(s)/User(s)/Default Folder (REST Services 7.x) and Create/Update/Delete User/Group Add/Remove User to/from Group (REST Services 7.3+)").append(NEWLINE)
-          .append("12 Get Relation Typs(s) and Relation Create/Delete/Get").append(NEWLINE);
+          .append("12 Get Relation Typs(s) and Relation Create/Delete/Get").append(NEWLINE)
+          .append("13 Get Format(s)").append(NEWLINE)
+          .append("14 Get Network Location(s)").append(NEWLINE);
         
         while(true) {
             String sample = read(sb.toString());
@@ -122,6 +124,12 @@ public class DCTMRestClientSample {
                         break;
                     case 12:
                         relation();
+                        break;
+                    case 13:
+                        format();
+                        break;
+                    case 14:
+                        networkLocation();
                         break;
                     default:
                         System.out.println("Unsupported " + op);
@@ -921,6 +929,48 @@ public class DCTMRestClientSample {
         client.delete(child);
         
         System.out.println("finish Relation samples");
+        printNewLine();
+    }
+    
+    /**
+     * samples to get the format
+     */
+    private static void format() {
+        System.out.println("start Format samples");
+        
+        System.out.println("-------------get all formats");
+        Feed<RestObject> formats = client.getFormats();
+        printEntryContentSrc(formats);
+        printNewLine();
+
+        System.out.println("-------------get a single format");
+        RestObject format = client.getFormat(formats.getEntries().get(0).getContentSrc());
+        printRestObject(format, "name", "description", "dos_extension");
+        printNewLine();
+        
+        System.out.println("finish Format samples");
+        printNewLine();
+    }
+    
+    /**
+     * samples to get the network location
+     */
+    private static void networkLocation() {
+        System.out.println("start Network Location samples");
+        
+        System.out.println("-------------get all network locations");
+        Feed<RestObject> networkLocations = client.getNetworkLocations();
+        printEntryContentSrc(networkLocations);
+        printNewLine();
+
+        if(networkLocations.getEntries().size() > 0) {
+            System.out.println("-------------get a single network location");
+            RestObject networkLocation = client.getNetworkLocation(networkLocations.getEntries().get(0).getContentSrc());
+            printRestObject(networkLocation, "object_name", "r_object_type", "netloc_ident", "netloc_display_name", "begin_near_ip_address", "end_near_ip_address");
+            printNewLine();
+        }
+        
+        System.out.println("finish Network Location samples");
         printNewLine();
     }
     
