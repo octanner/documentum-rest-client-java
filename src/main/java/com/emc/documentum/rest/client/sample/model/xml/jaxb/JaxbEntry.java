@@ -20,6 +20,7 @@ import com.emc.documentum.rest.client.sample.model.Entry;
 import com.emc.documentum.rest.client.sample.model.Inlineable;
 import com.emc.documentum.rest.client.sample.model.Link;
 import com.emc.documentum.rest.client.sample.model.Linkable;
+import com.emc.documentum.rest.client.sample.model.LinkableBase;
 import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
 @XmlRootElement(name = "entry", namespace = XMLNamespace.ATOM_NAMESPACE)

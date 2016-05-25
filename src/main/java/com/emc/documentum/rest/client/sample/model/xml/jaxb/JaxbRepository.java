@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.Link;
+import com.emc.documentum.rest.client.sample.model.LinkableBase;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
@@ -61,7 +62,7 @@ public class JaxbRepository extends LinkableBase implements Repository {
     }
 
     @Override
-    @XmlElementWrapper(name="links")
+    @XmlElementWrapper(name="links", namespace=XMLNamespace.DM_NAMESPACE)
     @XmlElement(name="link", type=JaxbLink.class, namespace=XMLNamespace.DM_NAMESPACE)
     public List<Link> getLinks() {
         return links;

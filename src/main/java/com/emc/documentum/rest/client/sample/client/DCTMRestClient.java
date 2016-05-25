@@ -6,9 +6,11 @@ package com.emc.documentum.rest.client.sample.client;
 import javax.annotation.concurrent.NotThreadSafe;
 
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
 import com.emc.documentum.rest.client.sample.model.Feed;
+import com.emc.documentum.rest.client.sample.model.FolderLink;
 import com.emc.documentum.rest.client.sample.model.HomeDocument;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
 import com.emc.documentum.rest.client.sample.model.Linkable;
@@ -189,6 +191,17 @@ public interface DCTMRestClient {
      * @return the updated RestObject
      */
     public RestObject update(RestObject oldObject, RestObject newObject, String... params);
+    
+    /**
+     * update the RestObject with new properties
+     * @param oldObject
+     * @param rel
+     * @param newObject
+     * @param method
+     * @param params
+     * @return
+     */
+    public RestObject update(RestObject oldObject, LinkRelation rel, RestObject newObject, HttpMethod method, String... params);
     
     /**
      * delete the resource
@@ -516,4 +529,37 @@ public interface DCTMRestClient {
      * @return
      */
     public RestObject getNetworkLocation(String uri, String... params);
+    
+    /**
+     * get folder links of the object
+     * @param params
+     * @return
+     */
+    public Feed<FolderLink> getFolderLinks(RestObject object, LinkRelation rel, String... params);
+    
+    /**
+     * get single folder link
+     * @param uri
+     * @param params
+     * @return
+     */
+    public FolderLink getFolderLink(String uri, String... params);
+    
+    /**
+     * move the object by the folder link
+     * @param oldLink
+     * @param newLink
+     * @param params
+     * @return
+     */
+    public FolderLink move(FolderLink oldLink, FolderLink newLink, String... params);
+    
+    /**
+     * link an object to another place
+     * @param object
+     * @param rel
+     * @param link
+     * @return
+     */
+    public FolderLink link(RestObject object, LinkRelation rel, FolderLink link);
 }

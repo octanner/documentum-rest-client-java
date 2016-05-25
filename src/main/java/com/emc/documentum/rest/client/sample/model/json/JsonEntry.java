@@ -11,6 +11,7 @@ import com.emc.documentum.rest.client.sample.model.Author;
 import com.emc.documentum.rest.client.sample.model.Entry;
 import com.emc.documentum.rest.client.sample.model.InlineLinkable;
 import com.emc.documentum.rest.client.sample.model.Link;
+import com.emc.documentum.rest.client.sample.model.LinkableBase;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class JsonEntry<T extends InlineLinkable> extends LinkableBase implements Entry<T> {

@@ -1,19 +1,19 @@
 /*
  * Copyright (c) 2016. EMC Corporation. All Rights Reserved.
  */
-package com.emc.documentum.rest.client.sample.model.json;
+package com.emc.documentum.rest.client.sample.model;
 
 import java.util.List;
+
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import com.emc.documentum.rest.client.sample.model.Link;
-import com.emc.documentum.rest.client.sample.model.LinkRelation;
-import com.emc.documentum.rest.client.sample.model.Linkable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public abstract class LinkableBase implements Linkable {
+    @XmlTransient
     @JsonIgnore
     private MultiValueMap<String, Link> linksMap;
     
@@ -26,7 +26,12 @@ public abstract class LinkableBase implements Linkable {
     public String getHref(LinkRelation rel, String title) {
         return getValue(rel, title);
     }
-    
+
+    @Override
+    public String self() {
+        return getHref(LinkRelation.SELF);
+    }
+
     private String getValue(LinkRelation rel, String title) {
         if(linksMap == null && getLinks() != null) {
             linksMap = new LinkedMultiValueMap<String, Link>();

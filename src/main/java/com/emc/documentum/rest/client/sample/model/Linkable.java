@@ -26,4 +26,9 @@ public interface Linkable {
      * @return specified link by relation and title
      */
     String getHref(LinkRelation rel, String title);
+    
+    /**
+     * @return self link
+     */
+    String self();
 }

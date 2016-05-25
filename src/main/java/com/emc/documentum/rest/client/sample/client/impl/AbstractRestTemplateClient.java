@@ -30,9 +30,14 @@ import com.emc.documentum.rest.client.sample.client.util.UriHelper;
 import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.HomeDocument;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
+import com.emc.documentum.rest.client.sample.model.Linkable;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestError;
 import com.emc.documentum.rest.client.sample.model.RestObject;
+
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.DELETE;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.EDIT;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.SELF;
 
 /**
  * the basic implementation with Spring RestTemplate
@@ -268,6 +273,19 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
         sendRequest(uri, HttpMethod.DELETE, isXml()?Headers.ACCEPT_XML_HEADERS:Headers.ACCEPT_JSON_HEADERS, null, null, params);
     }
     
+    @Override
+    public void delete(Linkable linkable, String... params) {
+        if(linkable.getHref(DELETE) != null) {
+            delete(linkable.getHref(DELETE), params);
+        } else if(linkable.getHref(SELF) != null) {
+            delete(linkable.getHref(SELF), params);
+        } else if(linkable.getHref(EDIT) != null) {
+            delete(linkable.getHref(EDIT), params);
+        } else {
+            throw new IllegalArgumentException(String.valueOf(linkable));
+        }
+    }
+    
     protected <T> T post(String uri, Object body, Class<? extends T> responseBodyClass, String... params) {
         return sendRequest(uri, HttpMethod.POST, isXml()?Headers.ACCEPT_XML_HEADERS_WITH_CONTENT:Headers.ACCEPT_JSON_HEADERS_WITH_CONTENT, body, responseBodyClass, params);
     }
@@ -279,6 +297,24 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     
     protected <T> T put(String uri, Class<? extends T> responseBodyClass, String... params) {
         return sendRequest(uri, HttpMethod.PUT, isXml()?Headers.ACCEPT_XML_HEADERS:Headers.ACCEPT_JSON_HEADERS, null, responseBodyClass, params);
+    }
+    
+    @Override
+    public RestObject update(RestObject oldObject, LinkRelation rel, RestObject newObject, HttpMethod method, String... params) {
+        try {
+            RestObject newRestObject = newRestObject(oldObject, newObject);
+            if(method == HttpMethod.PUT) {
+                return put(oldObject.getHref(rel), newRestObject, newRestObject.getClass(), params);
+            } else  {
+                return post(oldObject.getHref(rel), newRestObject, newRestObject.getClass(), params);
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException(oldObject.getClass().getName());
+        }
+    }
+    
+    protected <T> T put(String uri, Object body, Class<? extends T> responseBodyClass, String... params) {
+        return sendRequest(uri, HttpMethod.PUT, isXml()?Headers.ACCEPT_XML_HEADERS_WITH_CONTENT:Headers.ACCEPT_JSON_HEADERS_WITH_CONTENT, body, responseBodyClass, params);
     }
     
     protected <T> T post(String uri, T object, Object content, Class<? extends T> responseBodyClass, String... params) {

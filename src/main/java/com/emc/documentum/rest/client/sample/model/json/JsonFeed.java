@@ -12,6 +12,7 @@ import com.emc.documentum.rest.client.sample.model.Entry;
 import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.InlineLinkable;
 import com.emc.documentum.rest.client.sample.model.Link;
+import com.emc.documentum.rest.client.sample.model.LinkableBase;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;

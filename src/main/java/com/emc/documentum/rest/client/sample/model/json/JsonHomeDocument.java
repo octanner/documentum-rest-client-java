@@ -11,6 +11,7 @@ import java.util.Objects;
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.HomeDocument;
 import com.emc.documentum.rest.client.sample.model.Link;
+import com.emc.documentum.rest.client.sample.model.LinkableBase;
 
 public class JsonHomeDocument extends LinkableBase implements HomeDocument {
     private Map<String, Map<String, Object>> resources;

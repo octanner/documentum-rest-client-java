@@ -15,6 +15,7 @@ import com.emc.documentum.rest.client.sample.model.Entry;
 import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.Link;
 import com.emc.documentum.rest.client.sample.model.Linkable;
+import com.emc.documentum.rest.client.sample.model.LinkableBase;
 import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
 @XmlRootElement(name="feed", namespace=XMLNamespace.ATOM_NAMESPACE)

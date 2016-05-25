@@ -104,4 +104,9 @@ public class PlainRestObject implements RestObject {
     public String getHref(LinkRelation rel, String title) {
         return null;
     }
+
+    @Override
+    public String self() {
+        return null;
+    }
 }

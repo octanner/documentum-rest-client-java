@@ -8,6 +8,7 @@ import java.util.Objects;
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.InlineLinkable;
 import com.emc.documentum.rest.client.sample.model.Linkable;
+import com.emc.documentum.rest.client.sample.model.LinkableBase;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
