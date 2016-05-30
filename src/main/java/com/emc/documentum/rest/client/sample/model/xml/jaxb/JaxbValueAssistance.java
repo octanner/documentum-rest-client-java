@@ -9,7 +9,6 @@ import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -18,17 +17,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
-import com.emc.documentum.rest.client.sample.model.Link;
-import com.emc.documentum.rest.client.sample.model.LinkableBase;
 import com.emc.documentum.rest.client.sample.model.ValueAssistant;
 import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
 @XmlRootElement(name = "assist-values", namespace = XMLNamespace.DM_NAMESPACE)
-public class JaxbValueAssistance extends LinkableBase implements ValueAssistant {
+public class JaxbValueAssistance extends JaxbDmLinkableBase implements ValueAssistant {
     
     private List<Attribute> properties;
     private ValueAssistantProperties valueAssistantProperties;
-    private List<Link> links;
 
     @Override
     @XmlTransient
@@ -60,17 +56,6 @@ public class JaxbValueAssistance extends LinkableBase implements ValueAssistant 
 
     protected void setValueAssistantProperties(ValueAssistantProperties valueAssistantProperties) {
         this.valueAssistantProperties = valueAssistantProperties;
-    }
-    
-    @Override
-    @XmlElementWrapper(name = "links")
-    @XmlElement(name = "link", type = JaxbLink.class, namespace = XMLNamespace.DM_NAMESPACE)
-    public List<Link> getLinks() {
-        return links;
-    }
-
-    public void setLinks(List<Link> links) {
-        this.links = links;
     }
 
     @XmlRootElement(name = "properties")

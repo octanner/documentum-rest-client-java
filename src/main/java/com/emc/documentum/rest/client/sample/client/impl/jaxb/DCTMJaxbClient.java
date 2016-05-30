@@ -29,6 +29,7 @@ import com.emc.documentum.rest.client.sample.model.PlainRestObject;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.RestType;
+import com.emc.documentum.rest.client.sample.model.SearchFeed;
 import com.emc.documentum.rest.client.sample.model.ValueAssistant;
 import com.emc.documentum.rest.client.sample.model.ValueAssistantRequest;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbAspectType;
@@ -48,6 +49,7 @@ import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbProductInfo;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbRelation;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbRelationType;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbRepository;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSearchFeed;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSysObject;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbType;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbUser;
@@ -83,6 +85,7 @@ import static com.emc.documentum.rest.client.sample.model.LinkRelation.PRIMARY_C
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.RELATIONS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.RELATION_TYPES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.REPOSITORIES;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.SEARCH;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SELF;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SHARED_PARENT;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.TYPES;
@@ -143,6 +146,11 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     @Override
     public Feed<RestObject> dql(String dql, String... params) {
         return get(getRepository().getHref(SELF), true, JaxbFeed.class, UriHelper.append(params, "dql", dql));
+    }
+    
+    @Override
+    public SearchFeed<RestObject> search(String search, String... params) {
+        return get(getRepository().getHref(SEARCH), true, JaxbSearchFeed.class, UriHelper.append(params, "q", search));
     }
     
     @Override

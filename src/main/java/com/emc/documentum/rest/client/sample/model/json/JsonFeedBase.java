@@ -10,24 +10,21 @@ import java.util.Objects;
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.Author;
 import com.emc.documentum.rest.client.sample.model.Entry;
+import com.emc.documentum.rest.client.sample.model.FeedBase;
 import com.emc.documentum.rest.client.sample.model.InlineLinkable;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class JsonEntry<T extends InlineLinkable> extends JsonLinkableBase implements Entry<T> {
-    @JsonProperty
+public abstract class JsonFeedBase<T extends InlineLinkable, E extends Entry<T>> extends JsonLinkableBase implements FeedBase<T, E> {
     private String id;
-    @JsonProperty
     private String title;
-    @JsonProperty
     private String updated;
-    @JsonProperty
     private String summary;
+    private Integer page;
+    @JsonProperty("items-per-page")
+    private Integer itemsPerPage;
+    private Integer total;
     @JsonProperty
     private List<JsonAuthor> author;
-    @JsonProperty
-    private T content;
-    @JsonProperty
-    private String published;
     
     @Override
     public String getId() {
@@ -65,14 +62,6 @@ public class JsonEntry<T extends InlineLinkable> extends JsonLinkableBase implem
         this.summary = summary;
     }
 
-    public T getContent() {
-        return content;
-    }
-
-    public void setContent(T content) {
-        this.content= content;
-    }
-
     @Override
     public List<Author> getAuthors() {
         return author==null?null:new ArrayList<Author>(author);
@@ -83,42 +72,48 @@ public class JsonEntry<T extends InlineLinkable> extends JsonLinkableBase implem
     }
 
     @Override
-    public String getContentSrc() {
-        return content==null?null:content.getSrc();
+    public Integer getPage() {
+        return page;
+    }
+
+    public void setPage(Integer page) {
+        this.page = page;
     }
 
     @Override
-    public String getContentType() {
-        return content==null?null:content.getContentType();
+    public Integer getItemsPerPage() {
+        return itemsPerPage;
+    }
+
+    public void setItemsPerPage(Integer itemsPerPage) {
+        this.itemsPerPage = itemsPerPage;
     }
 
     @Override
-    public String getPublished() {
-        return published;
+    public Integer getTotal() {
+        return total;
     }
 
-    public void setPublished(String published) {
-        this.published = published;
+    public void setTotal(Integer total) {
+        this.total = total;
     }
 
-    @Override
-    public T getContentObject() {
-        return content;
-    }
-
+    @SuppressWarnings("rawtypes")
     @Override
     public boolean equals(Object obj) {
-        JsonEntry<?> that = (JsonEntry<?>)obj;
+        JsonFeedBase that = (JsonFeedBase)obj;
         return Equals.equal(id, that.id) 
             && Equals.equal(title, that.title)
             && Equals.equal(updated, that.updated)
             && Equals.equal(summary, that.summary)
-            && Equals.equal(content, that.content)
+            && Equals.equal(page, that.page)
+            && Equals.equal(itemsPerPage, that.itemsPerPage)
+            && Equals.equal(total, that.total)
             && Equals.equal(author, that.author);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, updated, summary, content);
+        return Objects.hash(id, title, updated, summary, page, total);
     }
 }

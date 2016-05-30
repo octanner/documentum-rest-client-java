@@ -3,22 +3,20 @@
  */
 package com.emc.documentum.rest.client.sample.model.json;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
-import com.emc.documentum.rest.client.sample.model.Link;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class JsonRepository extends InlineLinkableBase implements Repository {
+public class JsonRepository extends JsonInlineLinkableBase implements Repository {
     private int id;
     private String name;
     private String description;
     @JsonProperty
-    private List<Server> servers;
-    @JsonProperty
-    private List<Link> links;
+    private List<JsonServer> servers;
 
     @Override
     public int getId() {
@@ -49,20 +47,11 @@ public class JsonRepository extends InlineLinkableBase implements Repository {
 
     @Override
     public List<Server> getServers() {
-        return servers;
+        return servers==null?null:new ArrayList<Server>(servers);
     }
 
-    public void setServers(List<Server> servers) {
+    public void setServers(List<JsonServer> servers) {
         this.servers = servers;
-    }
-
-    @Override
-    public List<Link> getLinks() {
-        return links;
-    }
-
-    public void setLinks(List<Link> links) {
-        this.links = links;
     }
 
     public static class JsonServer implements Repository.Server {
@@ -121,7 +110,6 @@ public class JsonRepository extends InlineLinkableBase implements Repository {
                 && Equals.equal(name, that.name)
                 && Equals.equal(description, that.description)
                 && Equals.equal(servers, that.servers)
-                && Equals.equal(links, that.links)
                 && super.equals(obj);
     }
 

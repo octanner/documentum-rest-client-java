@@ -8,11 +8,10 @@ import java.util.Objects;
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.InlineLinkable;
 import com.emc.documentum.rest.client.sample.model.Linkable;
-import com.emc.documentum.rest.client.sample.model.LinkableBase;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public abstract class InlineLinkableBase extends LinkableBase implements InlineLinkable {
+public abstract class JsonInlineLinkableBase extends JsonLinkableBase implements InlineLinkable {
     private String src;
     @JsonProperty("type")  
     private String contentType;
@@ -41,7 +40,7 @@ public abstract class InlineLinkableBase extends LinkableBase implements InlineL
 
     @Override
     public boolean equals(Object obj) {
-        InlineLinkableBase that = (InlineLinkableBase)obj;
+        JsonInlineLinkableBase that = (JsonInlineLinkableBase)obj;
         return super.equals(obj)
             && Equals.equal(src, that.src) 
             && Equals.equal(contentType, that.contentType);

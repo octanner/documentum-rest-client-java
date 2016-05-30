@@ -3,54 +3,10 @@
  */
 package com.emc.documentum.rest.client.sample.model;
 
-import java.util.List;
 
 /**
  * the class represents a feed collection
  */
-public interface Feed<T extends Linkable> extends Linkable {
-    /**
-     * @return feed id
-     */
-    String getId();
-    
-    /**
-     * @return feed title
-     */
-    String getTitle();
-    
-    /**
-     * @return feed updated time
-     */
-    String getUpdated();
-    
-    /**
-     * @return feed authors
-     */
-    List<Author> getAuthors();
-    
-    /**
-     * @return feed summary
-     */
-    String getSummary();
+public interface Feed<T extends Linkable> extends FeedBase<T, Entry<T>> {
 
-    /**
-     * @return Entry list of the feed
-     */
-    List<Entry<T>> getEntries();
-    
-    /**
-     * @return total count of the request feed, including all page of feed
-     */
-    Integer getTotal();
-    
-    /**
-     * @return current page
-     */
-    Integer getPage();
-    
-    /**
-     * @return items per page
-     */
-    Integer getItemsPerPage();
 }

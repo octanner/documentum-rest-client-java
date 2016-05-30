@@ -55,10 +55,14 @@ public abstract class LinkableBase implements Linkable {
                     }
                 }
                 if(link != null) {
-                    href = link.isTemplate()?link.getHreftemplate():link.getHref();
+                    href = link.isTemplate()?trimHrefTemplate(link.getHreftemplate()):link.getHref();
                 }
             }
         }
         return href;
+    }
+    
+    private static String trimHrefTemplate(String template) {
+        return template.replaceFirst("\\{.+\\}$", "");
     }
 }

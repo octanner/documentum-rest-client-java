@@ -12,7 +12,6 @@ import java.util.Objects;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -21,11 +20,10 @@ import org.w3c.dom.NodeList;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.Link;
-import com.emc.documentum.rest.client.sample.model.LinkableBase;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
-public abstract class JaxbObject extends LinkableBase implements RestObject {
+public abstract class JaxbObject extends JaxbDmLinkableBase implements RestObject {
     protected String type;
     protected String definition;
     protected Map<String, Object> properties;
@@ -142,17 +140,6 @@ public abstract class JaxbObject extends LinkableBase implements RestObject {
     @Override
     public String getPropertiesType() {
         return objectProperties==null?null:objectProperties.getPropertiesType();
-    }
-
-    @Override
-    @XmlElementWrapper(name = "links")
-    @XmlElement(name = "link", type = JaxbLink.class, namespace = XMLNamespace.DM_NAMESPACE)
-    public List<Link> getLinks() {
-        return links;
-    }
-
-    public void setLinks(List<Link> links) {
-        this.links = links;
     }
 
     @XmlRootElement(name = "properties")

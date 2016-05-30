@@ -29,6 +29,7 @@ import com.emc.documentum.rest.client.sample.model.ObjectAspects;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.RestType;
+import com.emc.documentum.rest.client.sample.model.SearchFeed;
 import com.emc.documentum.rest.client.sample.model.ValueAssistant;
 import com.emc.documentum.rest.client.sample.model.ValueAssistantRequest;
 import com.emc.documentum.rest.client.sample.model.json.JsonFeeds;
@@ -71,6 +72,7 @@ import static com.emc.documentum.rest.client.sample.model.LinkRelation.PRIMARY_C
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.RELATIONS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.RELATION_TYPES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.REPOSITORIES;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.SEARCH;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SELF;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SHARED_PARENT;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.TYPES;
@@ -136,6 +138,13 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
         return (Feed<RestObject>)feed;
     }
     
+    @SuppressWarnings("unchecked")
+    @Override
+    public SearchFeed<RestObject> search(String search, String... params) {
+        SearchFeed<? extends RestObject> feed = get(getRepository().getHref(SEARCH), true, JsonFeeds.SearchFeed.class, UriHelper.append(params, "q", search));
+        return (SearchFeed<RestObject>)feed;
+    }
+
     @Override
     public Feed<RestObject> getCabinets(String... params) {
         Repository repository = getRepository();
@@ -488,6 +497,7 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
         for(HttpMessageConverter<?> c : restTemplate.getMessageConverters()) {
             if(c instanceof MappingJackson2HttpMessageConverter) {
                 ((MappingJackson2HttpMessageConverter)c).getObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+//                ((MappingJackson2HttpMessageConverter)c).getObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             } else if(c instanceof FormHttpMessageConverter) {
                 try {
                     Field pcField = FormHttpMessageConverter.class.getDeclaredField("partConverters");
@@ -496,6 +506,7 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
                     for(HttpMessageConverter<?> pc : partConverters) {
                         if(pc instanceof MappingJackson2HttpMessageConverter) {
                             ((MappingJackson2HttpMessageConverter)pc).getObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+//                            ((MappingJackson2HttpMessageConverter)pc).getObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                             break;
                         }
                     }

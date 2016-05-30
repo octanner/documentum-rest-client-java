@@ -12,7 +12,6 @@ import java.util.Objects;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -21,13 +20,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
-import com.emc.documentum.rest.client.sample.model.Link;
-import com.emc.documentum.rest.client.sample.model.LinkableBase;
 import com.emc.documentum.rest.client.sample.model.RestType;
 import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
 @XmlRootElement(name = "type", namespace = XMLNamespace.DM_NAMESPACE)
-public class JaxbType extends LinkableBase implements RestType {
+public class JaxbType extends JaxbDmLinkableBase implements RestType {
     private String name;
     private String label;
     private String parent;
@@ -35,7 +32,6 @@ public class JaxbType extends LinkableBase implements RestType {
     private String category;
     private List<Map<String, Object>> properties;
     private TypeProperties objectProperties;
-    private List<Link> links;
     
     @Override
     @XmlAttribute
@@ -176,17 +172,6 @@ public class JaxbType extends LinkableBase implements RestType {
 
     protected void setObjectProperties(TypeProperties objectProperties) {
         this.objectProperties = objectProperties;
-    }
-    
-    @Override
-    @XmlElementWrapper(name = "links")
-    @XmlElement(name = "link", type = JaxbLink.class, namespace = XMLNamespace.DM_NAMESPACE)
-    public List<Link> getLinks() {
-        return links;
-    }
-
-    public void setLinks(List<Link> links) {
-        this.links = links;
     }
 
     @XmlRootElement(name = "properties")

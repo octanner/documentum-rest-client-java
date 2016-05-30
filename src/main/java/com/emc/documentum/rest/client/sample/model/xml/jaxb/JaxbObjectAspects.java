@@ -8,20 +8,16 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
-import com.emc.documentum.rest.client.sample.model.Link;
-import com.emc.documentum.rest.client.sample.model.LinkableBase;
 import com.emc.documentum.rest.client.sample.model.ObjectAspects;
 import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
 @XmlRootElement(name="object-aspects", namespace=XMLNamespace.DM_NAMESPACE)
-public class JaxbObjectAspects extends LinkableBase implements ObjectAspects {
+public class JaxbObjectAspects extends JaxbDmLinkableBase implements ObjectAspects {
 
     private List<String> aspects;
-    private List<Link> links;
     
     public JaxbObjectAspects() {
     }
@@ -38,17 +34,6 @@ public class JaxbObjectAspects extends LinkableBase implements ObjectAspects {
 
     public void setAspects(List<String> aspects) {
         this.aspects = aspects;
-    }
-
-    @Override
-    @XmlElementWrapper(name = "links")
-    @XmlElement(name = "link", type = JaxbLink.class, namespace=XMLNamespace.DM_NAMESPACE)
-    public List<Link> getLinks() {
-        return links;
-    }
-
-    public void setLinks(List<Link> links) {
-        this.links = links;
     }
 
     @Override

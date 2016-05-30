@@ -16,4 +16,7 @@ public class JsonFeeds {
     
     public static class FolderLinkFeed extends JsonFeed<JsonFolderLink>{
     }
+    
+    public static class SearchFeed extends JsonSearchFeed<JsonObject>{
+    }
 }

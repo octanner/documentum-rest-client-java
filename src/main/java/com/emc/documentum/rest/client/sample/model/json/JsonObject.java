@@ -3,24 +3,19 @@
  */
 package com.emc.documentum.rest.client.sample.model.json;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
-import com.emc.documentum.rest.client.sample.model.Link;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class JsonObject extends InlineLinkableBase implements RestObject {
+public class JsonObject extends JsonInlineLinkableBase implements RestObject {
     private String name;
     private String type;
     private String definition;
     private Map<String, Object> properties;
     private String href;
-    @JsonProperty
-    private List<Link> links;
     
     public JsonObject() {
     }
@@ -30,7 +25,6 @@ public class JsonObject extends InlineLinkableBase implements RestObject {
         this.type = object.getType();
         this.definition = object.getDefinition();
         this.properties = object.getProperties();
-        this.links = object.getLinks();
         this.href = object.getHref();
     }
     
@@ -99,15 +93,6 @@ public class JsonObject extends InlineLinkableBase implements RestObject {
     @Override
     public String getPropertiesType() {
         return null;
-    }
-
-    @Override
-    public List<Link> getLinks() {
-        return links;
-    }
-
-    public void setLinks(List<Link> links) {
-        this.links = links;
     }
 
     @Override

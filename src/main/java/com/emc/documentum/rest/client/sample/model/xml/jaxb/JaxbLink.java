@@ -10,9 +10,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.Link;
-import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
-@XmlRootElement(name="link", namespace=XMLNamespace.ATOM_NAMESPACE)
+@XmlRootElement(name="link")
 public class JaxbLink implements Link {
     private String rel;
     private String hreftemplate;

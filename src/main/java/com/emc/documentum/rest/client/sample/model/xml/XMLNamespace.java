@@ -18,4 +18,7 @@ public final class XMLNamespace {
     
     public static final String XML_NAMESPACE = "http://www.w3.org/XML/1998/namespace";
     public static final String XML_PREFIX = "xml";
+    
+    public static final String RELEVANCE_NAMESPACE = "http://a9.com/-/opensearch/extensions/relevance/1.0/";
+    public static final String RELEVANCE_PREFIX = "relevance";
 }

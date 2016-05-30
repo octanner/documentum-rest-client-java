@@ -3,16 +3,12 @@
  */
 package com.emc.documentum.rest.client.sample.model;
 
-import com.emc.documentum.rest.client.sample.model.json.JsonLink;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 
 
 /**
  * the link of the resources
  */
-@JsonTypeInfo(use=Id.CLASS, defaultImpl=JsonLink.class)
 public interface Link {
     /**
      * @return the link relation of the link

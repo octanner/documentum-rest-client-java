@@ -8,17 +8,15 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
-import com.emc.documentum.rest.client.sample.model.Link;
 import com.emc.documentum.rest.client.sample.model.RestType;
 
-public class JsonType extends InlineLinkableBase implements RestType {
+public class JsonType extends JsonInlineLinkableBase implements RestType {
     private String name;
     private String label;
     private String parent;
     private String sharedParent;
     private String category;
     private List<Map<String, Object>> properties;
-    private List<Link> links;
 
     @Override
     public String getName() {
@@ -72,15 +70,6 @@ public class JsonType extends InlineLinkableBase implements RestType {
 
     public void setProperties(List<Map<String, Object>> properties) {
         this.properties = properties;
-    }
-    
-    @Override
-    public List<Link> getLinks() {
-        return links;
-    }
-
-    public void setLinks(List<Link> links) {
-        this.links = links;
     }
 
     @Override

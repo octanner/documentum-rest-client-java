@@ -8,16 +8,12 @@ import java.util.List;
 import java.util.Objects;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
-import com.emc.documentum.rest.client.sample.model.Link;
-import com.emc.documentum.rest.client.sample.model.LinkableBase;
 import com.emc.documentum.rest.client.sample.model.ObjectAspects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class JsonObjectAspects extends LinkableBase implements ObjectAspects {
+public class JsonObjectAspects extends JsonLinkableBase implements ObjectAspects {
     @JsonProperty
     private List<String> aspects;
-    @JsonProperty
-    private List<Link> links;
     
     public JsonObjectAspects() {
     }
@@ -33,15 +29,6 @@ public class JsonObjectAspects extends LinkableBase implements ObjectAspects {
 
     public void setAspects(List<String> aspects) {
         this.aspects = aspects;
-    }
-
-    @Override
-    public List<Link> getLinks() {
-        return links;
-    }
-
-    public void setLinks(List<Link> links) {
-        this.links = links;
     }
 
     @Override

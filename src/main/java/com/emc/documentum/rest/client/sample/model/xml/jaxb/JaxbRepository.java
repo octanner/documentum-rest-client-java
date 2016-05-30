@@ -7,22 +7,18 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
-import com.emc.documentum.rest.client.sample.model.Link;
-import com.emc.documentum.rest.client.sample.model.LinkableBase;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
 @XmlRootElement(name = "repository", namespace = XMLNamespace.DM_NAMESPACE)
-public class JaxbRepository extends LinkableBase implements Repository {
+public class JaxbRepository extends JaxbDmLinkableBase implements Repository {
     private int id;
     private String name;
     private String description;
     private List<Server> servers;
-    private List<Link> links;
 
     @Override
     public int getId() {
@@ -59,17 +55,6 @@ public class JaxbRepository extends LinkableBase implements Repository {
 
     public void setServers(List<Server> servers) {
         this.servers = servers;
-    }
-
-    @Override
-    @XmlElementWrapper(name="links", namespace=XMLNamespace.DM_NAMESPACE)
-    @XmlElement(name="link", type=JaxbLink.class, namespace=XMLNamespace.DM_NAMESPACE)
-    public List<Link> getLinks() {
-        return links;
-    }
-
-    public void setLinks(List<Link> links) {
-        this.links = links;
     }
 
     @XmlRootElement(name = "server")

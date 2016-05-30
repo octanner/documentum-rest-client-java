@@ -71,6 +71,7 @@ public enum LinkRelation {
     SHARED_PARENT("shared-parent", true),
     
     DQL("dql", true),
+    SEARCH("search", true),
     CABINETS("cabinets", true),
     FORMATS("formats", true),
     NETWORK_LOCATIONS("network-locations", true),

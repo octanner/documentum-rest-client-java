@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016. EMC Corporation. All Rights Reserved.
  */
-package com.emc.documentum.rest.client.sample.client;
+package com.emc.documentum.rest.client.sample;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -9,8 +9,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.emc.documentum.rest.client.sample.client.DCTMRestClient;
+import com.emc.documentum.rest.client.sample.client.DCTMRestClientBinding;
+import com.emc.documentum.rest.client.sample.client.DCTMRestClientBuilder;
 import com.emc.documentum.rest.client.sample.client.util.Randoms;
 import com.emc.documentum.rest.client.sample.model.Entry;
+import com.emc.documentum.rest.client.sample.model.Facet;
+import com.emc.documentum.rest.client.sample.model.FacetValue;
 import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.FolderLink;
 import com.emc.documentum.rest.client.sample.model.HomeDocument;
@@ -24,6 +29,8 @@ import com.emc.documentum.rest.client.sample.model.PlainValueAssistantRequest;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.RestType;
+import com.emc.documentum.rest.client.sample.model.SearchEntry;
+import com.emc.documentum.rest.client.sample.model.SearchFeed;
 import com.emc.documentum.rest.client.sample.model.ValueAssistant;
 
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CHILD_LINKS;
@@ -53,9 +60,9 @@ public class DCTMRestClientSample {
         String bindingStr = read(sb.toString(), "XML");
         DCTMRestClientBinding binding = DCTMRestClientBinding.valueOf(bindingStr.toUpperCase());
         String contextRoot = read("Please input the REST context path:", "http://localhost:8080/dctm-rest");
-        String repository = read("Please input the repository name:", "REPO");
-        String username = read("Please input the username:", "dmadmin");
-        String password = read("Please input the password:", "password");
+        String repository = read("Please input the repository name:");
+        String username = read("Please input the username:");
+        String password = read("Please input the password:");
         String useFormatExtension = read("Please input the whether add format extension .xml or .json for URI:", "false");
         String debug = read("Please input whether print debug information:", "false");
         
@@ -90,7 +97,8 @@ public class DCTMRestClientSample {
           .append("12 Get Relation Typs(s) and Relation Create/Delete/Get").append(NEWLINE)
           .append("13 Get Format(s)").append(NEWLINE)
           .append("14 Get Network Location(s)").append(NEWLINE)
-          .append("15 Copy, Move, Link, Unlink").append(NEWLINE);
+          .append("15 Copy, Move, Link, Unlink").append(NEWLINE)
+          .append("16 Simple Search").append(NEWLINE);
         
         while(true) {
             String sample = read(sb.toString());
@@ -146,6 +154,9 @@ public class DCTMRestClientSample {
                         break;
                     case 15:
                         copyMoveLinkUnlink();
+                        break;
+                    case 16:
+                        search();
                         break;
                     default:
                         System.out.println("Unsupported " + op);
@@ -206,10 +217,7 @@ public class DCTMRestClientSample {
         
         printStep("get home document resource");
         HomeDocument home = client.getHomeDocument();
-        List<Link> list = home.getLinks();
-        for(Link l : list) {
-            System.out.println(l.getRel() + " -> " + l.getHref());
-        }
+        printLinks(home);
         printNewLine();
         
         printStep("get repositories collection");
@@ -645,10 +653,7 @@ public class DCTMRestClientSample {
         
         printStep("get type resource");
         RestType type = client.getType("dm_document");
-        List<Link> list = type.getLinks();
-        for(Link l : list) {
-            System.out.println(l.getRel() + " -> " + l.getHref());
-        }
+        printLinks(type);
         System.out.println(type.getName() + " " + type.getCategory() + " " + type.getParent()
                 + (type.getSharedParent() == null ? "" : type.getSharedParent()));
         for(Map<String, Object> map : type.getProperties()) {
@@ -1060,6 +1065,49 @@ public class DCTMRestClientSample {
         printNewLine();
     }
     
+    /**
+     * samples to search
+     */
+    private static void search() {
+        System.out.println("start Search samples");
+        
+        printStep("simple search");
+        String searchValue = read("Please input the value you want to search:");
+        SearchFeed<RestObject> result = client.search(searchValue);
+        for(SearchEntry<RestObject> e : result.getEntries()) {
+            System.out.println(e.getTitle() + " -> " + e.getContentSrc());
+            System.out.println("score:" + e.getScore() + ", terms:" + e.getTerms());
+        }
+        printNewLine();
+
+        printStep("simple search with facet");
+        result = client.search(searchValue, "facet", "r_modify_date");
+        for(SearchEntry<RestObject> e : result.getEntries()) {
+            System.out.println(e.getTitle() + " -> " + e.getContentSrc());
+            System.out.println("score:" + e.getScore() + ", terms:" + e.getTerms());
+        }
+        for(Facet f : result.getFacets()) {
+            System.out.println("facet id:" + f.getId() + ", facet label:" + f.getLabel());
+            for(FacetValue fv : f.getValues()) {
+                System.out.println("facet-id:" + fv.getFacetId() + ", facet-value-id:" + fv.getId()
+                    + ", facet-value-count:" + fv.getCount() + "facet-value-constraint:" + fv.getConstraint());
+                printLinks(fv);
+            }
+        }
+        printNewLine();
+        
+        printStep("simple search with inline result");
+        result = client.search(searchValue, "inline", "true");
+        for(SearchEntry<RestObject> e : result.getEntries()) {
+            System.out.println("score:" + e.getScore() + ", terms:" + e.getTerms());
+            printRestObject(e.getContentObject());
+        }
+        printNewLine();
+        
+        System.out.println("finish Search samples");
+        printNewLine();
+    }
+    
     private static void printEntryContentSrc(Feed<?> feed) {
         for(Entry<?> e : feed.getEntries()) {
             System.out.println(e.getTitle() + " -> " + e.getContentSrc());
@@ -1092,6 +1140,18 @@ public class DCTMRestClientSample {
     private static void printLinkRel(Linkable linkable, LinkRelation... rels) {
         for(LinkRelation rel : rels) {
             System.out.println(rel.rel() + " -> " + linkable.getHref(rel));
+        }
+    }
+    
+    private static void printLinks(Linkable linkable) {
+        printLinks(linkable.getLinks());
+    }
+    
+    private static void printLinks(List<Link> links) {
+        if(links != null) {
+            for(Link l : links) {
+                System.out.println(l.getRel() + " -> " + l.getHref());
+            }
         }
     }
     

@@ -9,19 +9,16 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
-import com.emc.documentum.rest.client.sample.model.Link;
-import com.emc.documentum.rest.client.sample.model.LinkableBase;
 import com.emc.documentum.rest.client.sample.model.ValueAssistant;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class JsonValueAssistance extends LinkableBase implements ValueAssistant {
+public class JsonValueAssistance extends JsonLinkableBase implements ValueAssistant {
     @JsonIgnore
     private List<Attribute> properties;
     @SuppressWarnings("rawtypes")
     @JsonProperty("properties")
     private Map<String, Map> propertiesMap;
-    private List<Link> links;
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
@@ -43,15 +40,6 @@ public class JsonValueAssistance extends LinkableBase implements ValueAssistant 
     @SuppressWarnings("rawtypes")
     public void setPropertiesMap(Map<String, Map> propertiesMap) {
         this.propertiesMap = propertiesMap;
-    }
-
-    @Override
-    public List<Link> getLinks() {
-        return links;
-    }
-
-    public void setLinks(List<Link> links) {
-        this.links = links;
     }
     
     private static class JsonAssistantAttribute implements Attribute {

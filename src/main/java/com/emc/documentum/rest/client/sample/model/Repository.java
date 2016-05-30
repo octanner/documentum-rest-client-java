@@ -5,10 +5,6 @@ package com.emc.documentum.rest.client.sample.model;
 
 import java.util.List;
 
-import com.emc.documentum.rest.client.sample.model.json.JsonRepository;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-
 /**
  * represents the Repository object
  */
@@ -36,7 +32,6 @@ public interface Repository extends Linkable {
     /**
      * Repository server information
      */
-    @JsonTypeInfo(use=Id.CLASS, defaultImpl=JsonRepository.JsonServer.class)
     public interface Server {
         /**
          * @return server name
