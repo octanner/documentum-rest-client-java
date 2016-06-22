@@ -3,15 +3,19 @@
  */
 package com.emc.documentum.rest.client.sample;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.util.StringUtils;
+
 import com.emc.documentum.rest.client.sample.client.DCTMRestClient;
 import com.emc.documentum.rest.client.sample.client.DCTMRestClientBinding;
 import com.emc.documentum.rest.client.sample.client.DCTMRestClientBuilder;
+import com.emc.documentum.rest.client.sample.client.DCTMRestErrorException;
 import com.emc.documentum.rest.client.sample.client.util.Randoms;
 import com.emc.documentum.rest.client.sample.model.Entry;
 import com.emc.documentum.rest.client.sample.model.Facet;
@@ -32,6 +36,11 @@ import com.emc.documentum.rest.client.sample.model.RestType;
 import com.emc.documentum.rest.client.sample.model.SearchEntry;
 import com.emc.documentum.rest.client.sample.model.SearchFeed;
 import com.emc.documentum.rest.client.sample.model.ValueAssistant;
+import com.emc.documentum.rest.client.sample.model.batch.Batch;
+import com.emc.documentum.rest.client.sample.model.batch.Batch.OnError;
+import com.emc.documentum.rest.client.sample.model.batch.BatchBuilder;
+import com.emc.documentum.rest.client.sample.model.batch.Capabilities;
+import com.emc.documentum.rest.client.sample.model.batch.Operation;
 
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CHILD_LINKS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.DEFAULT_FOLDER;
@@ -43,6 +52,7 @@ import static com.emc.documentum.rest.client.sample.model.LinkRelation.OBJECTS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.PAGING_NEXT;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.PARENT_LINKS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SELF;
+import static org.springframework.http.HttpHeaders.LOCATION;
 
 /**
  * sample application uses DCTMRestClient
@@ -98,7 +108,8 @@ public class DCTMRestClientSample {
           .append("13 Get Format(s)").append(NEWLINE)
           .append("14 Get Network Location(s)").append(NEWLINE)
           .append("15 Copy, Move, Link, Unlink").append(NEWLINE)
-          .append("16 Simple Search").append(NEWLINE);
+          .append("16 Simple Search").append(NEWLINE)
+          .append("17 Batch and Batch Capabilities").append(NEWLINE);
         
         while(true) {
             String sample = read(sb.toString());
@@ -158,12 +169,16 @@ public class DCTMRestClientSample {
                     case 16:
                         search();
                         break;
+                    case 17:
+                        batch();
+                        break;
                     default:
                         System.out.println("Unsupported " + op);
                 }
             } catch(Exception e) {
                 e.printStackTrace();
             }
+            read("press \"Enter\" to continue", "");
         }
     }
     
@@ -188,7 +203,7 @@ public class DCTMRestClientSample {
     }
     
     private static String read(String prompt, String defaultValue) {
-        System.out.println(prompt + " [default " + defaultValue + "]"); 
+        System.out.println(StringUtils.isEmpty(defaultValue)?prompt:(prompt + " [default " + defaultValue + "]")); 
         String value = defaultValue;
         byte[] bytes = new byte[100];
         int readed;
@@ -365,7 +380,7 @@ public class DCTMRestClientSample {
         
         printStep("create an object without binary content under the Temp cabinet");
         RestObject newObjectWithoutContent = new PlainRestObject("object_name", "obj_without_content");
-        RestObject createdObjectWithoutContent = client.createObject(tempCabinet, newObjectWithoutContent, null);
+        RestObject createdObjectWithoutContent = client.createObject(tempCabinet, newObjectWithoutContent);
         printHttpStatus();
         printRestObject(createdObjectWithoutContent);
         printNewLine();
@@ -388,7 +403,7 @@ public class DCTMRestClientSample {
         newPropertiesMap.put("object_name", "obj_with_repeating_properties");
         newPropertiesMap.put("keywords", Arrays.asList("objects", "repeating", "properties"));
         RestObject newObjectWithRepeatingProperties = new PlainRestObject(newPropertiesMap);
-        RestObject createdObjectWithRepeatingProperties = client.createObject(tempCabinet, newObjectWithRepeatingProperties, null);
+        RestObject createdObjectWithRepeatingProperties = client.createObject(tempCabinet, newObjectWithRepeatingProperties);
         printHttpStatus();
         printRestObject(createdObjectWithRepeatingProperties, "r_object_id", "object_name", "r_object_type", "keywords");
         printNewLine();
@@ -400,7 +415,7 @@ public class DCTMRestClientSample {
 
         printStep("create an object with specify object type in another place to override the r_object_type");
         RestObject newObjectWithOverwriteType = new PlainRestObject("dm_sysobject", newPropertiesMap);
-        RestObject createdObjectWithOverwriteType = client.createObject(tempCabinet, newObjectWithOverwriteType, null);
+        RestObject createdObjectWithOverwriteType = client.createObject(tempCabinet, newObjectWithOverwriteType);
         printHttpStatus();
         printRestObject(createdObjectWithOverwriteType);
         printNewLine();
@@ -412,7 +427,7 @@ public class DCTMRestClientSample {
 
         printStep("create an object with binary content under the Temp cabinet");
         RestObject newObjectWithContent = new PlainRestObject("object_name", "obj_with_content");
-        RestObject createdObjectWithContent = client.createObject(tempCabinet, newObjectWithContent, "I'm the content of the object", "format", "crtext");
+        RestObject createdObjectWithContent = client.createObject(tempCabinet, newObjectWithContent, "I'm the content of the object", "text/plain", "format", "crtext");
         printHttpStatus();
         printRestObject(createdObjectWithContent);
         printNewLine();
@@ -436,7 +451,7 @@ public class DCTMRestClientSample {
         
         printStep("create a document without binary content under the Temp cabinet");
         RestObject newObjectWithoutContent = new PlainRestObject("object_name", "obj_without_content");
-        RestObject createdObjectWithoutContent = client.createDocument(tempCabinet, newObjectWithoutContent, null);
+        RestObject createdObjectWithoutContent = client.createDocument(tempCabinet, newObjectWithoutContent);
         printHttpStatus();
         printRestObject(createdObjectWithoutContent);
         printNewLine();
@@ -455,7 +470,7 @@ public class DCTMRestClientSample {
 
         printStep("create a document with binary content under the Temp cabinet");
         RestObject newObjectWithContent = new PlainRestObject("object_name", "obj_with_content");
-        RestObject createdObjectWithContent = client.createDocument(tempCabinet, newObjectWithContent, "I'm the content of the object", "format", "crtext");
+        RestObject createdObjectWithContent = client.createDocument(tempCabinet, newObjectWithContent, "I'm the content of the object", "text/plain", "format", "crtext");
         printHttpStatus();
         printRestObject(createdObjectWithContent);
         printNewLine();
@@ -480,7 +495,7 @@ public class DCTMRestClientSample {
         
         printStep("create a document with binary content under the Temp cabinet");
         RestObject newObjectWithContent = new PlainRestObject("object_name", "obj_with_content");
-        RestObject createdObjectWithContent = client.createDocument(tempCabinet, newObjectWithContent, "I'm the content of the object", "format", "crtext");
+        RestObject createdObjectWithContent = client.createDocument(tempCabinet, newObjectWithContent, "I'm the content of the object", "text/plain", "format", "crtext");
         printHttpStatus();
         printRestObject(createdObjectWithContent);
         printNewLine();
@@ -526,7 +541,7 @@ public class DCTMRestClientSample {
         
         printStep("create a document without binary content under the Temp cabinet");
         RestObject newObjectWithoutContent = new PlainRestObject("object_name", "obj_without_content");
-        RestObject createdObjectWithoutContent = client.createDocument(tempCabinet, newObjectWithoutContent, null);
+        RestObject createdObjectWithoutContent = client.createDocument(tempCabinet, newObjectWithoutContent);
         printHttpStatus();
         printRestObject(createdObjectWithoutContent, "r_object_id", "r_lock_owner");
         printNewLine();
@@ -551,7 +566,7 @@ public class DCTMRestClientSample {
         
         printStep("check in the created document next minor version with new name");
         RestObject newObjectWithName = new PlainRestObject("object_name", "obj_without_content_checked_in");
-        RestObject checkedInObject = client.checkinNextMinor(checkedOutObject, newObjectWithName, null);
+        RestObject checkedInObject = client.checkinNextMinor(checkedOutObject, newObjectWithName, null, null);
         printHttpStatus();
         printRestObject(checkedInObject, "r_object_id", "r_lock_owner", "r_version_label");
         printNewLine();
@@ -563,7 +578,7 @@ public class DCTMRestClientSample {
         printNewLine();
         
         printStep("check in the created document branch version with new binary content");
-        checkedInObject = client.checkinBranch(checkedOutObject, null, "new content");
+        checkedInObject = client.checkinBranch(checkedOutObject, null, "new content", null);
         printHttpStatus();
         printRestObject(checkedInObject, "r_object_id", "r_lock_owner", "r_version_label");
         printNewLine();
@@ -576,7 +591,7 @@ public class DCTMRestClientSample {
         
         printStep("check in the created document next major version with both new anme and new binary content");
         newObjectWithName = new PlainRestObject("object_name", "new object name");
-        checkedInObject = client.checkinNextMajor(checkedOutObject, newObjectWithName, "new content");
+        checkedInObject = client.checkinNextMajor(checkedOutObject, newObjectWithName, "new content", "text/plain");
         printHttpStatus();
         printRestObject(checkedInObject, "r_object_id", "r_lock_owner", "r_version_label");
         printNewLine();
@@ -726,14 +741,14 @@ public class DCTMRestClientSample {
         
         printStep("create a shreable object under the Temp cabinet");
         RestObject newShareableObject1 = new PlainRestObject("object_name", "shareable_object_1", "r_object_type", shareableType, "title", "shared title 1");
-        RestObject createdShareableObject1 = client.createObject(tempCabinet, newShareableObject1, null);
+        RestObject createdShareableObject1 = client.createObject(tempCabinet, newShareableObject1);
         printHttpStatus();
         printRestObject(createdShareableObject1);
         printNewLine();
         
         printStep("create a lightweight object sharing the " + createdShareableObject1.getObjectName());
         RestObject newLightweightObject1 = new PlainRestObject("object_name", "lightweight_object_1", "r_object_type", lightweightType);
-        RestObject createdLightweightObject1 = client.createObject(createdShareableObject1, LIGHTWEIGHT_OBJECTS, newLightweightObject1, null);
+        RestObject createdLightweightObject1 = client.createObject(createdShareableObject1, LIGHTWEIGHT_OBJECTS, newLightweightObject1, null, null);
         printHttpStatus();
         printRestObject(createdLightweightObject1);
         printNewLine();
@@ -757,7 +772,7 @@ public class DCTMRestClientSample {
         
         printStep("create another shreable object under the Temp cabinet");
         RestObject newShareableObject2 = new PlainRestObject("object_name", "shareable_object_2", "r_object_type", shareableType, "title", "shared title 2");
-        RestObject createdShareableObject2 = client.createObject(tempCabinet, newShareableObject2, null);
+        RestObject createdShareableObject2 = client.createObject(tempCabinet, newShareableObject2);
         printHttpStatus();
         printRestObject(createdShareableObject2);
         printNewLine();
@@ -803,7 +818,7 @@ public class DCTMRestClientSample {
         }
         
         RestObject tempCabinet = client.getCabinet("Temp");
-        RestObject object = client.createObject(tempCabinet, new PlainRestObject("object_name", "obj_to_be_attached"), null);
+        RestObject object = client.createObject(tempCabinet, new PlainRestObject("object_name", "obj_to_be_attached"));
         System.out.println(object.getObjectId() + " is created to attach " + aspectType);
         
         ObjectAspects objectAspects = client.attach(object, aspectType);
@@ -935,8 +950,8 @@ public class DCTMRestClientSample {
         
         printStep("create a relation");
         RestObject tempCabinet = client.getCabinet("Temp");
-        RestObject parent = client.createObject(tempCabinet, OBJECTS, new PlainRestObject("object_name", "parent_object", "r_object_type", "dm_sysobject"), null);
-        RestObject child = client.createObject(tempCabinet, OBJECTS, new PlainRestObject("object_name", "child_object", "r_object_type", "dm_sysobject"), null);
+        RestObject parent = client.createObject(tempCabinet, OBJECTS, new PlainRestObject("object_name", "parent_object", "r_object_type", "dm_sysobject"));
+        RestObject child = client.createObject(tempCabinet, OBJECTS, new PlainRestObject("object_name", "child_object", "r_object_type", "dm_sysobject"));
         RestObject createdRelation = client.createRelation(new PlainRestObject("relation_name", "peer", "parent_id", parent.getObjectId(), "child_id", child.getObjectId()));
         printRestObject(createdRelation, "relation_name", "parent_id", "child_id", "r_object_id");
         printNewLine();
@@ -1002,11 +1017,11 @@ public class DCTMRestClientSample {
         System.out.println("start Copy, Move, Link and Unlink samples");
         
         RestObject tempCabinet = client.getCabinet("Temp");
-        RestObject objectToBeChanged = client.createObject(tempCabinet, OBJECTS, new PlainRestObject("object_name", "object_to_be_copied", "r_object_type", "dm_sysobject"), null);
+        RestObject objectToBeChanged = client.createObject(tempCabinet, OBJECTS, new PlainRestObject("object_name", "object_to_be_copied", "r_object_type", "dm_sysobject"));
         RestObject destFolder = client.createFolder(tempCabinet, new PlainRestObject("object_name", "my_dest_folder"));
         printStep("copy the object " + objectToBeChanged.getObjectName() + "(" + objectToBeChanged.getObjectId() + ")" + " from " + tempCabinet.getObjectName() + "(" + tempCabinet.getObjectId() + ")"
                   + " to " + destFolder.getObjectName() + "(" + destFolder.getObjectId() + ")");
-        RestObject copiedObject = client.createObject(destFolder, OBJECTS, new PlainRestObject(objectToBeChanged.self()), null);
+        RestObject copiedObject = client.createObject(destFolder, OBJECTS, new PlainRestObject(objectToBeChanged.self()));
         printHttpStatus();
         printRestObject(copiedObject, "r_object_id", "object_name", "i_folder_id");
         printNewLine();
@@ -1108,6 +1123,139 @@ public class DCTMRestClientSample {
         printNewLine();
     }
     
+    /**
+     * samples to batch
+     */
+    private static void batch() {
+        System.out.println("start Batch and Batch Capabilities samples");
+        
+        printStep("get batch capabilities");
+        Capabilities capabilities = client.getBatchCapabilities();
+        System.out.println("transactions:" + capabilities.getTransactions() + ", sequence:" + capabilities.getSequence() + ", on-error:" + capabilities.getOnError());
+        System.out.println("batchable resources: " + capabilities.getBatchable());
+        System.out.println("non batchable resources: " + capabilities.getNonBatchable());
+        printNewLine();
+        
+        printStep("create simple batch with get operations, and the requests are returned as well");
+        BatchBuilder builder = BatchBuilder.builder(client).returnRequest(true);
+        builder.operation().getUsers("items-per-page", "10");
+        builder.operation().getCabinets("items-per-page", "10", "inline", "true");
+        RestObject tempCabinet = client.getCabinet("Temp");
+        builder.operation().getFolders(tempCabinet, "items-per-page", "10");
+        builder.operation().getObjects(tempCabinet, "items-per-page", "10");
+        builder.operation().get(tempCabinet);
+        Batch batch = builder.build();
+        Batch batchResult = client.createBatch(batch);
+        printBatchOperations(batchResult, true, true);
+        printNewLine();
+
+        final int operationCount = 200;
+        printStep("create sequential and parallel batch with " + operationCount + " get operations to see performance difference");
+        builder = BatchBuilder.builder(client).description("sequential batch").transactional(false).sequential(true);
+        for(int i=0;i<operationCount;++i) {
+            builder.operation().getUsers("items-per-page", "10");
+        }
+        batch = builder.build();
+        long start = System.currentTimeMillis();
+        batchResult = client.createBatch(batch);
+        long end = System.currentTimeMillis();
+        System.out.println(batch.getDescription() + " executed " + (end - start) + " milliseconds");
+        printBatch(batchResult);
+
+        builder = BatchBuilder.builder(client).description("parallel batch").transactional(false).sequential(false);
+        for(int i=0;i<operationCount;++i) {
+            builder.operation().getUsers("items-per-page", "10");
+        }
+        batch = builder.build();
+        start = System.currentTimeMillis();
+        batchResult = client.createBatch(batch);
+        end = System.currentTimeMillis();
+        System.out.println(batch.getDescription() + " executed " + (end - start) + " milliseconds");
+        printBatch(batchResult);
+        printNewLine();
+
+        printStep("create batch with create operations in a transaction");
+        builder = BatchBuilder.builder(client).transactional(true);
+        builder.operation().createDocument(tempCabinet, new PlainRestObject("object_name", "batch obj 1"));
+        builder.operation().createDocument(tempCabinet, new PlainRestObject("object_name", "batch obj 2"));
+        builder.operation().createDocument(tempCabinet, new PlainRestObject("object_name", "batch obj 3"));
+        batch = builder.build();
+        Batch createBatchResult = client.createBatch(batch);
+        printBatchOperations(createBatchResult, true, true);
+        printNewLine();
+        
+        printStep("create batch with delete operations in a transaction, the third operation will fail the transaction");
+        builder = BatchBuilder.builder(client).transactional(true);
+        builder.operation().delete(createBatchResult.getOperations().get(0).getResponse().getHeader(LOCATION));
+        builder.operation().delete(createBatchResult.getOperations().get(1).getResponse().getHeader(LOCATION));
+        //delete the deleted get(1) document
+        builder.operation().delete(createBatchResult.getOperations().get(1).getResponse().getHeader(LOCATION));
+        builder.operation().delete(createBatchResult.getOperations().get(2).getResponse().getHeader(LOCATION));
+        batch = builder.build();
+        try {
+            client.createBatch(batch);
+        } catch(DCTMRestErrorException e) {
+            System.out.println(e.getStatus() + " [" + e.getError().getCode() + "] " + e.getError().getDetails()); 
+        }
+        printRestObject(client.getDocument(createBatchResult.getOperations().get(0).getResponse().getHeader(LOCATION)));
+        printRestObject(client.getDocument(createBatchResult.getOperations().get(1).getResponse().getHeader(LOCATION)));
+        printRestObject(client.getDocument(createBatchResult.getOperations().get(2).getResponse().getHeader(LOCATION)));
+        printNewLine();
+        
+        printStep("create batch with delete operations in a non transaction and sequential and CONTINUE on error, the third operation will fail");
+        builder = BatchBuilder.builder(client).transactional(false).sequential(true).onError(OnError.CONTINUE);
+        builder.operation().delete(createBatchResult.getOperations().get(0).getResponse().getHeader(LOCATION));
+        builder.operation().delete(createBatchResult.getOperations().get(1).getResponse().getHeader(LOCATION));
+        //delete the deleted get(1) document
+        builder.operation().delete(createBatchResult.getOperations().get(1).getResponse().getHeader(LOCATION));
+        builder.operation().delete(createBatchResult.getOperations().get(2).getResponse().getHeader(LOCATION));
+        batch = builder.build();
+        batchResult = client.createBatch(batch);
+        printBatchOperations(batchResult, false, true);
+        try {
+            client.getDocument(createBatchResult.getOperations().get(0).getResponse().getHeader(LOCATION));
+        } catch(DCTMRestErrorException e) {
+            System.out.println(e.getStatus() + " [" + e.getError().getCode() + "] " + e.getError().getDetails()); 
+        }
+        try {
+            client.getDocument(createBatchResult.getOperations().get(1).getResponse().getHeader(LOCATION));
+        } catch(DCTMRestErrorException e) {
+            System.out.println(e.getStatus() + " [" + e.getError().getCode() + "] " + e.getError().getDetails()); 
+        }
+        try {
+            client.getDocument(createBatchResult.getOperations().get(2).getResponse().getHeader(LOCATION));
+        } catch(DCTMRestErrorException e) {
+            System.out.println(e.getStatus() + " [" + e.getError().getCode() + "] " + e.getError().getDetails()); 
+        }
+        printNewLine();
+        
+        printStep("create batch with create operations with attached contents");
+        builder = BatchBuilder.builder(client).transactional(true);
+        builder.operation().createDocument(tempCabinet, new PlainRestObject("object_name", "batch obj 1"),
+                new ByteArrayInputStream("I'm the content of the first object, 111".getBytes()), "text/plain");
+        builder.operation().createDocument(tempCabinet, new PlainRestObject("object_name", "batch obj 2"),
+                new ByteArrayInputStream("I'm the content of the second object, 222".getBytes()), "text/plain");
+        builder.operation().createDocument(tempCabinet, new PlainRestObject("object_name", "batch obj 3"),
+                new ByteArrayInputStream("I'm the content of the third object 333".getBytes()), "text/plain");
+        batch = builder.build();
+        createBatchResult = client.createBatch(batch);
+        printBatchOperations(createBatchResult, true, true);
+        printNewLine();
+        
+        printStep("create batch with delete operations");
+        builder = BatchBuilder.builder(client);
+        builder.operation().delete(createBatchResult.getOperations().get(0).getResponse().getHeader(LOCATION));
+        builder.operation().delete(createBatchResult.getOperations().get(1).getResponse().getHeader(LOCATION));
+        builder.operation().delete(createBatchResult.getOperations().get(2).getResponse().getHeader(LOCATION));
+        batch = builder.build();
+        batchResult = client.createBatch(batch);
+        printBatchOperations(batchResult, false, true);
+        printNewLine();
+        
+        System.out.println("finish Batch and Batch Capabilities samples");
+        printNewLine();
+    }
+    
     private static void printEntryContentSrc(Feed<?> feed) {
         for(Entry<?> e : feed.getEntries()) {
             System.out.println(e.getTitle() + " -> " + e.getContentSrc());
@@ -1127,6 +1275,28 @@ public class DCTMRestClientSample {
             sb.append(p.replaceFirst("^r_", "").replaceAll("_", " ")).append(':').append(object.getProperties().get(p));
         }
         System.out.println(sb);
+    }
+    
+    private static void printBatch(Batch batch) {
+        System.out.println((batch.getDescription()==null?"":(batch.getDescription()+" ")) + "started: " + batch.getStarted() + ", finished: " + batch.getFinished() + ", state: " + batch.getState() + (batch.getSubstate() == null ? "" : (", substate: " + batch.getSubstate())));
+    }
+    
+    private static void printBatchOperations(Batch batch, boolean printRequest, boolean printResponse) {
+        printBatch(batch);
+        if(batch.getOperations() != null) {
+            for(Operation o : batch.getOperations()) {
+                System.out.println("id: " + o.getId() + ", started: " + o.getStarted() + ", finished: " + o.getFinished() + ", state: " + o.getState());
+                if(printRequest && o.getRequest() != null) {
+                    System.out.println("\trequest: " + o.getRequest().getMethod() + " " + o.getRequest().getUri().substring(o.getRequest().getUri().lastIndexOf('/')+1) + ", headers: " + o.getRequest().getHeaders());
+                }
+                if(printResponse && o.getResponse() != null) {
+                    System.out.println("\tresponse: " + o.getResponse().getStatus() + ", headers: " + o.getResponse().getHeaders());
+                    if(!StringUtils.isEmpty(o.getResponse().getEntity())) {
+                        System.out.println("\t\t" + o.getResponse().getEntity());
+                    }
+                }
+            }
+        }
     }
     
     private static void printHttpStatus() {

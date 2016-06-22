@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns3:batch xmlns:ns2="http://www.w3.org/2004/08/xop/include"
+	xmlns:ns3="http://identifiers.emc.com/vocab/documentum">
+	<description>sequential batch</description>
+	<operations>
+		<ns3:operation id="op1">
+			<description>GET
+				http://127.0.0.1:8080/dctm-rest/repositories/REPO/users?items-per-page=10
+			</description>
+			<request method="GET"
+				uri="http://127.0.0.1:8080/dctm-rest/repositories/REPO/users?items-per-page=10">
+				<ns3:header name="Accept" value="application/atom+xml" />
+			</request>
+		</ns3:operation>
+	</operations>
+	<sequential>true</sequential>
+	<transactional>false</transactional>
+</ns3:batch>
+
+
+
+
+
+
+<?xml version='1.0' encoding='UTF-8'?>
+<batch xmlns="http://identifiers.emc.com/vocab/documentum"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<transactional>true</transactional>
+	<sequential>true</sequential>
+	<on-error>FAIL</on-error>
+	<return-request>true</return-request>
+	<state>FINISHED</state>
+	<submitted>2016-06-16T09:43:26.088+00:00</submitted>
+	<started>2016-06-16T09:43:26.088+00:00</started>
+	<finished>2016-06-16T09:43:26.556+00:00</finished>
+	<owner>dmadmin</owner>
+	<operations>
+		<operation id="op1">
+			<description>GET
+				http://127.0.0.1:8080/dctm-rest/repositories/REPO/users?items-per-page=10
+			</description>
+			<state>FINISHED</state>
+			<started>2016-06-16T09:43:26.088+00:00</started>
+			<finished>2016-06-16T09:43:26.119+00:00</finished>
+			<request method="GET"
+				uri="http://127.0.0.1:8080/dctm-rest/repositories/REPO/users?items-per-page=10">
+				<header name="Accept" value="application/atom+xml" />
+			</request>
+			<response status="200">
+				<header name="Content-Type" value="application/atom+xml;charset=UTF-8" />
+				<entity>entity</entity>
+			</response>
+		</operation>
+	</operations>
+</batch>

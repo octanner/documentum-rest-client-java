@@ -3,6 +3,7 @@
  */
 package com.emc.documentum.rest.client.sample.client.impl.jackson;
 
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.util.List;
 
@@ -32,6 +33,10 @@ import com.emc.documentum.rest.client.sample.model.RestType;
 import com.emc.documentum.rest.client.sample.model.SearchFeed;
 import com.emc.documentum.rest.client.sample.model.ValueAssistant;
 import com.emc.documentum.rest.client.sample.model.ValueAssistantRequest;
+import com.emc.documentum.rest.client.sample.model.batch.Batch;
+import com.emc.documentum.rest.client.sample.model.batch.Capabilities;
+import com.emc.documentum.rest.client.sample.model.json.JsonBatch;
+import com.emc.documentum.rest.client.sample.model.json.JsonBatchCapabilities;
 import com.emc.documentum.rest.client.sample.model.json.JsonFeeds;
 import com.emc.documentum.rest.client.sample.model.json.JsonFolderLink;
 import com.emc.documentum.rest.client.sample.model.json.JsonHomeDocument;
@@ -42,10 +47,12 @@ import com.emc.documentum.rest.client.sample.model.json.JsonType;
 import com.emc.documentum.rest.client.sample.model.json.JsonValueAssistance;
 import com.emc.documentum.rest.client.sample.model.json.JsonValueAssistantRequest;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.ABOUT;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.ASPECT_TYPES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.ASSIS_VALUES;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.BATCH_CAPABILITIES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CABINETS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CANCEL_CHECKOUT;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CHECKIN_BRANCH_VERSION;
@@ -84,6 +91,8 @@ import static com.emc.documentum.rest.client.sample.model.LinkRelation.VERSIONS;
  */
 @NotThreadSafe
 public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCTMRestClient {
+    private final ObjectMapper mapper = new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+
     public DCTMJacksonClient(String contextRoot, String repositoryName,
             String username, String password, boolean useFormatExtension) {
         super(contextRoot, repositoryName, username, password, useFormatExtension);
@@ -203,8 +212,8 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     }
     
     @Override
-    public RestObject createObject(RestObject parent, LinkRelation rel, RestObject objectToCreate, Object content, String... params) {
-        return post(parent.getHref(rel), new JsonObject(objectToCreate), content, JsonObject.class, params);
+    public RestObject createObject(RestObject parent, LinkRelation rel, RestObject objectToCreate, Object content, String contentMediaType, String... params) {
+        return post(parent.getHref(rel), new JsonObject(objectToCreate), content, contentMediaType, JsonObject.class, params);
     }
 
     @Override
@@ -213,8 +222,8 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     }
     
     @Override
-    public RestObject createDocument(RestObject parent, RestObject objectToCreate, Object content, String... params) {
-        return post(parent.getHref(DOCUMENTS), new JsonObject(objectToCreate), content, JsonObject.class, params);
+    public RestObject createDocument(RestObject parent, RestObject objectToCreate, Object content, String contentMediaType, String... params) {
+        return post(parent.getHref(DOCUMENTS), new JsonObject(objectToCreate), content, contentMediaType, JsonObject.class, params);
     }
     
     @Override
@@ -259,18 +268,18 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     }
     
     @Override
-    public RestObject checkinNextMajor(RestObject oldObject, RestObject newObject, Object content, String... params) {
-        return checkin(oldObject, CHECKIN_NEXT_MAJOR, newObject, content, params);
+    public RestObject checkinNextMajor(RestObject oldObject, RestObject newObject, Object content, String contentMediaType, String... params) {
+        return checkin(oldObject, CHECKIN_NEXT_MAJOR, newObject, content, contentMediaType, params);
     }
     
     @Override
-    public RestObject checkinNextMinor(RestObject oldObject, RestObject newObject, Object content, String... params) {
-        return checkin(oldObject, CHECKIN_NEXT_MINOR, newObject, content, params);
+    public RestObject checkinNextMinor(RestObject oldObject, RestObject newObject, Object content, String contentMediaType, String... params) {
+        return checkin(oldObject, CHECKIN_NEXT_MINOR, newObject, content, contentMediaType, params);
     }
     
     @Override
-    public RestObject checkinBranch(RestObject oldObject, RestObject newObject, Object content, String... params) {
-        return checkin(oldObject, CHECKIN_BRANCH_VERSION, newObject, content, params);
+    public RestObject checkinBranch(RestObject oldObject, RestObject newObject, Object content, String contentMediaType, String... params) {
+        return checkin(oldObject, CHECKIN_BRANCH_VERSION, newObject, content, contentMediaType, params);
     }
     
     @Override
@@ -450,6 +459,16 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     public FolderLink link(RestObject object, LinkRelation rel, FolderLink link) {
         return post(object.getHref(rel), new JsonFolderLink(link), JsonFolderLink.class);
     }
+    
+    @Override
+    public Capabilities getBatchCapabilities() {
+        return get(getRepository().getHref(BATCH_CAPABILITIES), false, JsonBatchCapabilities.class);
+    }
+
+    @Override
+    public Batch createBatch(Batch batch) {
+        return post(batch, JsonBatch.class);
+    }
 
     @Override
     public <T extends Linkable> Feed<T> nextPage(Feed<T> feed) {
@@ -479,12 +498,12 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
         return feed;
     }
     
-    private RestObject checkin(RestObject oldObject, LinkRelation rel, RestObject newObject, Object content, String... params) {
+    private RestObject checkin(RestObject oldObject, LinkRelation rel, RestObject newObject, Object content, String contentMediaType, String... params) {
         RestObject resp = null;
         if(newObject != null && content != null) {
-            resp = post(oldObject.getHref(rel), new JsonObject(newObject), content, JsonObject.class, params);
+            resp = post(oldObject.getHref(rel), new JsonObject(newObject), content, contentMediaType, JsonObject.class, params);
         } else if(newObject == null) {
-            resp = post(oldObject.getHref(rel), content, MediaType.APPLICATION_OCTET_STREAM_VALUE, oldObject.getClass(), params);
+            resp = post(oldObject.getHref(rel), content, contentMediaType==null?MediaType.APPLICATION_OCTET_STREAM_VALUE:contentMediaType, oldObject.getClass(), params);
         } else if(content == null) {
             resp = post(oldObject.getHref(rel), new JsonObject(newObject), JsonObject.class, params);
         }
@@ -493,11 +512,11 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     
     @Override
     protected void initRestTemplate(RestTemplate restTemplate) {
+        super.initRestTemplate(restTemplate);
         restTemplate.setErrorHandler(new DCTMJacksonErrorHandler(restTemplate.getMessageConverters()));
         for(HttpMessageConverter<?> c : restTemplate.getMessageConverters()) {
             if(c instanceof MappingJackson2HttpMessageConverter) {
                 ((MappingJackson2HttpMessageConverter)c).getObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-//                ((MappingJackson2HttpMessageConverter)c).getObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             } else if(c instanceof FormHttpMessageConverter) {
                 try {
                     Field pcField = FormHttpMessageConverter.class.getDeclaredField("partConverters");
@@ -506,7 +525,6 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
                     for(HttpMessageConverter<?> pc : partConverters) {
                         if(pc instanceof MappingJackson2HttpMessageConverter) {
                             ((MappingJackson2HttpMessageConverter)pc).getObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-//                            ((MappingJackson2HttpMessageConverter)pc).getObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                             break;
                         }
                     }
@@ -518,7 +536,16 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     }
 
     @Override
-    protected ClientType getClientType() {
+    public void serialize(Object object, OutputStream os) {
+        try {
+            mapper.writeValue(os, object);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    @Override
+    public ClientType getClientType() {
         return ClientType.JSON;
     }
 }

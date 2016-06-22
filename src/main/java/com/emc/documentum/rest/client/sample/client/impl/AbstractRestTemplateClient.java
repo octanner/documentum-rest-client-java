@@ -3,8 +3,10 @@
  */
 package com.emc.documentum.rest.client.sample.client.impl;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -23,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.emc.documentum.rest.client.sample.client.DCTMRestClient;
 import com.emc.documentum.rest.client.sample.client.DCTMRestErrorException;
+import com.emc.documentum.rest.client.sample.client.converter.MultipartBatchHttpMessageConverter;
 import com.emc.documentum.rest.client.sample.client.util.Debug;
 import com.emc.documentum.rest.client.sample.client.util.Headers;
 import com.emc.documentum.rest.client.sample.client.util.SupportedMediaTypes;
@@ -34,10 +37,25 @@ import com.emc.documentum.rest.client.sample.model.Linkable;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestError;
 import com.emc.documentum.rest.client.sample.model.RestObject;
+import com.emc.documentum.rest.client.sample.model.batch.Batch;
+import com.emc.documentum.rest.client.sample.model.batch.Operation;
 
-import static com.emc.documentum.rest.client.sample.model.LinkRelation.DELETE;
+import static com.emc.documentum.rest.client.sample.client.util.Headers.ACCEPT_ATOM_HEADERS;
+import static com.emc.documentum.rest.client.sample.client.util.Headers.ACCEPT_JSON_HEADERS;
+import static com.emc.documentum.rest.client.sample.client.util.Headers.ACCEPT_JSON_HEADERS_WITH_CONTENT;
+import static com.emc.documentum.rest.client.sample.client.util.Headers.ACCEPT_JSON_HEADERS_WITH_MULTIPART_CONTENT;
+import static com.emc.documentum.rest.client.sample.client.util.Headers.ACCEPT_XML_HEADERS;
+import static com.emc.documentum.rest.client.sample.client.util.Headers.ACCEPT_XML_HEADERS_WITH_CONTENT;
+import static com.emc.documentum.rest.client.sample.client.util.Headers.ACCEPT_XML_HEADERS_WITH_MULTIPART_CONTENT;
+import static com.emc.documentum.rest.client.sample.client.util.Headers.JSON_CONTENT;
+import static com.emc.documentum.rest.client.sample.client.util.Headers.XML_CONTENT;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.BATCHES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.EDIT;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SELF;
+import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
 
 /**
  * the basic implementation with Spring RestTemplate
@@ -60,7 +78,9 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     
     protected HttpHeaders headers;
     protected HttpStatus status;
+    protected RequestProcessor requestProcessor;
     
+    protected final RequestProcessor defaultRequestProcessor = new DefaultRequestProcessor();
     
     public AbstractRestTemplateClient(String contextRoot, String repositoryName, String username, String password, boolean useFormatExtension) {
         this.contextRoot = contextRoot;
@@ -110,9 +130,10 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     
     protected void initRestTemplate(RestTemplate restTemplate) {
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+        restTemplate.getMessageConverters().add(new MultipartBatchHttpMessageConverter());
     }
     
-    protected abstract ClientType getClientType();
+    public abstract ClientType getClientType();
     
     private void setupHttp(ResponseEntity<?> entity) {
         if(entity == null) {
@@ -170,7 +191,8 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
                 Debug.debug("Request parameters: " + UriHelper.queryString(params));
             }
         }
-        
+        RequestProcessor processor = requestProcessor == null ? defaultRequestProcessor : requestProcessor;
+        requestProcessor = null;
         if(uri == null || uri.length() == 0) {
             throw new IllegalStateException("The resource URI is empty, or you do not have priviledge");
         }
@@ -205,7 +227,7 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
             }
         }
         try {
-            entity = restTemplate.exchange(requestUri, httpMethod, requestEntity, responseBodyClass);
+            entity = processor.process(requestUri, httpMethod, requestEntity, responseBodyClass);
             setupHttp(entity);
         } catch(DCTMRestErrorException e) {
             setupHttp(e);
@@ -253,16 +275,31 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     }
     
     @Override
-    public RestObject createObject(RestObject parent, RestObject objectToCreate, Object content, String... params) {
-        return createObject(parent, LinkRelation.OBJECTS, objectToCreate, content, params);
+    public RestObject createObject(RestObject parent, RestObject objectToCreate, Object content, String contentMediaType, String... params) {
+        return createObject(parent, LinkRelation.OBJECTS, objectToCreate, content, contentMediaType, params);
+    }
+
+    @Override
+    public RestObject createObject(RestObject parent, RestObject objectToCreate) {
+        return createObject(parent, LinkRelation.OBJECTS, objectToCreate, null, null);
+    }
+    
+    @Override
+    public RestObject createObject(RestObject parent, LinkRelation rel, RestObject objectToCreate) {
+        return createObject(parent, rel, objectToCreate, null, null);
+    }
+    
+    @Override
+    public RestObject createDocument(RestObject parent, RestObject objectToCreate) {
+        return createDocument(parent, objectToCreate, null, null);
     }
 
     protected <T> T get(String uri, HttpHeaders headers, Class<? extends T> responseBodyClass, String... params) {
-        return sendRequest(uri, HttpMethod.GET, headers, null, responseBodyClass, params);
+        return sendRequest(uri, GET, headers, null, responseBodyClass, params);
     }
     
     protected <T> T get(String uri, boolean isCollection, Class<? extends T> responseBodyClass, String... params) {
-        return get(uri, isXml()?(isCollection?Headers.ACCEPT_ATOM_HEADERS:Headers.ACCEPT_XML_HEADERS):Headers.ACCEPT_JSON_HEADERS, responseBodyClass, params);
+        return get(uri, isXml()?(isCollection?ACCEPT_ATOM_HEADERS:ACCEPT_XML_HEADERS):ACCEPT_JSON_HEADERS, responseBodyClass, params);
     }
     
     public <T> T get(String uri, Class<T> clazz, String... params) {
@@ -270,13 +307,13 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     }
 
     public void delete(String uri, String... params) {
-        sendRequest(uri, HttpMethod.DELETE, isXml()?Headers.ACCEPT_XML_HEADERS:Headers.ACCEPT_JSON_HEADERS, null, null, params);
+        sendRequest(uri, DELETE, isXml()?ACCEPT_XML_HEADERS:ACCEPT_JSON_HEADERS, null, null, params);
     }
     
     @Override
     public void delete(Linkable linkable, String... params) {
-        if(linkable.getHref(DELETE) != null) {
-            delete(linkable.getHref(DELETE), params);
+        if(linkable.getHref(LinkRelation.DELETE) != null) {
+            delete(linkable.getHref(LinkRelation.DELETE), params);
         } else if(linkable.getHref(SELF) != null) {
             delete(linkable.getHref(SELF), params);
         } else if(linkable.getHref(EDIT) != null) {
@@ -287,23 +324,23 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     }
     
     protected <T> T post(String uri, Object body, Class<? extends T> responseBodyClass, String... params) {
-        return sendRequest(uri, HttpMethod.POST, isXml()?Headers.ACCEPT_XML_HEADERS_WITH_CONTENT:Headers.ACCEPT_JSON_HEADERS_WITH_CONTENT, body, responseBodyClass, params);
+        return sendRequest(uri, POST, isXml()?ACCEPT_XML_HEADERS_WITH_CONTENT:ACCEPT_JSON_HEADERS_WITH_CONTENT, body, responseBodyClass, params);
     }
     
-    protected <T> T post(String uri, Object content, String mediaType, Class<? extends T> responseBodyClass, String... params) {
-        return sendRequest(uri, HttpMethod.POST, new Headers().accept(isXml()?SupportedMediaTypes.APPLICATION_VND_DCTM_XML_VALUE:SupportedMediaTypes.APPLICATION_VND_DCTM_JSON_VALUE).contentType(mediaType).toHttpHeaders(),
+    protected <T> T post(String uri, Object content, String contentMediaType, Class<? extends T> responseBodyClass, String... params) {
+        return sendRequest(uri, POST, new Headers().accept(isXml()?SupportedMediaTypes.APPLICATION_VND_DCTM_XML_VALUE:SupportedMediaTypes.APPLICATION_VND_DCTM_JSON_VALUE).contentType(contentMediaType).toHttpHeaders(),
                 content, responseBodyClass, params);
     }
     
     protected <T> T put(String uri, Class<? extends T> responseBodyClass, String... params) {
-        return sendRequest(uri, HttpMethod.PUT, isXml()?Headers.ACCEPT_XML_HEADERS:Headers.ACCEPT_JSON_HEADERS, null, responseBodyClass, params);
+        return sendRequest(uri, PUT, isXml()?ACCEPT_XML_HEADERS:ACCEPT_JSON_HEADERS, null, responseBodyClass, params);
     }
     
     @Override
     public RestObject update(RestObject oldObject, LinkRelation rel, RestObject newObject, HttpMethod method, String... params) {
         try {
             RestObject newRestObject = newRestObject(oldObject, newObject);
-            if(method == HttpMethod.PUT) {
+            if(method == PUT) {
                 return put(oldObject.getHref(rel), newRestObject, newRestObject.getClass(), params);
             } else  {
                 return post(oldObject.getHref(rel), newRestObject, newRestObject.getClass(), params);
@@ -314,38 +351,104 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     }
     
     protected <T> T put(String uri, Object body, Class<? extends T> responseBodyClass, String... params) {
-        return sendRequest(uri, HttpMethod.PUT, isXml()?Headers.ACCEPT_XML_HEADERS_WITH_CONTENT:Headers.ACCEPT_JSON_HEADERS_WITH_CONTENT, body, responseBodyClass, params);
+        return sendRequest(uri, PUT, isXml()?ACCEPT_XML_HEADERS_WITH_CONTENT:ACCEPT_JSON_HEADERS_WITH_CONTENT, body, responseBodyClass, params);
     }
     
-    protected <T> T post(String uri, T object, Object content, Class<? extends T> responseBodyClass, String... params) {
+    protected <T> T post(String uri, T object, Object content, String contentMediaType, Class<? extends T> responseBodyClass, String... params) {
         T t = null;
         if(content == null) {
             t = post(uri, object, responseBodyClass, params);
         } else if(object != null && content != null) {
-            Map<String, String> partHeaders = new HashMap<String, String>();
-            partHeaders.put("Content-Type", isXml()?SupportedMediaTypes.APPLICATION_VND_DCTM_XML_VALUE:SupportedMediaTypes.APPLICATION_VND_DCTM_JSON_VALUE);
             MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
-            parts.add("metadata", new HttpEntity<Object>(object, isXml()?Headers.XML_CONTENT:Headers.JSON_CONTENT));
-            parts.add("binary", content);
-            t = sendRequest(uri, HttpMethod.POST, isXml()?Headers.ACCEPT_XML_HEADERS_WITH_MULTIPART_CONTENT:Headers.ACCEPT_JSON_HEADERS_WITH_MULTIPART_CONTENT, parts, responseBodyClass, params);
+            parts.add("metadata", new HttpEntity<Object>(object, isXml()?XML_CONTENT:JSON_CONTENT));
+            parts.add("binary", contentMediaType==null?content:new HttpEntity<Object>(content, new Headers().contentType(contentMediaType).toHttpHeaders()));
+            t = sendRequest(uri, POST, isXml()?ACCEPT_XML_HEADERS_WITH_MULTIPART_CONTENT:ACCEPT_JSON_HEADERS_WITH_MULTIPART_CONTENT, parts, responseBodyClass, params);
         }
         return t;
     }
     
+    protected Batch post(Batch batch, Class<? extends Batch> responseBodyClass) {
+        Batch result = null;
+        if(batch.hasAttachment()) {
+            MultiValueMap<String, HttpEntity<InputStream>> parts = new LinkedMultiValueMap<String, HttpEntity<InputStream>>();
+            HttpHeaders batchHeaders = new Headers().
+                    contentType(isXml() ?
+                            String.format("%s;type=\"%s\"",
+                                SupportedMediaTypes.APPLICATION_XOP_STRING, SupportedMediaTypes.APPLICATION_VND_DCTM_XML_VALUE):
+                            String.format("%s;type=\"%s\"",
+                                SupportedMediaTypes.APPLICATION_JOP_STRING, SupportedMediaTypes.APPLICATION_VND_DCTM_JSON_VALUE)).
+                    header("Content-ID", "batch").
+                    header("Content-disposition", "form-data; name=batch").
+                    toHttpHeaders();
+            parts.add("batch", new HttpEntity<InputStream>(toInputStream(batch), batchHeaders));
+            for(Operation op : batch.getOperations()) {
+                if(op.getRequest().getAttachment() != null) {
+                    HttpHeaders opHeaders = new Headers().
+                            contentType(op.getRequest().getAttachment().getContentType()).
+                            header("Content-ID", op.getRequest().getAttachment().getInclude().getRawHref()).
+                            header("Content-disposition", "form-data; name=" + op.getRequest().getAttachment().getInclude().getRawHref()).
+                            toHttpHeaders();
+                    parts.add(op.getRequest().getAttachment().getInclude().getRawHref(), new HttpEntity<InputStream>(op.getRequest().getAttachment().getContentStream(), opHeaders));
+                }
+            }
+            HttpHeaders relatedHeaders = new Headers().accept(isXml()?
+                    SupportedMediaTypes.APPLICATION_VND_DCTM_XML_VALUE :
+                    SupportedMediaTypes.APPLICATION_VND_DCTM_JSON_VALUE).
+                    contentType(String.format("%s;type=\"%s\";start=\"batch\";start-info=\"%s\"",
+                            SupportedMediaTypes.MULTIPART_RELATED_STRING,
+                            isXml() ?
+                                    SupportedMediaTypes.APPLICATION_XOP_STRING :
+                                    SupportedMediaTypes.APPLICATION_JOP_STRING,
+                            isXml() ?
+                                    SupportedMediaTypes.APPLICATION_VND_DCTM_XML_VALUE :
+                                    SupportedMediaTypes.APPLICATION_VND_DCTM_JSON_VALUE)).
+                    toHttpHeaders();
+            result = sendRequest(getRepository().getHref(BATCHES), POST, relatedHeaders, parts, responseBodyClass);
+        } else {
+            result = post(getRepository().getHref(BATCHES), batch, responseBodyClass);
+        }
+        return result;
+    }
+    
+    public abstract void serialize(Object object, OutputStream os);
+
+    private InputStream toInputStream(Object o) {
+        ByteArrayOutputStream os = new ByteArrayOutputStream(50*1024);
+        serialize(o, os);
+        return new ByteArrayInputStream(os.toByteArray());
+    }
+    
     @Override
-    public void enableStreamingForNextRequest() {
+    public DCTMRestClient enableStreamingForNextRequest() {
         this.enableStreaming = true;
+        return this;
     }
 
-    protected boolean isXml() {
+    public DCTMRestClient setRequestProcessor(RequestProcessor processor) {
+        requestProcessor = processor;
+        return this;
+    }
+    
+    public boolean isXml() {
         return ClientType.XML == getClientType();
     }
     
-    protected boolean isJson() {
+    public boolean isJson() {
         return ClientType.JSON == getClientType();
     }
 
-    protected static enum ClientType {
+    public static enum ClientType {
         XML, JSON
+    }
+    
+    public interface RequestProcessor {
+        <T> ResponseEntity<T> process(String url, HttpMethod method, HttpEntity<?> requestEntity, Class<T> responseType);
+    }
+    
+    private class DefaultRequestProcessor implements RequestProcessor {
+        @Override
+        public <T> ResponseEntity<T> process(String url, HttpMethod method, HttpEntity<?> requestEntity, Class<T> responseType) {
+            return restTemplate.exchange(url, method, requestEntity, responseType);
+        }
     }
 }

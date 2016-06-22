@@ -21,4 +21,7 @@ public final class XMLNamespace {
     
     public static final String RELEVANCE_NAMESPACE = "http://a9.com/-/opensearch/extensions/relevance/1.0/";
     public static final String RELEVANCE_PREFIX = "relevance";
+    
+    public static final String XOP_NAMESPACE = "http://www.w3.org/2004/08/xop/include";
+    public static final String XOP_PREFIX = "xop";
 }

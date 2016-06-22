@@ -3,6 +3,8 @@
  */
 package com.emc.documentum.rest.client.sample.client.impl.jaxb;
 
+import java.io.OutputStream;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
@@ -33,5 +35,9 @@ public final class DCTMJaxbContext {
             e.printStackTrace();
         }
         return obj;
+    }
+    
+    public static void marshal(OutputStream os, Object object) throws Exception {
+         context.createMarshaller().marshal(object, os);
     }
 }

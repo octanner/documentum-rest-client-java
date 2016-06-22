@@ -18,4 +18,11 @@ public class SupportedMediaTypes {
     public static final String APPLICATION_VND_DCTM_JSON_VALUE = APPLICATION_VND_DCTM_JSON.toString();
     public static final String APPLICATION_XML_HOME_VALUE = APPLICATION_XML_HOME.toString();
     public static final String APPLICATION_JSON_HOME_VALUE = APPLICATION_JSON_HOME.toString();
+
+    public static final String MULTIPART_RELATED_STRING = "multipart/related";
+    public static final MediaType MULTIPART_RELATED = MediaType.valueOf(MULTIPART_RELATED_STRING);
+    public static final String APPLICATION_XOP_STRING = "application/xop+xml";
+    public static final String APPLICATION_JOP_STRING = "application/jop+json";
+    public static final MediaType APPLICATION_XOP = MediaType.valueOf(APPLICATION_XOP_STRING);
+    public static final MediaType APPLICATION_JOP = MediaType.valueOf(APPLICATION_JOP_STRING);
 }

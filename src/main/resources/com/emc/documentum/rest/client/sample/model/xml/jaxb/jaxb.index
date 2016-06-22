@@ -1,6 +1,14 @@
 #Copyright (c) 2016. EMC Corporation. All Rights Reserved.
 JaxbAspectType
 JaxbAuthor
+JaxbBatch
+JaxbBatchAttachment
+JaxbBatchCapabilities
+JaxbBatchHeader
+JaxbBatchInclude
+JaxbBatchOperation
+JaxbBatchRequest
+JaxbBatchResponse
 JaxbCabinet
 JaxbContent
 JaxbDocument

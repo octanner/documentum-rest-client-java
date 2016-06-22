@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
+import com.emc.documentum.rest.client.sample.client.annotation.NotBatchable;
 import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.FolderLink;
 import com.emc.documentum.rest.client.sample.model.HomeDocument;
@@ -21,6 +22,8 @@ import com.emc.documentum.rest.client.sample.model.RestType;
 import com.emc.documentum.rest.client.sample.model.SearchFeed;
 import com.emc.documentum.rest.client.sample.model.ValueAssistant;
 import com.emc.documentum.rest.client.sample.model.ValueAssistantRequest;
+import com.emc.documentum.rest.client.sample.model.batch.Batch;
+import com.emc.documentum.rest.client.sample.model.batch.Capabilities;
 
 /**
  * The sample REST client library 
@@ -31,11 +34,13 @@ public interface DCTMRestClient {
     /**
      * @return the http headers of the previous operation 
      */
+    @NotBatchable
     public HttpHeaders getHeaders();
     
     /**
      * @return the http status of the previous operation
      */
+    @NotBatchable
     public HttpStatus getStatus();
     
     /**
@@ -44,26 +49,31 @@ public interface DCTMRestClient {
      * only valid for the next operations.
      * will be automatically disabled after the operation.
      */
-    public void enableStreamingForNextRequest();
+    @NotBatchable
+    public DCTMRestClient enableStreamingForNextRequest();
     
     /**
      * @return the cached HomeDocument object
      */
+    @NotBatchable
     public HomeDocument getHomeDocument();
 
     /**
      * @return the product info
      */
+    @NotBatchable
     public RestObject getProductInfo();
     
     /**
      * @return the cached Repositories feed
      */
+    @NotBatchable
     public Feed<Repository> getRepositories();
     
     /**
      * @return the cached Repository object
      */
+    @NotBatchable
     public Repository getRepository();
     
     /**
@@ -93,6 +103,7 @@ public interface DCTMRestClient {
      * @param params
      * @return the cabinet by its name
      */
+    @NotBatchable
     public RestObject getCabinet(String cabinet, String... params);
     
     /**
@@ -153,20 +164,39 @@ public interface DCTMRestClient {
      * @param rel the LinkRelation used to create new object under the parent
      * @param objectToCreate the new object with its properties
      * @param content the binary content, it can be byte array, String, javax.xml.transform.Source, org.springframework.core.io.Resource, JAXB object, and Jackson json object  
+     * @param contentMediaType the mediatype of the content
      * @param params
      * @return the created sysobject
      */
-    public RestObject createObject(RestObject parent, LinkRelation rel, RestObject objectToCreate, Object content, String... params);
+    public RestObject createObject(RestObject parent, LinkRelation rel, RestObject objectToCreate, Object content, String contentMediaType, String... params);
     
+    /**
+     * create a sysobject (or its subtype) under specified parent's link rel
+     * @param parent the parent object where the new sysobject will be created under
+     * @param rel the LinkRelation used to create new object under the parent
+     * @param objectToCreate the new object with its properties
+     * @return the created sysobject
+     */
+    public RestObject createObject(RestObject parent, LinkRelation rel, RestObject objectToCreate);
+
     /**
      * create a sysobject (or its subtype) under specified folder/cabinet
      * @param parent the folder/cabinet where the new sysobject will be created under
      * @param objectToCreate the new object with its properties
      * @param content the binary content, it can be byte array, String, javax.xml.transform.Source, org.springframework.core.io.Resource, JAXB object, and Jackson json object  
+     * @param contentMediaType the mediatype of the content
      * @param params
      * @return the created sysobject
      */
-    public RestObject createObject(RestObject parent, RestObject objectToCreate, Object content, String... params);
+    public RestObject createObject(RestObject parent, RestObject objectToCreate, Object content, String contentMediaType, String... params);
+    
+    /**
+     * create a sysobject (or its subtype) under specified folder/cabinet
+     * @param parent the folder/cabinet where the new sysobject will be created under
+     * @param objectToCreate the new object with its properties
+     * @return the created sysobject
+     */
+    public RestObject createObject(RestObject parent, RestObject objectToCreate);
 
     /**
      * @param objectUri
@@ -180,10 +210,19 @@ public interface DCTMRestClient {
      * @param parent the folder/cabinet where the new document will be created under
      * @param objectToCreate the new document with its properties
      * @param content the binary content, it can be byte array, String, javax.xml.transform.Source, org.springframework.core.io.Resource, JAXB object, and Jackson json object
+     * @param contentMediaType the mediatype of the content
      * @param params
      * @return the created document
      */
-    public RestObject createDocument(RestObject parent, RestObject objectToCreate, Object content, String... params);
+    public RestObject createDocument(RestObject parent, RestObject objectToCreate, Object content, String contentMediaType, String... params);
+
+    /**
+     * create a document (or its subtype) under specified folder/cabinet
+     * @param parent the folder/cabinet where the new document will be created under
+     * @param objectToCreate the new document with its properties
+     * @return the created document
+     */
+    public RestObject createDocument(RestObject parent, RestObject objectToCreate);
 
     /**
      * @param documentUri
@@ -369,10 +408,11 @@ public interface DCTMRestClient {
      * @param oldObject the checked out RestObject
      * @param newObject the new metadata to be checked in
      * @param content the binary content
+     * @param contentMediaType the mediatype of the content
      * @param params
      * @return checked in object
      */
-    public RestObject checkinNextMajor(RestObject oldObject, RestObject newObject, Object content, String... params);
+    public RestObject checkinNextMajor(RestObject oldObject, RestObject newObject, Object content, String contentMediaType, String... params);
     
     /**
      * check in the object with next minor version
@@ -381,10 +421,11 @@ public interface DCTMRestClient {
      * @param oldObject the checked out RestObject
      * @param newObject the new metadata to be checked in
      * @param content the binary content
+     * @param contentMediaType the mediatype of the content
      * @param params
      * @return checked in object
      */
-    public RestObject checkinNextMinor(RestObject oldObject, RestObject newObject, Object content, String... params);
+    public RestObject checkinNextMinor(RestObject oldObject, RestObject newObject, Object content, String contentMediaType, String... params);
     
     /**
      * check in the object with branch version
@@ -393,10 +434,11 @@ public interface DCTMRestClient {
      * @param oldObject the checked out RestObject
      * @param newObject the new metadata to be checked in
      * @param content the binary content
+     * @param contentMediaType the mediatype of the content
      * @param params
      * @return checked in object
      */
-    public RestObject checkinBranch(RestObject oldObject, RestObject newObject, Object content, String... params);
+    public RestObject checkinBranch(RestObject oldObject, RestObject newObject, Object content, String contentMediaType, String... params);
     
     /**
      * materialize the lightweight object
@@ -571,4 +613,18 @@ public interface DCTMRestClient {
      * @return
      */
     public FolderLink link(RestObject object, LinkRelation rel, FolderLink link);
+    
+    /**
+     * get batch capabilities
+     * @return
+     */
+    public Capabilities getBatchCapabilities();
+    
+    /**
+     * create and execute a batch
+     * @param batch
+     * @return
+     */
+    @NotBatchable
+    public Batch createBatch(Batch batch);
 }

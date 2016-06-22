@@ -70,6 +70,10 @@ public enum LinkRelation {
     LIGHTWEIGHT_OBJECTS("lightweight-objects", true),
     SHARED_PARENT("shared-parent", true),
     
+    //for batch
+    BATCH_CAPABILITIES("batch-capabilities", true),
+    BATCHES("batches", true),
+    
     DQL("dql", true),
     SEARCH("search", true),
     CABINETS("cabinets", true),
