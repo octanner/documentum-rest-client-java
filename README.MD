@@ -17,6 +17,10 @@ This Documentum REST Services client is written with Java code. Underlying it le
 the REST messages. It supports both `XML` and `JSON` representations. `JAXB` is used to bind XML object, and `Jackson`
 for JSON.
 
+Supported authentication scheme:
+* basic
+* basic-ct
+
 *DCTMRestClientSample* is the main class to be executed with some sample operations.
 
 ## System Requirements
