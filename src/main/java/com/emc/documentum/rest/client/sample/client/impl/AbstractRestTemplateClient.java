@@ -62,6 +62,9 @@ import static org.springframework.http.HttpMethod.PUT;
  */
 @NotThreadSafe
 public abstract class AbstractRestTemplateClient implements DCTMRestClient {
+    protected static final String CSRF_HEADER_NAME_HEADER = "DOCUMENTUM-CSRF-HEADER-NAME";
+    protected static final String CLIENT_TOKEN_NAME = "DOCUMENTUM-CLIENT-TOKEN";
+    
     protected final RestTemplate restTemplate = new RestTemplate();
     
     protected final String contextRoot;
@@ -75,10 +78,14 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     protected Repository repository;
     protected boolean enableStreaming = false;
     protected boolean debug;
+    protected boolean enableCSRFClientToken = true;
     
     protected HttpHeaders headers;
     protected HttpStatus status;
     protected RequestProcessor requestProcessor;
+    protected String clientToken;
+    protected String csrfHeader;
+    protected String csrfToken;
     
     protected final RequestProcessor defaultRequestProcessor = new DefaultRequestProcessor();
     
@@ -142,11 +149,12 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
         } else {
             headers = entity.getHeaders();
             status = entity.getStatusCode();
+            setupCSRFClientToken(headers);
             if(debug) {
                 Debug.debug("Response status: " + getStatus());
                 Debug.debug("Response headers: " + getHeaders());
             }
-        }        
+        }
     }
     
     private void setupHttp(DCTMRestErrorException exception) {
@@ -156,11 +164,64 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
         } else {
             headers = exception.getHeaders();
             status = exception.getStatus();
+            setupCSRFClientToken(headers);
             if(debug) {
                 Debug.debug("Response status: " + getStatus());
                 Debug.debug("Response headers: " + getHeaders());
             }
         }        
+    }
+    
+    private void setupCSRFClientToken(HttpHeaders headers) {
+        if(enableCSRFClientToken) {
+            String cookie = headers.getFirst(HttpHeaders.SET_COOKIE);
+            if(cookie != null) {
+                if(CLIENT_TOKEN_NAME.equals(cookie.substring(0, cookie.indexOf('=')))) {
+                    clientToken = cookie.substring(cookie.indexOf('=') + 1, cookie.indexOf(','));
+                    if(debug) {
+                        Debug.debug(CLIENT_TOKEN_NAME + "=" + clientToken);
+                    }
+                }
+            }
+            if(headers.containsKey(CSRF_HEADER_NAME_HEADER)) {
+                csrfHeader = headers.getFirst(CSRF_HEADER_NAME_HEADER);
+                if(csrfHeader != null) {
+                    csrfToken = headers.getFirst(csrfHeader);
+                    if(debug) {
+                        Debug.debug(csrfHeader + "=" + csrfToken);
+                    }
+                }
+            }
+        }
+    }
+    
+    private HttpHeaders setupAuthentication(HttpHeaders headers) {
+        HttpHeaders result = headers;
+        if(enableCSRFClientToken && clientToken != null) {
+            result = new HttpHeaders();
+            result.putAll(headers);
+            //the cookie is already processed by HttpComponentsClientHttpRequestFactory, need not to set client token header
+            //otherwise, the header has to be set (or cookie)
+            result.set(CLIENT_TOKEN_NAME, clientToken);
+            if(debug) {
+                Debug.debug("Authenticate with " + CLIENT_TOKEN_NAME + "=" + clientToken);
+            }
+            if(csrfHeader != null && csrfToken != null) {
+                result.set(csrfHeader, csrfToken);
+                if(debug) {
+                    Debug.debug("Authenticate with csrf " + csrfHeader + "=" + csrfToken);
+                }
+            }
+        } else if(username != null && password != null) {
+            result = new HttpHeaders();
+            result.putAll(headers);
+            String usernameAndPassword = username + ":" + password;
+            result.set(HttpHeaders.AUTHORIZATION, "Basic " + new String(Base64.encodeBase64(usernameAndPassword.getBytes())));
+            if(debug) {
+                Debug.debug("Authenticate with Basic " + new String(Base64.encodeBase64(usernameAndPassword.getBytes())));
+            }
+        }
+        return result;
     }
         
     /**
@@ -197,13 +258,7 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
             throw new IllegalStateException("The resource URI is empty, or you do not have priviledge");
         }
         uri = UriHelper.decode(uri);
-        if(username != null && password != null) {
-            HttpHeaders clonedHeader = new HttpHeaders();
-            clonedHeader.putAll(headers);
-            String usernameAndPassword = username + ":" + password;
-            clonedHeader.add("Authorization", "Basic " + new String(Base64.encodeBase64(usernameAndPassword.getBytes())));
-            headers = clonedHeader;
-        }
+        headers = setupAuthentication(headers);
         HttpEntity<Object> requestEntity = requestBody == null ? 
                 new HttpEntity<Object>(headers) :
                 new HttpEntity<Object>(requestBody, headers);
@@ -443,6 +498,18 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     
     public interface RequestProcessor {
         <T> ResponseEntity<T> process(String url, HttpMethod method, HttpEntity<?> requestEntity, Class<T> responseType);
+    }
+    
+    public AbstractRestTemplateClient enableCSRFClientToken(boolean enableCSRFClientToken) {
+        this.enableCSRFClientToken = enableCSRFClientToken;
+        resetCSRFClientToken();
+        return this;
+    }
+    
+    public void resetCSRFClientToken() {
+        this.clientToken = null;
+        this.csrfHeader = null;
+        this.csrfToken = null;
     }
     
     private class DefaultRequestProcessor implements RequestProcessor {

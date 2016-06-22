@@ -18,6 +18,7 @@ public final class DCTMRestClientBuilder {
     private DCTMRestClientBinding binding;
     private boolean useFormatExtension;
     private boolean debug;
+    private boolean enableCSRFClientToken;
     
     /**
      * the context root the REST service
@@ -73,6 +74,11 @@ public final class DCTMRestClientBuilder {
         return this;
     }
     
+    public DCTMRestClientBuilder enableCSRFClientToken(boolean enable) {
+        this.enableCSRFClientToken = enable;
+        return this;
+    }
+    
     /**
      * @param username
      * @param password
@@ -88,13 +94,13 @@ public final class DCTMRestClientBuilder {
         DCTMRestClient client = null;
         switch(binding) {
             case XML:
-                client = new DCTMJaxbClient(contextRoot, repository, username, password, useFormatExtension).debug(debug);
+                client = new DCTMJaxbClient(contextRoot, repository, username, password, useFormatExtension).debug(debug).enableCSRFClientToken(enableCSRFClientToken);
                 if(debug) {
                     Debug.debug("Build DCTMRestClient with JAXB implementation");
                 }
                 break;
             case JSON:
-                client = new DCTMJacksonClient(contextRoot, repository, username, password, useFormatExtension).debug(debug);
+                client = new DCTMJacksonClient(contextRoot, repository, username, password, useFormatExtension).debug(debug).enableCSRFClientToken(enableCSRFClientToken);
                 if(debug) {
                     Debug.debug("Build DCTMRestClient with Jackson implementation");
                 }
@@ -108,6 +114,7 @@ public final class DCTMRestClientBuilder {
             Debug.debug("User Name=" + username);
             Debug.debug("Password=" + password);
             Debug.debug("Use Format Extension=" + useFormatExtension);
+            Debug.debug("Enable CSRF Client Token=" + enableCSRFClientToken);
         }
         return client;
     }
