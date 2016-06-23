@@ -70,9 +70,9 @@ public class DCTMRestClientSample {
         String bindingStr = read(sb.toString(), "XML");
         DCTMRestClientBinding binding = DCTMRestClientBinding.valueOf(bindingStr.toUpperCase());
         String contextRoot = read("Please input the REST context path:", "http://localhost:8080/dctm-rest");
-        String repository = read("Please input the repository name:", "REPO");
-        String username = read("Please input the username:", "dmadmin");
-        String password = read("Please input the password:", "password");
+        String repository = read("Please input the repository name:");
+        String username = read("Please input the username:");
+        String password = read("Please input the password:");
         String enableCSRFClientToken = read("Please input whether enable the client token authentication with the server based CSRF:", "true");
         String useFormatExtension = read("Please input the whether add format extension .xml or .json for URI:", "false");
         String debug = read("Please input whether print debug information:", "false");
