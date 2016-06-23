@@ -1,9 +1,13 @@
 /*
  * Copyright (c) 2016. EMC Corporation. All Rights Reserved.
  */
-package com.emc.documentum.rest.client.sample.model;
+package com.emc.documentum.rest.client.sample.model.plain;
 
 import java.util.List;
+
+import com.emc.documentum.rest.client.sample.model.FolderLink;
+import com.emc.documentum.rest.client.sample.model.Link;
+import com.emc.documentum.rest.client.sample.model.LinkRelation;
 
 
 /**

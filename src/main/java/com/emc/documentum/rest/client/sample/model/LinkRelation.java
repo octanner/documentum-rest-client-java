@@ -56,6 +56,7 @@ public enum LinkRelation {
     USER("user", true),
     GROUPS("groups", true),
     CURRENT_USER("current-user", true),
+    CURRENT_USER_PREFERENCES("current-user-preferences", true),
     
     //for versioning
     CHECKIN_NEXT_MAJOR("checkin-next-major", true),

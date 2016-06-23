@@ -19,4 +19,7 @@ public class JsonFeeds {
     
     public static class SearchFeed extends JsonSearchFeed<JsonObject>{
     }
+    
+    public static class PreferenceFeed extends JsonFeed<JsonPreference>{
+    }
 }

@@ -27,9 +27,7 @@ import com.emc.documentum.rest.client.sample.model.Link;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
 import com.emc.documentum.rest.client.sample.model.Linkable;
 import com.emc.documentum.rest.client.sample.model.ObjectAspects;
-import com.emc.documentum.rest.client.sample.model.PlainFolderLink;
-import com.emc.documentum.rest.client.sample.model.PlainRestObject;
-import com.emc.documentum.rest.client.sample.model.PlainValueAssistantRequest;
+import com.emc.documentum.rest.client.sample.model.Preference;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.RestType;
@@ -41,6 +39,10 @@ import com.emc.documentum.rest.client.sample.model.batch.Batch.OnError;
 import com.emc.documentum.rest.client.sample.model.batch.BatchBuilder;
 import com.emc.documentum.rest.client.sample.model.batch.Capabilities;
 import com.emc.documentum.rest.client.sample.model.batch.Operation;
+import com.emc.documentum.rest.client.sample.model.plain.PlainFolderLink;
+import com.emc.documentum.rest.client.sample.model.plain.PlainPreference;
+import com.emc.documentum.rest.client.sample.model.plain.PlainRestObject;
+import com.emc.documentum.rest.client.sample.model.plain.PlainValueAssistantRequest;
 
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CHILD_LINKS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.DEFAULT_FOLDER;
@@ -111,7 +113,8 @@ public class DCTMRestClientSample {
           .append("14 Get Network Location(s)").append(NEWLINE)
           .append("15 Copy, Move, Link, Unlink").append(NEWLINE)
           .append("16 Simple Search").append(NEWLINE)
-          .append("17 Batch and Batch Capabilities").append(NEWLINE);
+          .append("17 Batch and Batch Capabilities").append(NEWLINE)
+          .append("18 User Preference CRUD (REST Services 7.3+)").append(NEWLINE);
         
         while(true) {
             String sample = read(sb.toString());
@@ -173,6 +176,9 @@ public class DCTMRestClientSample {
                         break;
                     case 17:
                         batch();
+                        break;
+                    case 18:
+                        preference();
                         break;
                     default:
                         System.out.println("Unsupported " + op);
@@ -1258,6 +1264,49 @@ public class DCTMRestClientSample {
         printNewLine();
     }
     
+    /**
+     * samples to manipulate the preference
+     */
+    private static void preference() {
+        System.out.println("start User Preference samples");
+        
+        printStep("create an user preference");
+        PlainPreference plainPreference = new PlainPreference();
+        plainPreference.setClient("client code");
+        plainPreference.setKeywords(Arrays.asList("key1", "key2"));
+        plainPreference.setSubject("preference subject");
+        plainPreference.setTitle("preference title");
+        plainPreference.setPreference("any preference string can be set here");
+        Preference createdPreference = client.createPreference(plainPreference);
+        printPreference(createdPreference);
+        printNewLine();
+        
+        printStep("get all preferences");
+        Feed<Preference> prefenreces = client.getPreferences();
+        printEntryContentSrc(prefenreces);
+        printNewLine();
+
+        printStep("get a single prefenrece");
+        Preference preference = client.getPreference(prefenreces.getEntries().get(0).getContentSrc());
+        printPreference(preference);
+        printNewLine();
+
+        printStep("udpate prefenrece");
+        plainPreference = new PlainPreference();
+        plainPreference.setPreference("the new updated user prefenrece string");
+        Preference updatedPreference = client.updatePreference(createdPreference, plainPreference);
+        printPreference(updatedPreference);
+        printNewLine();
+        
+        printStep("delete a prefenrece");
+        client.delete(updatedPreference);
+        printHttpStatus();
+        printNewLine();
+        
+        System.out.println("finish User Preference samples");
+        printNewLine();
+    }
+    
     private static void printEntryContentSrc(Feed<?> feed) {
         for(Entry<?> e : feed.getEntries()) {
             System.out.println(e.getTitle() + " -> " + e.getContentSrc());
@@ -1299,6 +1348,11 @@ public class DCTMRestClientSample {
                 }
             }
         }
+    }
+    
+    private static void printPreference(Preference preference) {
+        System.out.println("client: " + preference.getClient() + ", title: " + preference.getTitle() + ", subject: " + preference.getSubject() + ", keywords: " + preference.getKeywords()); 
+        System.out.println("preference: " + preference.getPreference());
     }
     
     private static void printHttpStatus() {

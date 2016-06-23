@@ -26,7 +26,7 @@ import com.emc.documentum.rest.client.sample.model.HomeDocument;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
 import com.emc.documentum.rest.client.sample.model.Linkable;
 import com.emc.documentum.rest.client.sample.model.ObjectAspects;
-import com.emc.documentum.rest.client.sample.model.PlainRestObject;
+import com.emc.documentum.rest.client.sample.model.Preference;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.RestType;
@@ -35,6 +35,7 @@ import com.emc.documentum.rest.client.sample.model.ValueAssistant;
 import com.emc.documentum.rest.client.sample.model.ValueAssistantRequest;
 import com.emc.documentum.rest.client.sample.model.batch.Batch;
 import com.emc.documentum.rest.client.sample.model.batch.Capabilities;
+import com.emc.documentum.rest.client.sample.model.plain.PlainRestObject;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbAspectType;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbBatch;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbBatchCapabilities;
@@ -50,6 +51,7 @@ import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbHomeDocument;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbNetworkLocation;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbObject;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbObjectAspects;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbPreference;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbProductInfo;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbRelation;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbRelationType;
@@ -72,6 +74,7 @@ import static com.emc.documentum.rest.client.sample.model.LinkRelation.CHECKIN_N
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CHECKIN_NEXT_MINOR;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CHECKOUT;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CONTENTS;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.CURRENT_USER_PREFERENCES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.DELETE;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.DEMATERIALIZE;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.DOCUMENTS;
@@ -468,6 +471,27 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
         return post(batch, JaxbBatch.class);
     }
     
+    @Override
+    public Feed<Preference> getPreferences(String... params) {
+        Feed<? extends Preference> feed = get(getRepository().getHref(CURRENT_USER_PREFERENCES), true, JaxbFeed.class, params);
+        return (Feed<Preference>)feed;
+    }
+
+    @Override
+    public Preference getPreference(String uri, String... params) {
+        return get(uri, false, JaxbPreference.class, params);
+    }
+
+    @Override
+    public Preference createPreference(Preference preference) {
+        return post(getRepository().getHref(CURRENT_USER_PREFERENCES), new JaxbPreference(preference), JaxbPreference.class);
+    }
+
+    @Override
+    public Preference updatePreference(Preference oldPreference, Preference newPreference) {
+        return post(oldPreference.self(), new JaxbPreference(newPreference), JaxbPreference.class);
+    }
+
     @Override
     public <T extends Linkable> Feed<T> nextPage(Feed<T> feed) {
         return page(feed.getHref(PAGING_NEXT));

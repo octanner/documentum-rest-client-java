@@ -27,6 +27,7 @@ import com.emc.documentum.rest.client.sample.model.HomeDocument;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
 import com.emc.documentum.rest.client.sample.model.Linkable;
 import com.emc.documentum.rest.client.sample.model.ObjectAspects;
+import com.emc.documentum.rest.client.sample.model.Preference;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.RestType;
@@ -42,6 +43,7 @@ import com.emc.documentum.rest.client.sample.model.json.JsonFolderLink;
 import com.emc.documentum.rest.client.sample.model.json.JsonHomeDocument;
 import com.emc.documentum.rest.client.sample.model.json.JsonObject;
 import com.emc.documentum.rest.client.sample.model.json.JsonObjectAspects;
+import com.emc.documentum.rest.client.sample.model.json.JsonPreference;
 import com.emc.documentum.rest.client.sample.model.json.JsonRepository;
 import com.emc.documentum.rest.client.sample.model.json.JsonType;
 import com.emc.documentum.rest.client.sample.model.json.JsonValueAssistance;
@@ -60,6 +62,7 @@ import static com.emc.documentum.rest.client.sample.model.LinkRelation.CHECKIN_N
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CHECKIN_NEXT_MINOR;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CHECKOUT;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CONTENTS;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.CURRENT_USER_PREFERENCES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.DELETE;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.DEMATERIALIZE;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.DOCUMENTS;
@@ -468,6 +471,27 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     @Override
     public Batch createBatch(Batch batch) {
         return post(batch, JsonBatch.class);
+    }
+
+    @Override
+    public Feed<Preference> getPreferences(String... params) {
+        Feed<? extends Preference> feed = get(getRepository().getHref(CURRENT_USER_PREFERENCES), true, JsonFeeds.PreferenceFeed.class, params);
+        return (Feed<Preference>)feed;
+    }
+
+    @Override
+    public Preference getPreference(String uri, String... params) {
+        return get(uri, false, JsonPreference.class, params);
+    }
+
+    @Override
+    public Preference createPreference(Preference preference) {
+        return post(getRepository().getHref(CURRENT_USER_PREFERENCES), new JsonPreference(preference), JsonPreference.class);
+    }
+
+    @Override
+    public Preference updatePreference(Preference oldPreference, Preference newPreference) {
+        return post(oldPreference.self(), new JsonPreference(newPreference), JsonPreference.class);
     }
 
     @Override

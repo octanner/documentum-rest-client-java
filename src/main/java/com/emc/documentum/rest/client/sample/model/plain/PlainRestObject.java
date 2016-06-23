@@ -1,11 +1,15 @@
 /*
  * Copyright (c) 2016. EMC Corporation. All Rights Reserved.
  */
-package com.emc.documentum.rest.client.sample.model;
+package com.emc.documentum.rest.client.sample.model.plain;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.emc.documentum.rest.client.sample.model.Link;
+import com.emc.documentum.rest.client.sample.model.LinkRelation;
+import com.emc.documentum.rest.client.sample.model.RestObject;
 
 /**
  * the plain RestObject implementation which has properties only

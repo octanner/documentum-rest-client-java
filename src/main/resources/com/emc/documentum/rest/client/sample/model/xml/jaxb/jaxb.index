@@ -24,6 +24,7 @@ JaxbHomeDocument
 JaxbItem
 JaxbLink
 JaxbNetworkLocation
+JaxbPreference
 JaxbQueryResult
 JaxbRepository
 JaxbSearchEntry

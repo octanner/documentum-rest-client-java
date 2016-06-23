@@ -109,9 +109,4 @@ public class MultipartBatchHttpMessageConverter implements HttpMessageConverter<
         os.write('\r');
         os.write('\n');
     }
-    
-    private static void writeNewLine2(OutputStream os) throws IOException {
-        writeNewLine(os);
-        writeNewLine(os);
-    }
 }

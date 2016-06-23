@@ -16,6 +16,7 @@ import com.emc.documentum.rest.client.sample.model.HomeDocument;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
 import com.emc.documentum.rest.client.sample.model.Linkable;
 import com.emc.documentum.rest.client.sample.model.ObjectAspects;
+import com.emc.documentum.rest.client.sample.model.Preference;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.RestType;
@@ -627,4 +628,34 @@ public interface DCTMRestClient {
      */
     @NotBatchable
     public Batch createBatch(Batch batch);
+    
+    /**
+     * get user preferences
+     * @param params
+     * @return
+     */
+    public Feed<Preference> getPreferences(String... params);
+    
+    /**
+     * get single preference
+     * @param uri
+     * @param params
+     * @return
+     */
+    public Preference getPreference(String uri, String... params);
+    
+    /**
+     * create a preference
+     * @param preference
+     * @return
+     */
+    public Preference createPreference(Preference preference);
+    
+    /**
+     * update a preference
+     * @param oldPreference
+     * @param newPreference
+     * @return
+     */
+    public Preference updatePreference(Preference oldPreference, Preference newPreference);
 }
