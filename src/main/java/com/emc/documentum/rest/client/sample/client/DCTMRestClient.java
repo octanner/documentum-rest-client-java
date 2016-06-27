@@ -65,6 +65,12 @@ public interface DCTMRestClient {
     @NotBatchable
     public RestObject getProductInfo();
     
+    @NotBatchable
+    /**
+     * @return the major version of the rest services
+     */
+    public double getMajorVersion();
+    
     /**
      * @return the cached Repositories feed
      */

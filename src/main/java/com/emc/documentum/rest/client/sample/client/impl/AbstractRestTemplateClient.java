@@ -315,6 +315,16 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
         return entity == null ? null : entity.getBody();
     }
     
+    @Override
+    public double getMajorVersion() {
+        try {
+            return Double.parseDouble((String)getProductInfo().getProperties().get("major"));
+        } catch(Exception e) {
+            e.printStackTrace();
+            return 7.2;
+        }
+    }
+
     /**
      * construct a new RestObject based on oldObject's class with new properties
      * @param oldObject

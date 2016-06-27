@@ -6,8 +6,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.METHOD})
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
+@RestServiceVersion
 @Inherited
-public @interface NotBatchable {
+public @interface RestServiceSample {
+    String value();
 }
