@@ -84,22 +84,21 @@ public abstract class Sample {
     
     @RestServiceSampleExclude
     public void run() {
-        System.out.println("start " + name + " sample");
-        Method[] methods = this.getClass().getMethods();
-        for(Method method : methods) {
-            if(method.getParameterCount() == 0 && void.class.equals(method.getReturnType()) && !Object.class.equals(method.getDeclaringClass()) && method.getAnnotation(RestServiceSampleExclude.class) == null) {
-                RestServiceVersion serviceVersion = method.getAnnotation(RestServiceVersion.class);
+        System.out.println("start " + name + " samples");
+        for(Method m : this.getClass().getMethods()) {
+            if(!Object.class.equals(m.getDeclaringClass()) && m.getParameterTypes().length == 0 && m.getAnnotation(RestServiceSampleExclude.class)==null && void.class.equals(m.getReturnType())) {
+                RestServiceVersion serviceVersion = m.getAnnotation(RestServiceVersion.class);
                 if(serviceVersion == null || serviceVersion.value() <= version) {
                     try {
-                        method.invoke(this);
+                        m.invoke(this);
                     } catch (Exception e) {
-                        Debug.error(method.toString());
+                        Debug.error(m.toString());
                         e.printStackTrace();
                     }
                 }
             }
         }
-        System.out.println("finish " + name + " sample");
+        System.out.println("finish " + name + " samples");
         printNewLine();
     }
     
