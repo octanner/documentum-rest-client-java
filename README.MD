@@ -33,12 +33,11 @@ Supported authentication scheme:
 >       mvn clean install
 
 2. There will be several files built in target directory:
- *rest-api-client-sample-7.3.jar* --> the sample client jar file
- *lib* -> the lib directory contains all other required third party library
- *rest-api-client-sample-7.3-all-in-one.jar* -> the sample client jar file, with all other third party classes embedded
- *rest-api-client-sample-7.3-javadoc.jar* -> javadoc of the sample client
- *rest-api-client-sample-7.3-sources.jar* -> source code of the sample client
-   
+ * *rest-api-client-sample-7.3.jar* --> the sample client jar file
+ * *lib* -> the lib directory contains all other required third party library
+ * *rest-api-client-sample-7.3-all-in-one.jar* -> the sample client jar file, with all other third party classes embedded
+ * *rest-api-client-sample-7.3-javadoc.jar* -> javadoc of the sample client
+ * *rest-api-client-sample-7.3-sources.jar* -> source code of the sample client
 3. Run the project
  execute rest-api-client-sample-7.3.jar, with lib directory at the same place
 >     java -jar rest-api-client-sample-7.3.jar
@@ -48,10 +47,10 @@ Supported authentication scheme:
    
 4. After the program is started, please input the required information prompted by the sample client. After that, you
 will see a list of commands:
->    	Please input the number of the sample operation which need be executed:
->    	  0 Exit
->    	  1 Navigation
->    	  2 Folder Create/Update/Delete
+>       Please input the number of the sample operation which need be executed:
+>         0 Exit
+>         1 Navigation
+>         2 Folder Create/Update/Delete
 >         ...
 
 5. Then input the number of the sample you want to execute.
