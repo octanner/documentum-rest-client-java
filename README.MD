@@ -15,7 +15,7 @@ EMC shares the source code of this project for the technology sharing. If users 
 ## Overview
 This Documentum REST Services client is written with Java code. Underlying it leverages Spring *RestTemplate* to send
 the REST messages. It supports both `XML` and `JSON` representations. `JAXB` is used to bind XML object, and `Jackson`
-for JSON.
+for JSON. Both http and https are supported.
 
 Supported authentication scheme:
 * basic
@@ -52,11 +52,15 @@ will see a list of commands:
 >    	  0 Exit
 >    	  1 Navigation
 >    	  2 Folder Create/Update/Delete
->    	  3 Sysobject Create/Update/Delete
->    	  4 Document Create/Update/Delete
->    	  5 Content Management
->    	  6 Version Management
->    	  7 DQL Query
 >         ...
 
 5. Then input the number of the sample you want to execute.
+
+6. Basic sample client
+![alt tag](https://raw.githubusercontent.com/Enterprise-Content-Management/documentum-rest-client-java/master/imgs/basic.gif)
+
+7. HTTPS connection without authenticating the rest server
+![alt tag](https://raw.githubusercontent.com/Enterprise-Content-Management/documentum-rest-client-java/master/imgs/https1.gif)
+
+8. HTTPS connection with authenticating the rest server (the trust store must contain the rest server)
+![alt tag](https://raw.githubusercontent.com/Enterprise-Content-Management/documentum-rest-client-java/master/imgs/https2.gif)
