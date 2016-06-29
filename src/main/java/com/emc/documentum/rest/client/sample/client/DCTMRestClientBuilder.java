@@ -21,6 +21,7 @@ public final class DCTMRestClientBuilder {
     private DCTMRestClientBinding binding;
     private boolean useFormatExtension;
     private boolean debug;
+    private boolean ignoreAuthenticateServer;
     
     public static DCTMRestClient buildWithPrompt() {
         StringBuilder sb = new StringBuilder();
@@ -31,18 +32,21 @@ public final class DCTMRestClientBuilder {
         String bindingStr = read(sb.toString(), "XML");
         DCTMRestClientBinding binding = DCTMRestClientBinding.valueOf(bindingStr.toUpperCase());
         String contextRoot = read("Please input the REST context path:", "http://localhost:8080/dctm-rest");
-        String repository = read("Please input the repository name:", "REPO");
-        String username = read("Please input the username:", "dmadmin");
-        String password = read("Please input the password:", "password");
+        boolean ignoreAuthenticateServer = ignoreAuthenticateServer(contextRoot);
+        String repository = read("Please input the repository name:");
+        String username = read("Please input the username:");
+        String password = read("Please input the password:");
         String useFormatExtension = read("Please input the whether add format extension .xml or .json for URI:", "false");
         String debug = read("Please input whether print debug information:", "false");
         AbstractRestTemplateClient client = (AbstractRestTemplateClient)new DCTMRestClientBuilder().
                    bind(binding).
                    contextRoot(contextRoot).
+                   ignoreAuthenticateServer(ignoreAuthenticateServer).
                    credentials(username, password).
                    repository(repository).
                    useFormatExtension("true".equalsIgnoreCase(useFormatExtension)).
                    debug("true".equalsIgnoreCase(debug)).build();
+        client.getHomeDocument();
         if(client.getMajorVersion() >= 7.2) {
             String msg = client.getMajorVersion() >= 7.3?"Please input whether enable the client token authentication with the server based CSRF:":"Please input whether enable the client token authentication:";
             boolean enableCSRFClientToken = "true".equalsIgnoreCase(read(msg, "true"));
@@ -52,6 +56,23 @@ public final class DCTMRestClientBuilder {
             }
         }
         return client;
+    }
+    
+    private static boolean ignoreAuthenticateServer(String contextRoot) {
+        if("https".equalsIgnoreCase(contextRoot.substring(0, 5))) {
+            String useTrustStore = read("Please input whether authenticate the rest server:", "false");
+            if("true".equalsIgnoreCase(useTrustStore)) {
+                if(System.getProperty("javax.net.ssl.trustStore") == null) {
+                    String trustStore = read("Please input the trust store path:");
+                    String password = read("Please input the password of the trust store:");
+                    System.setProperty("javax.net.ssl.trustStore", trustStore);
+                    System.setProperty("javax.net.ssl.trustStorePassword", password);
+                }
+            } else {
+                return true;
+            }
+        }
+        return false;
     }
     
     /**
@@ -119,20 +140,25 @@ public final class DCTMRestClientBuilder {
         return this;
     }
     
+    public DCTMRestClientBuilder ignoreAuthenticateServer(boolean ignoreAuthenticateServer) {
+        this.ignoreAuthenticateServer = ignoreAuthenticateServer;
+        return this;
+    }
+    
     public DCTMRestClient build() {
         DCTMRestClient client = null;
         switch(binding) {
             case XML:
-                client = new DCTMJaxbClient(contextRoot, repository, username, password, useFormatExtension).debug(debug);
                 if(debug) {
                     Debug.debug("Build DCTMRestClient with JAXB implementation");
                 }
+                client = new DCTMJaxbClient(contextRoot, repository, username, password, useFormatExtension).debug(debug).ignoreAuthenticateServer(ignoreAuthenticateServer);
                 break;
             case JSON:
-                client = new DCTMJacksonClient(contextRoot, repository, username, password, useFormatExtension).debug(debug);
                 if(debug) {
                     Debug.debug("Build DCTMRestClient with Jackson implementation");
                 }
+                client = new DCTMJacksonClient(contextRoot, repository, username, password, useFormatExtension).debug(debug).ignoreAuthenticateServer(ignoreAuthenticateServer);
                 break;
             default:
                 throw new IllegalArgumentException(binding + " binding is not supported yet");    

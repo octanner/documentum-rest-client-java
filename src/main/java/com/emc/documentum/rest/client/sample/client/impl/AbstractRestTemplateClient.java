@@ -11,6 +11,11 @@ import java.io.OutputStream;
 import javax.annotation.concurrent.NotThreadSafe;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.client.HttpClient;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -79,6 +84,7 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     protected boolean enableStreaming = false;
     protected boolean debug;
     protected boolean enableCSRFClientToken = true;
+    protected boolean ignoreAuthenticateServer = true;
     
     protected HttpHeaders headers;
     protected HttpStatus status;
@@ -136,7 +142,17 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     }
     
     protected void initRestTemplate(RestTemplate restTemplate) {
-        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        if(ignoreAuthenticateServer) {
+            try {
+                SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(new SSLContextBuilder().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build());
+                HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
+                factory.setHttpClient(httpClient);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        restTemplate.setRequestFactory(factory);
         restTemplate.getMessageConverters().add(new MultipartBatchHttpMessageConverter());
     }
     
@@ -320,7 +336,6 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
         try {
             return Double.parseDouble((String)getProductInfo().getProperties().get("major"));
         } catch(Exception e) {
-            e.printStackTrace();
             return 7.2;
         }
     }
@@ -522,6 +537,11 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
         this.csrfToken = null;
     }
     
+    public AbstractRestTemplateClient ignoreAuthenticateServer(boolean ignoreAuthenticateServer) {
+        this.ignoreAuthenticateServer = ignoreAuthenticateServer;
+        return this;
+    }
+
     private class DefaultRequestProcessor implements RequestProcessor {
         @Override
         public <T> ResponseEntity<T> process(String url, HttpMethod method, HttpEntity<?> requestEntity, Class<T> responseType) {

@@ -23,17 +23,18 @@ public class DCTMRestClientSample {
     
     public static void main(String[] args) throws Exception {
         client = buildWithPrompt();
+        
         double version = client.getMajorVersion();
         printNewLine();
         List<Sample> samples = loadSamples(version, client);
         RestObject productInfo = client.getProductInfo();
         StringBuilder sb = new StringBuilder();
         sb.append(productInfo.getProperties().get("product") + " " + productInfo.getProperties().get("product_version")).append(NEWLINE)
-          .append("Please input the number of the sample operation which need be executed:").append(NEWLINE)
           .append(" 0 Exit").append(NEWLINE);
         for(int i=0;i<samples.size();++i) {
             sb.append(" " + (i+1) + " " + samples.get(i).name() + " samples").append(NEWLINE);
         }
+        sb.append("Please input the number of the sample operation which need be executed:");
         while(true) {
             String sampleOperation = read(sb.toString());
             int op = 0;
