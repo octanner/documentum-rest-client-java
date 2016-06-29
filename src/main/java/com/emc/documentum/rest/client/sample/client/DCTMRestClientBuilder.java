@@ -60,13 +60,17 @@ public final class DCTMRestClientBuilder {
     
     private static boolean ignoreAuthenticateServer(String contextRoot) {
         if("https".equalsIgnoreCase(contextRoot.substring(0, 5))) {
-            String useTrustStore = read("Please input whether authenticate the rest server:", "false");
-            if("true".equalsIgnoreCase(useTrustStore)) {
-                if(System.getProperty("javax.net.ssl.trustStore") == null) {
-                    String trustStore = read("Please input the trust store path:");
-                    String password = read("Please input the password of the trust store:");
-                    System.setProperty("javax.net.ssl.trustStore", trustStore);
-                    System.setProperty("javax.net.ssl.trustStorePassword", password);
+            if(System.getProperty("javax.net.ssl.trustStore") == null) {
+                String useTrustStore = read("Please input whether authenticate the rest server:", "false");
+                if("true".equalsIgnoreCase(useTrustStore)) {
+                    if(System.getProperty("javax.net.ssl.trustStore") == null) {
+                        String trustStore = read("Please input the trust store path:");
+                        String password = read("Please input the password of the trust store:");
+                        System.setProperty("javax.net.ssl.trustStore", trustStore);
+                        System.setProperty("javax.net.ssl.trustStorePassword", password);
+                    }
+                } else {
+                    return true;
                 }
             } else {
                 return true;

@@ -24,7 +24,7 @@ Supported authentication scheme:
 *DCTMRestClientSample* is the main class to be executed with some sample operations.
 
 ## System Requirements
-1. Documentum REST Services 7.x is deployed in the development environment.
+1. Documentum REST Services 7.x is deployed in the development environment. The samples will be automatically loaded according the rest server version.
 2. Java 7 or later is installed.
 3. Maven 3 is required to build the project.
 
@@ -63,3 +63,6 @@ will see a list of commands:
 
 8. HTTPS connection with authenticating the rest server (the trust store must contain the rest server)
 ![alt tag](https://raw.githubusercontent.com/Enterprise-Content-Management/documentum-rest-client-java/master/imgs/https2.gif)
+
+Or provide the trust store path with -D parameter:
+> java -Djavax.net.ssl.trustStore=X:\git\documentum-rest-client-java\truststore.jks -Djavax.net.ssl.trustStorePassword=password -jar rest-api-client-sample-7.3.jar
