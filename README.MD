@@ -1,7 +1,8 @@
 Documentum REST Java Client Samples
 =========
 
-[![Build Status](https://travis-ci.org/Enterprise-Content-Management/documentum-rest-client-java.svg?branch=master)](https://travis-ci.org/Enterprise-Content-Management/documentum-rest-client-java)
+[![Build Status](https://travis-ci.org/Enterprise-Content-Management/documentum-rest-client-java.svg?branch=master)](https://travis-ci.org/Enterprise-Content-Management/documentum-rest-client-java) 
+[![License: Apache 2](https://img.shields.io/hexpm/l/plug.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 This Java project contains a reference implementation of Documentum REST Services client written in Java code. The
 purpose of this project is to demonstrate one way to develop a hypermedia driven REST client to consume Documentum
@@ -56,13 +57,14 @@ will see a list of commands:
 5. Then input the number of the sample you want to execute.
 
 6. Basic sample client
-![alt tag](https://raw.githubusercontent.com/Enterprise-Content-Management/documentum-rest-client-java/master/imgs/basic.gif)
+<img src="imgs/basic.gif" width="600">
 
 7. HTTPS connection without authenticating the rest server
-![alt tag](https://raw.githubusercontent.com/Enterprise-Content-Management/documentum-rest-client-java/master/imgs/https1.gif)
+<img src="imgs/https1.gif" width="600">
+
 
 8. HTTPS connection with authenticating the rest server (the trust store must contain the rest server)
-![alt tag](https://raw.githubusercontent.com/Enterprise-Content-Management/documentum-rest-client-java/master/imgs/https2.gif)
+<img src="imgs/https2.gif" width="600">
 
 Or provide the trust store path with -D parameter:
 > java -Djavax.net.ssl.trustStore=X:\git\documentum-rest-client-java\truststore.jks -Djavax.net.ssl.trustStorePassword=password -jar rest-api-client-sample-7.3.jar
