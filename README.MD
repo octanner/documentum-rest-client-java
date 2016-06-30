@@ -54,14 +54,12 @@ will see a list of commands:
 >         2 Folder Create/Update/Delete
 >         ...
 
-5. Then input the number of the sample you want to execute.
-
-6. Basic sample client
+5. Then input the number of the sample you want to execute
+6. Basic sample client <br/>
 <img src="imgs/basic.gif" width="600">
 
 7. HTTPS connection without authenticating the rest server
 <img src="imgs/https1.gif" width="600">
-
 
 8. HTTPS connection with authenticating the rest server (the trust store must contain the rest server)
 <img src="imgs/https2.gif" width="600">
