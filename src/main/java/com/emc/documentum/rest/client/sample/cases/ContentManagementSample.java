@@ -47,6 +47,16 @@ public class ContentManagementSample extends Sample {
         }
         printNewLine();
         
+        printStep("get the content bytes of the document from the local rest server");
+        renditionList = client.getContents(createdObjectWithContent, "media-url-policy", "local", "inline", "true");
+        for(Entry<RestObject> renditionEntry : renditionList.getEntries()) {
+            System.out.println(renditionEntry.getTitle());
+            System.out.println("the content media link: " + renditionEntry.getHref(ENCLOSURE));
+            byte[] bytes = client.getContentBytes(renditionEntry.getHref(ENCLOSURE));
+            System.out.println(new String(bytes));
+        }
+        printNewLine();
+        
         printStep("delete the created document");
         client.delete(createdObjectWithContent);
         printHttpStatus();        

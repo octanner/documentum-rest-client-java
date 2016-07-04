@@ -391,6 +391,11 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     }
     
     @Override
+    public byte[] getContentBytes(String uri) {
+        return get(uri, byte[].class);
+    }
+
+    @Override
     public void delete(Linkable linkable, String... params) {
         if(linkable.getHref(LinkRelation.DELETE) != null) {
             delete(linkable.getHref(LinkRelation.DELETE), params);

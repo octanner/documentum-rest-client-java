@@ -303,6 +303,8 @@ public interface DCTMRestClient {
      */
     public Feed<RestObject> getContents(RestObject object, String... params);
     
+    public byte[] getContentBytes(String uri);
+    
     /**
      * get users of the repository
      * @param params
