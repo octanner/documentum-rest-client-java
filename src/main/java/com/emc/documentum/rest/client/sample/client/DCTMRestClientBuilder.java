@@ -150,22 +150,26 @@ public final class DCTMRestClientBuilder {
     }
     
     public DCTMRestClient build() {
-        DCTMRestClient client = null;
+        AbstractRestTemplateClient client = null;
         switch(binding) {
             case XML:
                 if(debug) {
                     Debug.debug("Build DCTMRestClient with JAXB implementation");
                 }
-                client = new DCTMJaxbClient(contextRoot, repository, username, password, useFormatExtension).debug(debug).ignoreAuthenticateServer(ignoreAuthenticateServer);
+                client = new DCTMJaxbClient(contextRoot, repository, username, password, useFormatExtension);
                 break;
             case JSON:
                 if(debug) {
                     Debug.debug("Build DCTMRestClient with Jackson implementation");
                 }
-                client = new DCTMJacksonClient(contextRoot, repository, username, password, useFormatExtension).debug(debug).ignoreAuthenticateServer(ignoreAuthenticateServer);
+                client = new DCTMJacksonClient(contextRoot, repository, username, password, useFormatExtension);
                 break;
             default:
                 throw new IllegalArgumentException(binding + " binding is not supported yet");    
+        }
+        client.debug(debug);
+        if(ignoreAuthenticateServer) {
+            client.ignoreAuthenticateServer();
         }
         if(debug) {
             Debug.debug("Context Root=" + contextRoot);

@@ -84,7 +84,6 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     protected boolean enableStreaming = false;
     protected boolean debug;
     protected boolean enableCSRFClientToken = true;
-    protected boolean ignoreAuthenticateServer = true;
     
     protected HttpHeaders headers;
     protected HttpStatus status;
@@ -142,17 +141,7 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     }
     
     protected void initRestTemplate(RestTemplate restTemplate) {
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        if(ignoreAuthenticateServer) {
-            try {
-                SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(new SSLContextBuilder().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build());
-                HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
-                factory.setHttpClient(httpClient);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        restTemplate.setRequestFactory(factory);
+        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
         restTemplate.getMessageConverters().add(new MultipartBatchHttpMessageConverter());
     }
     
@@ -542,8 +531,18 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
         this.csrfToken = null;
     }
     
-    public AbstractRestTemplateClient ignoreAuthenticateServer(boolean ignoreAuthenticateServer) {
-        this.ignoreAuthenticateServer = ignoreAuthenticateServer;
+    public AbstractRestTemplateClient ignoreAuthenticateServer() {
+        if(restTemplate.getRequestFactory() instanceof HttpComponentsClientHttpRequestFactory) {
+            try {
+                SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(new SSLContextBuilder().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build());
+                HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
+                ((HttpComponentsClientHttpRequestFactory)restTemplate.getRequestFactory()).setHttpClient(httpClient);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            Debug.error("the request factory " + restTemplate.getRequestFactory().getClass().getName() + " does not support ignoreAuthenticateServer");
+        }
         return this;
     }
 
