@@ -344,22 +344,22 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     }
     
     @Override
-    public RestObject createObject(RestObject parent, RestObject objectToCreate, Object content, String contentMediaType, String... params) {
+    public RestObject createObject(Linkable parent, RestObject objectToCreate, Object content, String contentMediaType, String... params) {
         return createObject(parent, LinkRelation.OBJECTS, objectToCreate, content, contentMediaType, params);
     }
 
     @Override
-    public RestObject createObject(RestObject parent, RestObject objectToCreate) {
+    public RestObject createObject(Linkable parent, RestObject objectToCreate) {
         return createObject(parent, LinkRelation.OBJECTS, objectToCreate, null, null);
     }
     
     @Override
-    public RestObject createObject(RestObject parent, LinkRelation rel, RestObject objectToCreate) {
+    public RestObject createObject(Linkable parent, LinkRelation rel, RestObject objectToCreate) {
         return createObject(parent, rel, objectToCreate, null, null);
     }
     
     @Override
-    public RestObject createDocument(RestObject parent, RestObject objectToCreate) {
+    public RestObject createDocument(Linkable parent, RestObject objectToCreate) {
         return createDocument(parent, objectToCreate, null, null);
     }
 

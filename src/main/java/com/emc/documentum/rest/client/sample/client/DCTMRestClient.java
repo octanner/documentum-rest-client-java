@@ -118,21 +118,21 @@ public interface DCTMRestClient {
      * @param params
      * @return the folders feed under the specified object
      */
-    public Feed<RestObject> getFolders(RestObject parent, String... params);
+    public Feed<RestObject> getFolders(Linkable parent, String... params);
     
     /**
      * @param parent the parent object, e.g. cabinet, folder
      * @param params
      * @return the documents (dm_document or its subtype) feed under the specified object
      */
-    public Feed<RestObject> getDocuments(RestObject parent, String... params);
+    public Feed<RestObject> getDocuments(Linkable parent, String... params);
     
     /**
      * @param parent the parent object, e.g. cabinet, folder
      * @param params
      * @return the sysobjects (dm_sysobject or its subtype) feed under the specified object
      */
-    public Feed<RestObject> getObjects(RestObject parent, String... params);
+    public Feed<RestObject> getObjects(Linkable parent, String... params);
     
     /**
      * @param object
@@ -156,7 +156,7 @@ public interface DCTMRestClient {
      * @param params
      * @return the created folder
      */
-    public RestObject createFolder(RestObject parent, RestObject newFolder, String... params);
+    public RestObject createFolder(Linkable parent, RestObject newFolder, String... params);
     
     /**
      * @param folderUri
@@ -175,7 +175,7 @@ public interface DCTMRestClient {
      * @param params
      * @return the created sysobject
      */
-    public RestObject createObject(RestObject parent, LinkRelation rel, RestObject objectToCreate, Object content, String contentMediaType, String... params);
+    public RestObject createObject(Linkable parent, LinkRelation rel, RestObject objectToCreate, Object content, String contentMediaType, String... params);
     
     /**
      * create a sysobject (or its subtype) under specified parent's link rel
@@ -184,7 +184,7 @@ public interface DCTMRestClient {
      * @param objectToCreate the new object with its properties
      * @return the created sysobject
      */
-    public RestObject createObject(RestObject parent, LinkRelation rel, RestObject objectToCreate);
+    public RestObject createObject(Linkable parent, LinkRelation rel, RestObject objectToCreate);
 
     /**
      * create a sysobject (or its subtype) under specified folder/cabinet
@@ -195,7 +195,7 @@ public interface DCTMRestClient {
      * @param params
      * @return the created sysobject
      */
-    public RestObject createObject(RestObject parent, RestObject objectToCreate, Object content, String contentMediaType, String... params);
+    public RestObject createObject(Linkable parent, RestObject objectToCreate, Object content, String contentMediaType, String... params);
     
     /**
      * create a sysobject (or its subtype) under specified folder/cabinet
@@ -203,7 +203,7 @@ public interface DCTMRestClient {
      * @param objectToCreate the new object with its properties
      * @return the created sysobject
      */
-    public RestObject createObject(RestObject parent, RestObject objectToCreate);
+    public RestObject createObject(Linkable parent, RestObject objectToCreate);
 
     /**
      * @param objectUri
@@ -221,7 +221,7 @@ public interface DCTMRestClient {
      * @param params
      * @return the created document
      */
-    public RestObject createDocument(RestObject parent, RestObject objectToCreate, Object content, String contentMediaType, String... params);
+    public RestObject createDocument(Linkable parent, RestObject objectToCreate, Object content, String contentMediaType, String... params);
 
     /**
      * create a document (or its subtype) under specified folder/cabinet
@@ -229,7 +229,7 @@ public interface DCTMRestClient {
      * @param objectToCreate the new document with its properties
      * @return the created document
      */
-    public RestObject createDocument(RestObject parent, RestObject objectToCreate);
+    public RestObject createDocument(Linkable parent, RestObject objectToCreate);
 
     /**
      * @param documentUri
@@ -595,7 +595,7 @@ public interface DCTMRestClient {
      * @param params
      * @return
      */
-    public Feed<FolderLink> getFolderLinks(RestObject object, LinkRelation rel, String... params);
+    public Feed<FolderLink> getFolderLinks(Linkable object, LinkRelation rel, String... params);
     
     /**
      * get single folder link
@@ -621,7 +621,7 @@ public interface DCTMRestClient {
      * @param link
      * @return
      */
-    public FolderLink link(RestObject object, LinkRelation rel, FolderLink link);
+    public FolderLink link(Linkable object, LinkRelation rel, FolderLink link);
     
     /**
      * get batch capabilities

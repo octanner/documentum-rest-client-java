@@ -191,22 +191,22 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     }
     
     @Override
-    public Feed<RestObject> getFolders(RestObject parent, String... params) {
+    public Feed<RestObject> getFolders(Linkable parent, String... params) {
         return get(parent.getHref(FOLDERS), true, JaxbFeed.class, params);
     }
     
     @Override
-    public Feed<RestObject> getObjects(RestObject parent, String... params) {
+    public Feed<RestObject> getObjects(Linkable parent, String... params) {
         return get(parent.getHref(OBJECTS), true, JaxbFeed.class, params);
     }
     
     @Override
-    public Feed<RestObject> getDocuments(RestObject parent, String... params) {
+    public Feed<RestObject> getDocuments(Linkable parent, String... params) {
         return get(parent.getHref(DOCUMENTS), true, JaxbFeed.class, params);
     }
     
     @Override
-    public RestObject createFolder(RestObject parent, RestObject newFolder, String... params) {
+    public RestObject createFolder(Linkable parent, RestObject newFolder, String... params) {
         return post(parent.getHref(FOLDERS), new JaxbFolder(newFolder), JaxbFolder.class, params);
     }
     
@@ -216,7 +216,7 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     }
     
     @Override
-    public RestObject createObject(RestObject parent, LinkRelation rel, RestObject objectToCreate, Object content, String contentMediaType, String... params) {
+    public RestObject createObject(Linkable parent, LinkRelation rel, RestObject objectToCreate, Object content, String contentMediaType, String... params) {
         return post(parent.getHref(rel), new JaxbSysObject(objectToCreate), content, contentMediaType, JaxbSysObject.class, params);
     }
 
@@ -226,7 +226,7 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     }
     
     @Override
-    public RestObject createDocument(RestObject parent, RestObject objectToCreate, Object content, String contentMediaType, String... params) {
+    public RestObject createDocument(Linkable parent, RestObject objectToCreate, Object content, String contentMediaType, String... params) {
         return post(parent.getHref(DOCUMENTS), new JaxbDocument(objectToCreate), content, contentMediaType, JaxbDocument.class, params);
     }
     
@@ -441,7 +441,7 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     }
     
     @Override
-    public Feed<FolderLink> getFolderLinks(RestObject object, LinkRelation rel, String... params) {
+    public Feed<FolderLink> getFolderLinks(Linkable object, LinkRelation rel, String... params) {
         Feed<? extends FolderLink> feed = get(object.getHref(rel), true, JaxbFeed.class, params);
         return (Feed<FolderLink>)feed;
     }
@@ -457,7 +457,7 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     }
     
     @Override
-    public FolderLink link(RestObject object, LinkRelation rel, FolderLink link) {
+    public FolderLink link(Linkable object, LinkRelation rel, FolderLink link) {
         return post(object.getHref(rel), new JaxbFolderLink(link), JaxbFolderLink.class);
     }
     

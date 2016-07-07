@@ -187,25 +187,25 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     }
     
     @Override
-    public Feed<RestObject> getFolders(RestObject parent, String... params) {
+    public Feed<RestObject> getFolders(Linkable parent, String... params) {
         Feed<? extends RestObject> feed = get(parent.getHref(FOLDERS), true, JsonFeeds.ObjectFeed.class, params);
         return (Feed<RestObject>)feed;
     }
     
     @Override
-    public Feed<RestObject> getObjects(RestObject parent, String... params) {
+    public Feed<RestObject> getObjects(Linkable parent, String... params) {
         Feed<? extends RestObject> feed = get(parent.getHref(OBJECTS), true, JsonFeeds.ObjectFeed.class, params);
         return (Feed<RestObject>)feed;
     }
     
     @Override
-    public Feed<RestObject> getDocuments(RestObject parent, String... params) {
+    public Feed<RestObject> getDocuments(Linkable parent, String... params) {
         Feed<? extends RestObject> feed = get(parent.getHref(DOCUMENTS), true, JsonFeeds.ObjectFeed.class, params);
         return (Feed<RestObject>)feed;
     }
     
     @Override
-    public RestObject createFolder(RestObject parent, RestObject newFolder, String... params) {
+    public RestObject createFolder(Linkable parent, RestObject newFolder, String... params) {
         return post(parent.getHref(FOLDERS), new JsonObject(newFolder), JsonObject.class, params);
     }
     
@@ -215,7 +215,7 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     }
     
     @Override
-    public RestObject createObject(RestObject parent, LinkRelation rel, RestObject objectToCreate, Object content, String contentMediaType, String... params) {
+    public RestObject createObject(Linkable parent, LinkRelation rel, RestObject objectToCreate, Object content, String contentMediaType, String... params) {
         return post(parent.getHref(rel), new JsonObject(objectToCreate), content, contentMediaType, JsonObject.class, params);
     }
 
@@ -225,7 +225,7 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     }
     
     @Override
-    public RestObject createDocument(RestObject parent, RestObject objectToCreate, Object content, String contentMediaType, String... params) {
+    public RestObject createDocument(Linkable parent, RestObject objectToCreate, Object content, String contentMediaType, String... params) {
         return post(parent.getHref(DOCUMENTS), new JsonObject(objectToCreate), content, contentMediaType, JsonObject.class, params);
     }
     
@@ -443,7 +443,7 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     }
     
     @Override
-    public Feed<FolderLink> getFolderLinks(RestObject object, LinkRelation rel, String... params) {
+    public Feed<FolderLink> getFolderLinks(Linkable object, LinkRelation rel, String... params) {
         Feed<? extends FolderLink> feed = get(object.getHref(rel), true, JsonFeeds.FolderLinkFeed.class, params);
         return (Feed<FolderLink>)feed;
     }
@@ -459,7 +459,7 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     }
     
     @Override
-    public FolderLink link(RestObject object, LinkRelation rel, FolderLink link) {
+    public FolderLink link(Linkable object, LinkRelation rel, FolderLink link) {
         return post(object.getHref(rel), new JsonFolderLink(link), JsonFolderLink.class);
     }
     
