@@ -15,14 +15,14 @@ public interface Linkable {
     List<Link> getLinks();
     
     /**
-     * @param rel
+     * @param rel the link relation
      * @return specified link by relation
      */
     String getHref(LinkRelation rel);
     
     /**
-     * @param rel
-     * @param title
+     * @param rel the link relation
+     * @param title the link title
      * @return specified link by relation and title
      */
     String getHref(LinkRelation rel, String title);

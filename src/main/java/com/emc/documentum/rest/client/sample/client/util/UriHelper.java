@@ -13,9 +13,9 @@ public final class UriHelper {
 
     /**
      * append query parameters to uri
-     * @param uri
-     * @param params
-     * @return
+     * @param uri the uri to append parameters
+     * @param params the query parameters
+     * @return the new uri
      */
     public static String appendQueryString(String uri, String... params) {
         String requestUri = uri;
@@ -27,8 +27,8 @@ public final class UriHelper {
 
     /**
      * create query string based on the query parameters
-     * @param params
-     * @return
+     * @param params the query parameters
+     * @return the query string
      */
     public static String queryString(String... params) {
         if(params.length%2 != 0) {
@@ -48,9 +48,9 @@ public final class UriHelper {
     
     /**
      * append more parameters to existed parameters
-     * @param params
-     * @param moreParams
-     * @return
+     * @param params the query parameters
+     * @param moreParams more query parameters
+     * @return all parameters
      */
     public static String[] append(String[] params, String... moreParams) {
         if(params == null) {
@@ -67,8 +67,8 @@ public final class UriHelper {
     
     /**
      * decode uri by URLDecoder
-     * @param uri
-     * @return
+     * @param uri the uri to be decoded
+     * @return decoded uri
      */
     public static String decode(String uri) {
         String newUri = uri;

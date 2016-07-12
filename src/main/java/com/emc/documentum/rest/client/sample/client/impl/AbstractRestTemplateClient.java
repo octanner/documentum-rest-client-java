@@ -237,7 +237,8 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
      * @param requestBody the request http body
      * @param responseBodyClass the class to represent response
      * @param params request parameters
-     * @return
+     * @param <T> the response type
+     * @return the response
      */
     protected <T> T sendRequest(String uri,
                              HttpMethod httpMethod,
@@ -331,9 +332,9 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
 
     /**
      * construct a new RestObject based on oldObject's class with new properties
-     * @param oldObject
-     * @param newObject
-     * @return
+     * @param oldObject the old object
+     * @param newObject the new object
+     * @return new object instance
      */
     protected RestObject newRestObject(RestObject oldObject, RestObject newObject) {
         try {

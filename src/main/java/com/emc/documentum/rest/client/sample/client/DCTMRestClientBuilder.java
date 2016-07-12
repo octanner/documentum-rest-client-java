@@ -23,6 +23,10 @@ public final class DCTMRestClientBuilder {
     private boolean debug;
     private boolean ignoreAuthenticateServer;
     
+    /**
+     * build the DCTMRestClient with the promption
+     * @return the DCTMRestClient
+     */
     public static DCTMRestClient buildWithPrompt() {
         StringBuilder sb = new StringBuilder();
         sb.append("Please input the client representation type: ");
@@ -83,8 +87,8 @@ public final class DCTMRestClientBuilder {
      * the context root the REST service
      * e.g.
      * http://localhost:8080/dctm-rest
-     * @param contextRoot
-     * @return
+     * @param contextRoot the contextRoot of the rest
+     * @return the DCTMRestClientBuilder itself
      */
     public DCTMRestClientBuilder contextRoot(String contextRoot) {
         this.contextRoot = contextRoot.endsWith("/")?contextRoot.substring(0, contextRoot.length()-1):contextRoot;
@@ -93,7 +97,7 @@ public final class DCTMRestClientBuilder {
     
     /**
      * @param repository the repository name
-     * @return
+     * @return the DCTMRestClientBuilder itself
      */
     public DCTMRestClientBuilder repository(String repository) {
         this.repository = repository;
@@ -102,7 +106,7 @@ public final class DCTMRestClientBuilder {
     
     /**
      * @param binding binding type
-     * @return
+     * @return the DCTMRestClientBuilder itself
      */
     public DCTMRestClientBuilder bind(DCTMRestClientBinding binding) {
         this.binding = binding;
@@ -115,8 +119,8 @@ public final class DCTMRestClientBuilder {
      * http://localhost:8080/dctm-rest/services.xml
      * or
      * http://localhost:8080/dctm-rest/services.json
-     * @param useFormatExtension
-     * @return
+     * @param useFormatExtension whether use format extension
+     * @return the DCTMRestClientBuilder itself
      */
     public DCTMRestClientBuilder useFormatExtension(boolean useFormatExtension) {
         this.useFormatExtension = useFormatExtension;
@@ -125,8 +129,8 @@ public final class DCTMRestClientBuilder {
     
     /**
      * whether print debug information
-     * @param debug
-     * @return
+     * @param debug whether print debug information
+     * @return the DCTMRestClientBuilder itself
      */
     public DCTMRestClientBuilder debug(boolean debug) {
         this.debug = debug;
@@ -134,9 +138,9 @@ public final class DCTMRestClientBuilder {
     }
     
     /**
-     * @param username
-     * @param password
-     * @return
+     * @param username the user name
+     * @param password the password
+     * @return the DCTMRestClientBuilder itself
      */
     public DCTMRestClientBuilder credentials(String username, String password) {
         this.username = username;
@@ -144,11 +148,19 @@ public final class DCTMRestClientBuilder {
         return this;
     }
     
+    /**
+     * @param ignoreAuthenticateServer whether ignore authenticate the server for ssl
+     * @return the DCTMRestClientBuilder itself
+     */
     public DCTMRestClientBuilder ignoreAuthenticateServer(boolean ignoreAuthenticateServer) {
         this.ignoreAuthenticateServer = ignoreAuthenticateServer;
         return this;
     }
     
+    /**
+     * build up the DCTMRestClient
+     * @return DCTMRestClient instance
+     */
     public DCTMRestClient build() {
         AbstractRestTemplateClient client = null;
         switch(binding) {
