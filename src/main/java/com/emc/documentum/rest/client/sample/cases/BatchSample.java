@@ -4,6 +4,7 @@
 package com.emc.documentum.rest.client.sample.cases;
 
 import java.io.ByteArrayInputStream;
+import java.util.Arrays;
 
 import com.emc.documentum.rest.client.sample.client.DCTMRestErrorException;
 import com.emc.documentum.rest.client.sample.client.annotation.RestServiceSample;
@@ -16,6 +17,7 @@ import com.emc.documentum.rest.client.sample.model.batch.Capabilities;
 import com.emc.documentum.rest.client.sample.model.plain.PlainRestObject;
 
 import static com.emc.documentum.rest.client.sample.client.util.Debug.print;
+import static com.emc.documentum.rest.client.sample.client.util.Debug.printEntryContentSrc;
 import static com.emc.documentum.rest.client.sample.client.util.Debug.printNewLine;
 import static com.emc.documentum.rest.client.sample.client.util.Debug.printStep;
 import static org.springframework.http.HttpHeaders.LOCATION;
@@ -144,6 +146,51 @@ public class BatchSample extends Sample {
         builder.operation().delete(createBatchResult.getOperations().get(2).getResponse().getHeader(LOCATION));
         batch = builder.build();
         batchResult = client.createBatch(batch);
+        print(batchResult, false, true);
+        printNewLine();
+    }
+    
+    @RestServiceVersion(7.3)
+    public void batchWithMultipleAttachment() {
+        printStep("create batch with create operations with attached contents");
+        RestObject tempCabinet = client.getCabinet("Temp");
+        BatchBuilder builder = BatchBuilder.builder(client).returnRequest(true);
+        builder = BatchBuilder.builder(client).transactional(true);
+        builder.operation().createDocument(tempCabinet, new PlainRestObject("object_name", "batch obj 1"),
+                new ByteArrayInputStream("I'm the content of the first object, 111".getBytes()), "text/plain");
+        builder.operation().createDocument(tempCabinet, new PlainRestObject("object_name", "batch obj 2"),
+                Arrays.asList((Object)new ByteArrayInputStream("I'm the number 1 content of the second object, 222-1".getBytes()),
+                              (Object)new ByteArrayInputStream("I'm the number 2 content of the second object, 222-2".getBytes()),
+                              (Object)new ByteArrayInputStream("I'm the number 3 content of the second object, 222-3".getBytes()),
+                              (Object)new ByteArrayInputStream("I'm the number 4 content of the second object, 222-4".getBytes()),
+                              (Object)new ByteArrayInputStream("I'm the number 5 content of the second object, 222-5".getBytes()),
+                              (Object)new ByteArrayInputStream("I'm the number 6 content of the second object, 222-6".getBytes())),
+                Arrays.asList("text/plain", "text/plain", "text/plain", "text/plain", "text/plain", "text/plain"),
+                "content-count", "6", "format", "crtext");
+        builder.operation().createDocument(tempCabinet, new PlainRestObject("object_name", "batch obj 3"),
+                Arrays.asList((Object)new ByteArrayInputStream("I'm the number 1 content of the third object, 333-1".getBytes()),
+                              (Object)new ByteArrayInputStream("I'm the number 2 content of the third object, 333-2".getBytes()),
+                              (Object)new ByteArrayInputStream("I'm the number 3 content of the third object, 333-3".getBytes())),
+                Arrays.asList("text/plain", "text/plain", "text/plain"),
+                "content-count", "3", "format", "crtext,crtext,crtext", "modifier", ",mod1,mod2", "all-primary", "false");
+        Batch batch = builder.build();
+        Batch createBatchResult = client.createBatch(batch);
+        print(createBatchResult, true, true);
+        RestObject o1 = client.getDocument(createBatchResult.getOperations().get(0).getResponse().getHeader(LOCATION));
+        printEntryContentSrc(client.getContents(o1));
+        RestObject o2 = client.getDocument(createBatchResult.getOperations().get(1).getResponse().getHeader(LOCATION));
+        printEntryContentSrc(client.getContents(o2));
+        RestObject o3 = client.getDocument(createBatchResult.getOperations().get(2).getResponse().getHeader(LOCATION));
+        printEntryContentSrc(client.getContents(o3));
+        printNewLine();
+        
+        printStep("create batch with delete operations");
+        builder = BatchBuilder.builder(client);
+        builder.operation().delete(o1);
+        builder.operation().delete(o2);
+        builder.operation().delete(o3);
+        batch = builder.build();
+        Batch batchResult = client.createBatch(batch);
         print(batchResult, false, true);
         printNewLine();
     }

@@ -47,7 +47,7 @@ public class LightweightObjectSample extends Sample {
         
         printStep("create a lightweight object sharing the " + createdShareableObject1.getObjectName());
         RestObject newLightweightObject1 = new PlainRestObject("object_name", "lightweight_object_1", "r_object_type", lightweightType);
-        RestObject createdLightweightObject1 = client.createObject(createdShareableObject1, LIGHTWEIGHT_OBJECTS, newLightweightObject1, null, null);
+        RestObject createdLightweightObject1 = client.createObject(createdShareableObject1, LIGHTWEIGHT_OBJECTS, newLightweightObject1);
         printHttpStatus();
         print(createdLightweightObject1);
         printNewLine();

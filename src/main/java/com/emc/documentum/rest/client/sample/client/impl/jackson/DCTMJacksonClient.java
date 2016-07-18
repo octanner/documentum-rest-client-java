@@ -10,7 +10,6 @@ import java.util.List;
 import javax.annotation.concurrent.NotThreadSafe;
 
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -220,6 +219,11 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     }
 
     @Override
+    public RestObject createObject(Linkable parent, LinkRelation rel, RestObject objectToCreate, List<Object> contents, List<String> contentMediaTypes, String... params) {
+        return post(parent.getHref(rel), new JsonObject(objectToCreate), contents, contentMediaTypes, JsonObject.class, params);
+    }
+
+    @Override
     public RestObject getObject(String objectUri, String... params) {
         return get(objectUri, false, JsonObject.class, params);
     }
@@ -227,6 +231,11 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     @Override
     public RestObject createDocument(Linkable parent, RestObject objectToCreate, Object content, String contentMediaType, String... params) {
         return post(parent.getHref(DOCUMENTS), new JsonObject(objectToCreate), content, contentMediaType, JsonObject.class, params);
+    }
+    
+    @Override
+    public RestObject createDocument(Linkable parent, RestObject objectToCreate, List<Object> contents, List<String> contentMediaTypes, String... params) {
+        return post(parent.getHref(DOCUMENTS), new JsonObject(objectToCreate), contents, contentMediaTypes, JsonObject.class, params);
     }
     
     @Override
@@ -271,20 +280,52 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     }
     
     @Override
-    public RestObject checkinNextMajor(RestObject oldObject, RestObject newObject, Object content, String contentMediaType, String... params) {
-        return checkin(oldObject, CHECKIN_NEXT_MAJOR, newObject, content, contentMediaType, params);
+    public RestObject checkinNextMajor(RestObject oldObject, RestObject newObject, String... params) {
+        return post(oldObject.getHref(CHECKIN_NEXT_MAJOR), new JsonObject(newObject), JsonObject.class, params);
     }
     
     @Override
+    public RestObject checkinNextMajor(RestObject oldObject, RestObject newObject, Object content, String contentMediaType, String... params) {
+        return post(oldObject.getHref(CHECKIN_NEXT_MAJOR), newObject==null?null:new JsonObject(newObject), content, contentMediaType, JsonObject.class, params);
+    }
+
+    @Override
+    public RestObject checkinNextMajor(RestObject oldObject, RestObject newObject, List<Object> contents,
+            List<String> contentMediaTypes, String... params) {
+        return post(oldObject.getHref(CHECKIN_NEXT_MAJOR), newObject==null?null:new JsonObject(newObject), contents, contentMediaTypes, JsonObject.class, params);
+    }
+
+    @Override
+    public RestObject checkinNextMinor(RestObject oldObject, RestObject newObject, String... params) {
+        return post(oldObject.getHref(CHECKIN_NEXT_MINOR), new JsonObject(newObject), JsonObject.class, params);
+    }
+
+    @Override
     public RestObject checkinNextMinor(RestObject oldObject, RestObject newObject, Object content, String contentMediaType, String... params) {
-        return checkin(oldObject, CHECKIN_NEXT_MINOR, newObject, content, contentMediaType, params);
+        return post(oldObject.getHref(CHECKIN_NEXT_MINOR), newObject==null?null:new JsonObject(newObject), content, contentMediaType, JsonObject.class, params);
+    }
+    
+    @Override
+    public RestObject checkinNextMinor(RestObject oldObject, RestObject newObject, List<Object> contents, List<String> contentMediaTypes, String... params) {
+        return post(oldObject.getHref(CHECKIN_NEXT_MINOR), newObject==null?null:new JsonObject(newObject), contents, contentMediaTypes, JsonObject.class, params);
+    }
+
+    @Override
+    public RestObject checkinBranch(RestObject oldObject, RestObject newObject, String... params) {
+        return post(oldObject.getHref(CHECKIN_BRANCH_VERSION), new JsonObject(newObject), JsonObject.class, params);
     }
     
     @Override
     public RestObject checkinBranch(RestObject oldObject, RestObject newObject, Object content, String contentMediaType, String... params) {
-        return checkin(oldObject, CHECKIN_BRANCH_VERSION, newObject, content, contentMediaType, params);
+        return post(oldObject.getHref(CHECKIN_BRANCH_VERSION), newObject==null?null:new JsonObject(newObject), content, contentMediaType, JsonObject.class, params);
     }
-    
+
+    @Override
+    public RestObject checkinBranch(RestObject oldObject, RestObject newObject, List<Object> contents,
+            List<String> contentMediaTypes, String... params) {
+        return post(oldObject.getHref(CHECKIN_BRANCH_VERSION), newObject==null?null:new JsonObject(newObject), contents, contentMediaTypes, JsonObject.class, params);
+    }
+
     @Override
     public Feed<RestObject> getVersions(RestObject object, String... params) {
         Feed<? extends RestObject> feed = get(object.getHref(VERSIONS), true, JsonFeeds.ObjectFeed.class, params);
@@ -521,19 +562,7 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
         }
         return feed;
     }
-    
-    private RestObject checkin(RestObject oldObject, LinkRelation rel, RestObject newObject, Object content, String contentMediaType, String... params) {
-        RestObject resp = null;
-        if(newObject != null && content != null) {
-            resp = post(oldObject.getHref(rel), new JsonObject(newObject), content, contentMediaType, JsonObject.class, params);
-        } else if(newObject == null) {
-            resp = post(oldObject.getHref(rel), content, contentMediaType==null?MediaType.APPLICATION_OCTET_STREAM_VALUE:contentMediaType, oldObject.getClass(), params);
-        } else if(content == null) {
-            resp = post(oldObject.getHref(rel), new JsonObject(newObject), JsonObject.class, params);
-        }
-        return resp;
-    }
-    
+
     @Override
     protected void initRestTemplate(RestTemplate restTemplate) {
         super.initRestTemplate(restTemplate);

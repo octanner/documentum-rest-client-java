@@ -18,6 +18,7 @@ public class JsonBatchRequest implements SettableRequest {
     private List<JsonBatchHeader> batchHeaders;
     private String entity;
     private JsonBatchAttachment attachment;
+    private List<JsonBatchAttachment> attachments;
     
     @Override
     public String getUri() {
@@ -47,6 +48,24 @@ public class JsonBatchRequest implements SettableRequest {
     @Override
     public void setAttachment(Attachment attachment) {
         this.attachment = (JsonBatchAttachment)attachment;
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Override
+    public List<Attachment> getAttachments() {
+        return (List)attachments;
+    }
+
+    public void setAttachments(List<JsonBatchAttachment> attachments) {
+        this.attachments = attachments;
+    }
+    
+    @Override
+    public void addAttachment(Attachment attachment) {
+        if(attachments == null) {
+            attachments = new ArrayList<>();
+        }
+        attachments.add((JsonBatchAttachment)attachment);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -102,6 +121,7 @@ public class JsonBatchRequest implements SettableRequest {
         return Equals.equal(uri, that.uri) &&
                Equals.equal(method, that.method) &&
                Equals.equal(attachment, that.attachment) &&
+               Equals.equal(attachments, that.attachments) &&
                Equals.equal(batchHeaders, that.batchHeaders) &&
                Equals.equal(entity, that.entity);
     }

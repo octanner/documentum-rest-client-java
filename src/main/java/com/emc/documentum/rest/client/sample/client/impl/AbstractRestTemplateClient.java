@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -20,6 +21,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -42,6 +44,7 @@ import com.emc.documentum.rest.client.sample.model.Linkable;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestError;
 import com.emc.documentum.rest.client.sample.model.RestObject;
+import com.emc.documentum.rest.client.sample.model.batch.Attachment;
 import com.emc.documentum.rest.client.sample.model.batch.Batch;
 import com.emc.documentum.rest.client.sample.model.batch.Operation;
 
@@ -246,7 +249,8 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
                              Object requestBody,
                              Class<T> responseBodyClass,
                              String... params) {
-        if(debug) {
+        boolean noRequestProcessor = requestProcessor == null;
+        if(debug && noRequestProcessor) {
             Debug.debug("Resource URI: " + uri);
             Debug.debug("HTTP method: " + httpMethod);
             Debug.debug("Request headers: " + headers);
@@ -258,22 +262,24 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
                 Debug.debug("Request parameters: " + UriHelper.queryString(params));
             }
         }
-        RequestProcessor processor = requestProcessor == null ? defaultRequestProcessor : requestProcessor;
+        RequestProcessor processor = noRequestProcessor ? defaultRequestProcessor : requestProcessor;
         requestProcessor = null;
         if(uri == null || uri.length() == 0) {
             throw new IllegalStateException("The resource URI is empty, or you do not have priviledge");
         }
         uri = UriHelper.decode(uri);
-        headers = setupAuthentication(headers);
+        if(noRequestProcessor) {
+            headers = setupAuthentication(headers);
+        }
         HttpEntity<Object> requestEntity = requestBody == null ? 
                 new HttpEntity<Object>(headers) :
                 new HttpEntity<Object>(requestBody, headers);
         String requestUri = UriHelper.appendQueryString(uri, params);
-        if(debug) {
+        if(debug && noRequestProcessor) {
             Debug.debug("Sending " + httpMethod + " request to " + uri);
         }
         ResponseEntity<T> entity = null;
-        if(enableStreaming) {
+        if(enableStreaming && noRequestProcessor) {
             ClientHttpRequestFactory factory = restTemplate.getRequestFactory();
             if(factory instanceof SimpleClientHttpRequestFactory) {
                 ((SimpleClientHttpRequestFactory)factory).setBufferRequestBody(false);
@@ -302,7 +308,7 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
             }
             throw e;
         } finally {
-            if(enableStreaming) {
+            if(enableStreaming && noRequestProcessor) {
                 enableStreaming = false;
                 ClientHttpRequestFactory factory = restTemplate.getRequestFactory();
                 if(factory instanceof SimpleClientHttpRequestFactory) {
@@ -350,18 +356,24 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     }
 
     @Override
+    public RestObject createObject(Linkable parent, RestObject objectToCreate, List<Object> contents, List<String> contentMediaTypes, String... params) {
+        return createObject(parent, LinkRelation.OBJECTS, objectToCreate, contents, contentMediaTypes, params);
+    }
+
+    
+    @Override
     public RestObject createObject(Linkable parent, RestObject objectToCreate) {
-        return createObject(parent, LinkRelation.OBJECTS, objectToCreate, null, null);
+        return createObject(parent, LinkRelation.OBJECTS, objectToCreate, (Object)null, (String)null);
     }
     
     @Override
     public RestObject createObject(Linkable parent, LinkRelation rel, RestObject objectToCreate) {
-        return createObject(parent, rel, objectToCreate, null, null);
+        return createObject(parent, rel, objectToCreate, (Object)null, (String)null);
     }
     
     @Override
     public RestObject createDocument(Linkable parent, RestObject objectToCreate) {
-        return createDocument(parent, objectToCreate, null, null);
+        return createDocument(parent, objectToCreate, (Object)null, (String)null);
     }
 
     protected <T> T get(String uri, HttpHeaders headers, Class<? extends T> responseBodyClass, String... params) {
@@ -433,10 +445,32 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
         T t = null;
         if(content == null) {
             t = post(uri, object, responseBodyClass, params);
-        } else if(object != null && content != null) {
+        } else if(object == null) {
+            t = post(uri, content, contentMediaType==null?MediaType.APPLICATION_OCTET_STREAM_VALUE:contentMediaType, responseBodyClass, params);
+        } else {
             MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
             parts.add("metadata", new HttpEntity<Object>(object, isXml()?XML_CONTENT:JSON_CONTENT));
             parts.add("binary", contentMediaType==null?content:new HttpEntity<Object>(content, new Headers().contentType(contentMediaType).toHttpHeaders()));
+            t = sendRequest(uri, POST, isXml()?ACCEPT_XML_HEADERS_WITH_MULTIPART_CONTENT:ACCEPT_JSON_HEADERS_WITH_MULTIPART_CONTENT, parts, responseBodyClass, params);
+        }
+        return t;
+    }
+    
+    protected <T> T post(String uri, T object, List<Object> contents, List<String> contentMediaTypes, Class<? extends T> responseBodyClass, String... params) {
+        T t = null;
+        if(contents == null || contents.isEmpty()) {
+            t = post(uri, object, responseBodyClass, params);
+        } else if(contents.size() == 1) {
+            t = post(uri, object, contents.get(0), contentMediaTypes!=null&&contentMediaTypes.size()>0?contentMediaTypes.get(0):null, responseBodyClass, params);
+        } else {
+            MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
+            if(object != null) {
+                parts.add("metadata", new HttpEntity<Object>(object, isXml()?XML_CONTENT:JSON_CONTENT));
+            }
+            for(int i=0;i<contents.size();++i) {
+                String contentMediaType = (contentMediaTypes != null && i<contentMediaTypes.size())?contentMediaTypes.get(i):null;
+                parts.add("binary", contentMediaType==null?contents.get(i):new HttpEntity<Object>(contents.get(i), new Headers().contentType(contentMediaType).toHttpHeaders()));
+            }
             t = sendRequest(uri, POST, isXml()?ACCEPT_XML_HEADERS_WITH_MULTIPART_CONTENT:ACCEPT_JSON_HEADERS_WITH_MULTIPART_CONTENT, parts, responseBodyClass, params);
         }
         return t;
@@ -457,13 +491,12 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
                     toHttpHeaders();
             parts.add("batch", new HttpEntity<InputStream>(toInputStream(batch), batchHeaders));
             for(Operation op : batch.getOperations()) {
-                if(op.getRequest().getAttachment() != null) {
-                    HttpHeaders opHeaders = new Headers().
-                            contentType(op.getRequest().getAttachment().getContentType()).
-                            header("Content-ID", op.getRequest().getAttachment().getInclude().getRawHref()).
-                            header("Content-disposition", "form-data; name=" + op.getRequest().getAttachment().getInclude().getRawHref()).
-                            toHttpHeaders();
-                    parts.add(op.getRequest().getAttachment().getInclude().getRawHref(), new HttpEntity<InputStream>(op.getRequest().getAttachment().getContentStream(), opHeaders));
+                if(op.getRequest().getAttachments() != null) {
+                    for(Attachment a : op.getRequest().getAttachments()) {
+                        addAttachment(parts, a);    
+                    }
+                } else if(op.getRequest().getAttachment() != null) {
+                    addAttachment(parts, op.getRequest().getAttachment());
                 }
             }
             HttpHeaders relatedHeaders = new Headers().accept(isXml()?
@@ -483,6 +516,15 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
             result = post(getRepository().getHref(BATCHES), batch, responseBodyClass);
         }
         return result;
+    }
+    
+    private void addAttachment(MultiValueMap<String, HttpEntity<InputStream>> parts, Attachment attachment) {
+        HttpHeaders opHeaders = new Headers().
+                contentType(attachment.getContentType()).
+                header("Content-ID", attachment.getInclude().getRawHref()).
+                header("Content-disposition", "form-data; name=" + attachment.getInclude().getRawHref()).
+                toHttpHeaders();
+        parts.add(attachment.getInclude().getRawHref(), new HttpEntity<InputStream>(attachment.getContentStream(), opHeaders));
     }
     
     public abstract void serialize(Object object, OutputStream os);

@@ -9,6 +9,7 @@ import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -25,6 +26,7 @@ public class JaxbBatchRequest implements SettableRequest {
     private List<JaxbBatchHeader> headers;
     private String entity;
     private JaxbBatchAttachment attachment;
+    private List<JaxbBatchAttachment> attachments;
         
     @Override
     @XmlAttribute
@@ -57,6 +59,26 @@ public class JaxbBatchRequest implements SettableRequest {
     @Override
     public void setAttachment(Attachment attachment) {
         this.attachment = (JaxbBatchAttachment)attachment;
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
+    @XmlElementWrapper(name = "attachments")
+    @XmlElement(name = "attachment", type = JaxbBatchAttachment.class, namespace = XMLNamespace.DM_NAMESPACE)
+    public List<Attachment> getAttachments() {
+        return (List)attachments;
+    }
+
+    public void setAttachments(List<JaxbBatchAttachment> attachments) {
+        this.attachments = attachments;
+    }
+    
+    @Override
+    public void addAttachment(Attachment attachment) {
+        if(attachments == null) {
+            attachments = new ArrayList<>();
+        }
+        attachments.add((JaxbBatchAttachment)attachment);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })

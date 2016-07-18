@@ -8,10 +8,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.emc.documentum.rest.client.sample.client.annotation.RestServiceSample;
+import com.emc.documentum.rest.client.sample.client.annotation.RestServiceVersion;
+import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.plain.PlainRestObject;
 
 import static com.emc.documentum.rest.client.sample.client.util.Debug.print;
+import static com.emc.documentum.rest.client.sample.client.util.Debug.printEntryContentSrc;
 import static com.emc.documentum.rest.client.sample.client.util.Debug.printNewLine;
 import static com.emc.documentum.rest.client.sample.client.util.Debug.printStep;
 
@@ -76,6 +79,47 @@ public class ObjectCRUDSample extends Sample {
         
         printStep("delete the created object");
         client.delete(createdObjectWithContent);
+        printHttpStatus();        
+        printNewLine();
+    }
+    
+    @RestServiceVersion(7.3)
+    public void importObjectWithContents() {
+        RestObject tempCabinet = client.getCabinet("Temp");
+        
+        printStep("import an object with binary contents under the Temp cabinet");
+        printStep("and all contents are saved as primary content");
+        RestObject newObjectWithContent = new PlainRestObject("object_name", "obj_with_contents");
+        RestObject createdObjectWithContent = client.createObject(tempCabinet, newObjectWithContent,
+                Arrays.asList((Object)"I'm the first content of the object", (Object)"I'm the second content of the object", (Object)"I'm the third content of the object", (Object)"I'm the fourth content of the object"),
+                Arrays.asList("text/plain", "text/plain", "text/plain", "text/plain"),
+                "format", "crtext", "content-count", "4");
+        printHttpStatus();
+        print(createdObjectWithContent);
+        Feed<RestObject> contents = client.getContents(createdObjectWithContent);
+        printEntryContentSrc(contents);
+        printNewLine();
+        
+        printStep("delete the created object");
+        client.delete(createdObjectWithContent);
+        printHttpStatus();        
+        printNewLine();
+
+        printStep("import an object with binary contents under the Temp cabinet");
+        printStep("and the first content is saved as primary content, all other contents are saved as renditions");
+        RestObject newObjectWithRendition = new PlainRestObject("object_name", "obj_with_renditions");
+        RestObject createdObjectWithRendition = client.createObject(tempCabinet, newObjectWithRendition,
+                Arrays.asList((Object)"I'm the first content of the object", (Object)"I'm the second content of the object", (Object)"I'm the third content of the object", (Object)"I'm the fourth content of the object"),
+                Arrays.asList("text/plain", "text/plain", "text/plain", "text/plain"),
+                "all-primary", "false", "format", "crtext,html,pub_html,crtext", "modifier", ",,m2,m3", "content-count", "4");
+        printHttpStatus();
+        print(createdObjectWithRendition);
+        contents = client.getContents(createdObjectWithRendition);
+        printEntryContentSrc(contents);
+        printNewLine();
+        
+        printStep("delete the created object");
+        client.delete(createdObjectWithRendition);
         printHttpStatus();        
         printNewLine();
     }

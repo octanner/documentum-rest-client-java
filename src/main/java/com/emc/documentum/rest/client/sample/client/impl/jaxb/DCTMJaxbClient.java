@@ -9,7 +9,6 @@ import java.util.List;
 import javax.annotation.concurrent.NotThreadSafe;
 
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
@@ -49,7 +48,6 @@ import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbFormat;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbGroup;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbHomeDocument;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbNetworkLocation;
-import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbObject;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbObjectAspects;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbPreference;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbProductInfo;
@@ -219,10 +217,15 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     public RestObject createObject(Linkable parent, LinkRelation rel, RestObject objectToCreate, Object content, String contentMediaType, String... params) {
         return post(parent.getHref(rel), new JaxbSysObject(objectToCreate), content, contentMediaType, JaxbSysObject.class, params);
     }
-
+    
+    @Override
+    public RestObject createObject(Linkable parent, LinkRelation rel, RestObject objectToCreate, List<Object> contents, List<String> contentMediaTypes, String... params) {
+        return post(parent.getHref(rel), new JaxbSysObject(objectToCreate), contents, contentMediaTypes, JaxbSysObject.class, params);
+    }
+    
     @Override
     public RestObject getObject(String objectUri, String... params) {
-        return get(objectUri, false, JaxbObject.class, params);
+        return get(objectUri, false, JaxbSysObject.class, params);
     }
     
     @Override
@@ -230,6 +233,11 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
         return post(parent.getHref(DOCUMENTS), new JaxbDocument(objectToCreate), content, contentMediaType, JaxbDocument.class, params);
     }
     
+    @Override
+    public RestObject createDocument(Linkable parent, RestObject objectToCreate, List<Object> contents, List<String> contentMediaTypes, String... params) {
+        return post(parent.getHref(DOCUMENTS), new JaxbDocument(objectToCreate), contents, contentMediaTypes, JaxbDocument.class, params);
+    }
+
     @Override
     public RestObject getDocument(String documentUri, String... params) {
         return get(documentUri, false, JaxbDocument.class, params);
@@ -271,18 +279,50 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     }
     
     @Override
-    public RestObject checkinNextMajor(RestObject oldObject, RestObject newObject, Object content, String contentMediaType, String... params) {
-        return checkin(oldObject, CHECKIN_NEXT_MAJOR, newObject, content, contentMediaType, params);
+    public RestObject checkinNextMajor(RestObject oldObject, RestObject newObject, String... params) {
+        return post(oldObject.getHref(CHECKIN_NEXT_MAJOR), new JaxbSysObject(newObject), JaxbSysObject.class, params);
     }
     
     @Override
+    public RestObject checkinNextMajor(RestObject oldObject, RestObject newObject, Object content, String contentMediaType, String... params) {
+        return post(oldObject.getHref(CHECKIN_NEXT_MAJOR), newObject==null?null:new JaxbSysObject(newObject), content, contentMediaType, JaxbSysObject.class, params);
+    }
+
+    @Override
+    public RestObject checkinNextMajor(RestObject oldObject, RestObject newObject, List<Object> contents,
+            List<String> contentMediaTypes, String... params) {
+        return post(oldObject.getHref(CHECKIN_NEXT_MAJOR), newObject==null?null:new JaxbSysObject(newObject), contents, contentMediaTypes, JaxbSysObject.class, params);
+    }
+
+    @Override
+    public RestObject checkinNextMinor(RestObject oldObject, RestObject newObject, String... params) {
+        return post(oldObject.getHref(CHECKIN_NEXT_MINOR), new JaxbSysObject(newObject), JaxbSysObject.class, params);
+    }
+
+    @Override
     public RestObject checkinNextMinor(RestObject oldObject, RestObject newObject, Object content, String contentMediaType, String... params) {
-        return checkin(oldObject, CHECKIN_NEXT_MINOR, newObject, content, contentMediaType, params);
+        return post(oldObject.getHref(CHECKIN_NEXT_MINOR), newObject==null?null:new JaxbSysObject(newObject), content, contentMediaType, JaxbSysObject.class, params);
+    }
+    
+    @Override
+    public RestObject checkinNextMinor(RestObject oldObject, RestObject newObject, List<Object> contents,
+            List<String> contentMediaTypes, String... params) {
+        return post(oldObject.getHref(CHECKIN_NEXT_MINOR), newObject==null?null:new JaxbSysObject(newObject), contents, contentMediaTypes, JaxbSysObject.class, params);
+    }
+
+    @Override
+    public RestObject checkinBranch(RestObject oldObject, RestObject newObject, String... params) {
+        return post(oldObject.getHref(CHECKIN_BRANCH_VERSION), new JaxbSysObject(newObject), JaxbSysObject.class, params);
     }
     
     @Override
     public RestObject checkinBranch(RestObject oldObject, RestObject newObject, Object content, String contentMediaType, String... params) {
-        return checkin(oldObject, CHECKIN_BRANCH_VERSION, newObject, content, contentMediaType, params);
+        return post(oldObject.getHref(CHECKIN_BRANCH_VERSION), newObject==null?null:new JaxbSysObject(newObject), content, contentMediaType, JaxbSysObject.class, params);
+    }
+
+    @Override
+    public RestObject checkinBranch(RestObject oldObject, RestObject newObject, List<Object> contents, List<String> contentMediaTypes, String... params) {
+        return post(oldObject.getHref(CHECKIN_BRANCH_VERSION), newObject==null?null:new JaxbSysObject(newObject), contents, contentMediaTypes, JaxbSysObject.class, params);
     }
     
     @Override
@@ -518,18 +558,6 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
             feed = get(uri, true, JaxbFeed.class);
         }
         return feed;
-    }
-    
-    private RestObject checkin(RestObject oldObject, LinkRelation rel, RestObject newObject, Object content, String contentMediaType, String... params) {
-        RestObject resp = null;
-        if(newObject != null && content != null) {
-            resp = post(oldObject.getHref(rel), new JaxbSysObject(newObject), content, contentMediaType, JaxbSysObject.class, params);
-        } else if(newObject == null) {
-            resp = post(oldObject.getHref(rel), content, contentMediaType==null?MediaType.APPLICATION_OCTET_STREAM_VALUE:contentMediaType, oldObject.getClass(), params);
-        } else if(content == null) {
-            resp = post(oldObject.getHref(rel), new JaxbSysObject(newObject), JaxbSysObject.class, params);
-        }
-        return resp;
     }
     
     @Override

@@ -168,6 +168,9 @@ public class JsonBatch implements SettableBatch {
             if(o.getRequest().getAttachment() != null) {
                 return true;
             }
+            if(o.getRequest().getAttachments() != null && !o.getRequest().getAttachments().isEmpty()) {
+                return true;
+            }
         }
         return false;
     }

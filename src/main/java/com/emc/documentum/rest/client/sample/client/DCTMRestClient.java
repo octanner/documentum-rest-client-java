@@ -3,6 +3,8 @@
  */
 package com.emc.documentum.rest.client.sample.client;
 
+import java.util.List;
+
 import javax.annotation.concurrent.NotThreadSafe;
 
 import org.springframework.http.HttpHeaders;
@@ -184,6 +186,18 @@ public interface DCTMRestClient {
      * @param parent the parent object where the new sysobject will be created under
      * @param rel the LinkRelation used to create new object under the parent
      * @param objectToCreate the new object with its properties
+     * @param contents the binary contents, it can be list of byte array, String, javax.xml.transform.Source, org.springframework.core.io.Resource, JAXB object, and Jackson json object  
+     * @param contentMediaTypes the mediatypes of the contents
+     * @param params the query parameters
+     * @return the created sysobject
+     */
+    public RestObject createObject(Linkable parent, LinkRelation rel, RestObject objectToCreate, List<Object> contents, List<String> contentMediaTypes, String... params);
+
+    /**
+     * create a sysobject (or its subtype) under specified parent's link rel
+     * @param parent the parent object where the new sysobject will be created under
+     * @param rel the LinkRelation used to create new object under the parent
+     * @param objectToCreate the new object with its properties
      * @return the created sysobject
      */
     public RestObject createObject(Linkable parent, LinkRelation rel, RestObject objectToCreate);
@@ -199,6 +213,17 @@ public interface DCTMRestClient {
      */
     public RestObject createObject(Linkable parent, RestObject objectToCreate, Object content, String contentMediaType, String... params);
     
+    /**
+     * create a sysobject (or its subtype) under specified folder/cabinet
+     * @param parent the folder/cabinet where the new sysobject will be created under
+     * @param objectToCreate the new object with its properties
+     * @param contents the binary content, it can be list of byte array, String, javax.xml.transform.Source, org.springframework.core.io.Resource, JAXB object, and Jackson json object  
+     * @param contentMediaTypes the mediatypes of the contents
+     * @param params the query parameters
+     * @return the created sysobject
+     */
+    public RestObject createObject(Linkable parent, RestObject objectToCreate, List<Object> contents, List<String> contentMediaTypes, String... params);
+
     /**
      * create a sysobject (or its subtype) under specified folder/cabinet
      * @param parent the folder/cabinet where the new sysobject will be created under
@@ -224,6 +249,17 @@ public interface DCTMRestClient {
      * @return the created document
      */
     public RestObject createDocument(Linkable parent, RestObject objectToCreate, Object content, String contentMediaType, String... params);
+
+    /**
+     * create a document (or its subtype) under specified folder/cabinet
+     * @param parent the folder/cabinet where the new document will be created under
+     * @param objectToCreate the new document with its properties
+     * @param contents the binary contents, it can be list of byte array, String, javax.xml.transform.Source, org.springframework.core.io.Resource, JAXB object, and Jackson json object  
+     * @param contentMediaTypes the mediatypes of the contents
+     * @param params the query parameters
+     * @return the created document
+     */
+    public RestObject createDocument(Linkable parent, RestObject objectToCreate, List<Object> contents, List<String> contentMediaTypes, String... params);
 
     /**
      * create a document (or its subtype) under specified folder/cabinet
@@ -420,6 +456,15 @@ public interface DCTMRestClient {
     public void cancelCheckout(RestObject object);
     
     /**
+     * check in the object metadata only with next major version
+     * @param oldObject the checked out RestObject
+     * @param newObject the new metadata to be checked in
+     * @param params the query parameters
+     * @return checked in object
+     */
+    public RestObject checkinNextMajor(RestObject oldObject, RestObject newObject, String... params);
+    
+    /**
      * check in the object with next major version
      * can check in both new object metadata and binary content , or new metadata or binary content only
      * the content can be byte array, String, javax.xml.transform.Source, org.springframework.core.io.Resource, JAXB object, and Jackson json object
@@ -431,7 +476,20 @@ public interface DCTMRestClient {
      * @return checked in object
      */
     public RestObject checkinNextMajor(RestObject oldObject, RestObject newObject, Object content, String contentMediaType, String... params);
-    
+
+    /**
+     * check in the object with next major version
+     * can check in both new object metadata and binary content , or new metadata or binary content only
+     * the content can be byte array, String, javax.xml.transform.Source, org.springframework.core.io.Resource, JAXB object, and Jackson json object
+     * @param oldObject the checked out RestObject
+     * @param newObject the new metadata to be checked in
+     * @param contents the binary contents, it can be list of byte array, String, javax.xml.transform.Source, org.springframework.core.io.Resource, JAXB object, and Jackson json object  
+     * @param contentMediaTypes the mediatypes of the contents
+     * @param params the query parameters
+     * @return checked in object
+     */
+    public RestObject checkinNextMajor(RestObject oldObject, RestObject newObject, List<Object> contents, List<String> contentMediaTypes, String... params);
+
     /**
      * check in the object with next minor version
      * can check in both new object metadata and binary content , or new metadata or binary content only
@@ -446,6 +504,28 @@ public interface DCTMRestClient {
     public RestObject checkinNextMinor(RestObject oldObject, RestObject newObject, Object content, String contentMediaType, String... params);
     
     /**
+     * check in the object metadata only with next minor version
+     * @param oldObject the checked out RestObject
+     * @param newObject the new metadata to be checked in
+     * @param params the query parameters
+     * @return checked in object
+     */
+    public RestObject checkinNextMinor(RestObject oldObject, RestObject newObject, String... params);
+
+    /**
+     * check in the object with next minor version
+     * can check in both new object metadata and binary content , or new metadata or binary content only
+     * the content can be byte array, String, javax.xml.transform.Source, org.springframework.core.io.Resource, JAXB object, and Jackson json object
+     * @param oldObject the checked out RestObject
+     * @param newObject the new metadata to be checked in
+     * @param contents the binary contents, it can be list of byte array, String, javax.xml.transform.Source, org.springframework.core.io.Resource, JAXB object, and Jackson json object  
+     * @param contentMediaTypes the mediatypes of the contents
+     * @param params the query parameters
+     * @return checked in object
+     */
+    public RestObject checkinNextMinor(RestObject oldObject, RestObject newObject, List<Object> contents, List<String> contentMediaTypes, String... params);
+
+    /**
      * check in the object with branch version
      * can check in both new object metadata and binary content , or new metadata or binary content only
      * the content can be byte array, String, javax.xml.transform.Source, org.springframework.core.io.Resource, JAXB object, and Jackson json object
@@ -458,6 +538,28 @@ public interface DCTMRestClient {
      */
     public RestObject checkinBranch(RestObject oldObject, RestObject newObject, Object content, String contentMediaType, String... params);
     
+    /**
+     * check in the object metadata only with branch version
+     * @param oldObject the checked out RestObject
+     * @param newObject the new metadata to be checked in
+     * @param params the query parameters
+     * @return checked in object
+     */
+    public RestObject checkinBranch(RestObject oldObject, RestObject newObject, String... params);
+
+    /**
+     * check in the object with branch version
+     * can check in both new object metadata and binary content , or new metadata or binary content only
+     * the content can be byte array, String, javax.xml.transform.Source, org.springframework.core.io.Resource, JAXB object, and Jackson json object
+     * @param oldObject the checked out RestObject
+     * @param newObject the new metadata to be checked in
+     * @param contents the binary contents, it can be list of byte array, String, javax.xml.transform.Source, org.springframework.core.io.Resource, JAXB object, and Jackson json object  
+     * @param contentMediaTypes the mediatypes of the contents
+     * @param params the query parameters
+     * @return checked in object
+     */
+    public RestObject checkinBranch(RestObject oldObject, RestObject newObject, List<Object> contents, List<String> contentMediaTypes, String... params);
+
     /**
      * materialize the lightweight object
      * @param oldObject the object to be materialized

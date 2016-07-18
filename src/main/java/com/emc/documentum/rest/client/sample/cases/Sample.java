@@ -86,7 +86,8 @@ public abstract class Sample {
     public void run() {
         System.out.println("start " + name + " samples");
         for(Method m : this.getClass().getMethods()) {
-            if(!Object.class.equals(m.getDeclaringClass()) && m.getParameterTypes().length == 0 && m.getAnnotation(RestServiceSampleExclude.class)==null && void.class.equals(m.getReturnType())) {
+            if(!Object.class.equals(m.getDeclaringClass()) && m.getParameterTypes().length == 0
+                    && m.getAnnotation(RestServiceSampleExclude.class)==null && void.class.equals(m.getReturnType())) {
                 RestServiceVersion serviceVersion = m.getAnnotation(RestServiceVersion.class);
                 if(serviceVersion == null || serviceVersion.value() <= version) {
                     try {

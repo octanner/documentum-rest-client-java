@@ -108,22 +108,27 @@ public abstract class BatchBuilder {
             }
             if(requestEntity.getBody() != null) {
                 if(requestEntity.getBody() instanceof Map) {
-                    HttpEntity<?> metadataEntity = ((List<HttpEntity<?>>)((Map<?,?>)requestEntity.getBody()).get("metadata")).get(0);
-                    HttpEntity<?> binaryEntity = ((List<HttpEntity<?>>)((Map<?,?>)requestEntity.getBody()).get("binary")).get(0);
-                    request.setEntity(toEntity(metadataEntity.getBody()));
-                    SettableInclude include = createInclude();
-                    include.setHref(UUID.randomUUID().toString());
-                    SettableAttachment attachment = createAttachment();
-                    attachment.setInclude(include);
-                    attachment.setContentStream((InputStream)binaryEntity.getBody());
-                    if(binaryEntity.getHeaders().getContentType() != null) {
-                        attachment.setContentType(binaryEntity.getHeaders().getContentType().toString());
+                    if(((Map<?,?>)requestEntity.getBody()).containsKey("metadata")) {
+                        HttpEntity<?> metadataEntity = ((List<HttpEntity<?>>)((Map<?,?>)requestEntity.getBody()).get("metadata")).get(0);
+                        request.setEntity(toEntity(metadataEntity.getBody()));
+                        SettableHeader header = createHeader();
+                        header.setName(HttpHeaders.CONTENT_TYPE);
+                        header.setValue(client.isXml()?SupportedMediaTypes.APPLICATION_VND_DCTM_XML_VALUE:SupportedMediaTypes.APPLICATION_VND_DCTM_JSON_VALUE);
+                        request.setHeader(header);
                     }
-                    request.setAttachment(attachment);
-                    SettableHeader header = createHeader();
-                    header.setName(HttpHeaders.CONTENT_TYPE);
-                    header.setValue(client.isXml()?SupportedMediaTypes.APPLICATION_VND_DCTM_XML_VALUE:SupportedMediaTypes.APPLICATION_VND_DCTM_JSON_VALUE);
-                    request.setHeader(header);
+                    if(((Map<?,?>)requestEntity.getBody()).containsKey("binary")) {
+                        List<HttpEntity<?>> binaries = ((List<HttpEntity<?>>)((Map<?,?>)requestEntity.getBody()).get("binary"));
+                        if(client.getMajorVersion() >= 7.3) {
+                            for(HttpEntity<?> binaryEntity : binaries) {
+                                request.addAttachment(toAttachment(binaryEntity));
+                            }
+                        } else {
+                            if(binaries.size() > 1) {
+                                throw new IllegalArgumentException("The batch for the rest services " + client.getMajorVersion() + " only supports one attachment for each operation");
+                            }
+                            request.setAttachment(toAttachment(binaries.get(0)));
+                        }
+                    }
                 } else {
                     request.setEntity(toEntity(requestEntity.getBody()));
                 }
@@ -134,6 +139,18 @@ public abstract class BatchBuilder {
             operation.setRequest(request);
             batch.addOperation(operation);
             return null;
+        }
+        
+        private Attachment toAttachment(HttpEntity<?> binaryEntity) {
+            SettableInclude include = createInclude();
+            include.setHref(UUID.randomUUID().toString());
+            SettableAttachment attachment = createAttachment();
+            attachment.setInclude(include);
+            attachment.setContentStream((InputStream)binaryEntity.getBody());
+            if(binaryEntity.getHeaders().getContentType() != null) {
+                attachment.setContentType(binaryEntity.getHeaders().getContentType().toString());
+            }
+            return attachment;
         }
         
         private String toEntity(Object o) {
