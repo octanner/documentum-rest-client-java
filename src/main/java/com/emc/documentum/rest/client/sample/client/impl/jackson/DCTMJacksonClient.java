@@ -51,8 +51,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.ABOUT;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.ACLS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.ASPECT_TYPES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.ASSIS_VALUES;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.ASSOCIATIONS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.BATCH_CAPABILITIES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CABINETS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CANCEL_CHECKOUT;
@@ -502,6 +504,28 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     @Override
     public FolderLink link(Linkable object, LinkRelation rel, FolderLink link) {
         return post(object.getHref(rel), new JsonFolderLink(link), JsonFolderLink.class);
+    }
+    
+    @Override
+    public Feed<RestObject> getAcls(String... params) {
+        Feed<? extends RestObject> feed = get(getRepository().getHref(ACLS), true, JsonFeeds.ObjectFeed.class, params);
+        return (Feed<RestObject>)feed;
+    }
+    
+    @Override
+    public Feed<RestObject> getAclAssociations(Linkable acl, String... params) {
+        Feed<? extends RestObject> feed = get(acl.getHref(ASSOCIATIONS), true, JsonFeeds.ObjectFeed.class, params);
+        return (Feed<RestObject>)feed;
+    }
+    
+    @Override
+    public RestObject getAcl(String uri, String... params) {
+        return get(uri, false, JsonObject.class, params);
+    }
+    
+    @Override
+    public RestObject createAcl(RestObject object) {
+        return post(getRepository().getHref(ACLS), new JsonObject(object), JsonObject.class);
     }
     
     @Override

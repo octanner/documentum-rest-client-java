@@ -46,7 +46,10 @@ public enum LinkRelation {
     DEFAULT_FOLDER("default-folder", true),
     RELATIONS("relations", true),
     RELATION_TYPES("relation-types", true),
- 
+    ASSOCIATIONS("associations", true),
+    ACLS("acls", true),
+    ACL("acl", true),
+
     //Home Document link relations
     REPOSITORIES("repositories", true),
     ABOUT("about", false),

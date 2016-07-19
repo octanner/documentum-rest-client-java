@@ -778,4 +778,33 @@ public interface DCTMRestClient {
      * @return updated preference
      */
     public Preference updatePreference(Preference oldPreference, Preference newPreference);
+
+    /**
+     * get acl collection of the repository
+     * @param params the query parameters
+     * @return the acl collection feed
+     */
+    public Feed<RestObject> getAcls(String... params);
+    
+    /**
+     * get acl associations
+     * @param params the query parameters
+     * @return the acl associations feed
+     */
+    public Feed<RestObject> getAclAssociations(Linkable acl, String... params);
+    
+    /**
+     * get single acl
+     * @param uri the uri of the acl
+     * @param params the query parameters
+     * @return the acl RestObject
+     */
+    public RestObject getAcl(String uri, String... params);
+    
+    /**
+     * create an acl
+     * @param object the acl to be created
+     * @return the created acl
+     */
+    public RestObject createAcl(RestObject object);
 }

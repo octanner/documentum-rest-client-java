@@ -35,6 +35,7 @@ import com.emc.documentum.rest.client.sample.model.ValueAssistantRequest;
 import com.emc.documentum.rest.client.sample.model.batch.Batch;
 import com.emc.documentum.rest.client.sample.model.batch.Capabilities;
 import com.emc.documentum.rest.client.sample.model.plain.PlainRestObject;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbAcl;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbAspectType;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbBatch;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbBatchCapabilities;
@@ -62,8 +63,10 @@ import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbValueAssistance;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbValueAssistantRequest;
 
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.ABOUT;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.ACLS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.ASPECT_TYPES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.ASSIS_VALUES;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.ASSOCIATIONS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.BATCH_CAPABILITIES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CABINETS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CANCEL_CHECKOUT;
@@ -499,6 +502,28 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     @Override
     public FolderLink link(Linkable object, LinkRelation rel, FolderLink link) {
         return post(object.getHref(rel), new JaxbFolderLink(link), JaxbFolderLink.class);
+    }
+    
+    @Override
+    public Feed<RestObject> getAcls(String... params) {
+        Feed<? extends RestObject> feed = get(getRepository().getHref(ACLS), true, JaxbFeed.class, params);
+        return (Feed<RestObject>)feed;
+    }
+    
+    @Override
+    public Feed<RestObject> getAclAssociations(Linkable acl, String... params) {
+        Feed<? extends RestObject> feed = get(acl.getHref(ASSOCIATIONS), true, JaxbFeed.class, params);
+        return (Feed<RestObject>)feed;
+    }
+    
+    @Override
+    public RestObject getAcl(String uri, String... params) {
+        return get(uri, false, JaxbAcl.class, params);
+    }
+    
+    @Override
+    public RestObject createAcl(RestObject object) {
+        return post(getRepository().getHref(ACLS), new JaxbAcl(object), JaxbAcl.class);
     }
     
     @Override

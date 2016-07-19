@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -65,6 +67,12 @@ public abstract class Sample {
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
+        Collections.sort(list, new Comparator<Sample>() {
+            @Override
+            public int compare(Sample o1, Sample o2) {
+                return o1.getClass().getAnnotation(RestServiceSample.class).value().compareTo(o2.getClass().getAnnotation(RestServiceSample.class).value());
+            }
+        });
         return list;
     }
     
