@@ -3,6 +3,8 @@
  */
 package com.emc.documentum.rest.client.sample.client.util;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.transform.Source;
@@ -106,6 +108,31 @@ public class Debug {
                 sb.append(", ");
             }
             sb.append(p.replaceFirst("^r_", "").replaceAll("_", " ")).append(':').append(object.getProperties().get(p));
+        }
+        System.out.println(sb);
+    }
+    
+    public static void printFields(Object object, String... fields) {
+        StringBuilder sb = new StringBuilder();
+        if(fields == null || fields.length == 0) {
+            fields = new String[object.getClass().getDeclaredFields().length];
+            for(int i=0;i<fields.length;++i) {
+                fields[i] = object.getClass().getDeclaredFields()[i].getName();
+            }
+            Arrays.sort(fields);
+        }
+        for(String p : fields) {
+            if(sb.length() > 0) {
+                sb.append(", ");
+            }
+            try {
+                Field f = object.getClass().getDeclaredField(p);
+                f.setAccessible(true);
+                sb.append(p.replaceAll("([A-Z])", " $1").toLowerCase()).append(':').append(f.get(object));
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new IllegalArgumentException(p);
+            }
         }
         System.out.println(sb);
     }

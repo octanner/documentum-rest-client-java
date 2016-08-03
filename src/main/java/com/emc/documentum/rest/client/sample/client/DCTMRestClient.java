@@ -12,6 +12,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
 import com.emc.documentum.rest.client.sample.client.annotation.NotBatchable;
+import com.emc.documentum.rest.client.sample.model.Comment;
 import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.FolderLink;
 import com.emc.documentum.rest.client.sample.model.HomeDocument;
@@ -839,4 +840,41 @@ public interface DCTMRestClient {
      * @return the permission set object
      */
     public PermissionSet getPermissionSet(Linkable linkable, String... params);
+
+    /**
+     * @param parent the parent object
+     * @param params the query parameters
+     * @return the comments feed of the specified object
+     */
+    public Feed<Comment> getComments(Linkable parent, String... params);
+    
+    /**
+     * create a Comment of the specified object
+     * @param parent the object to create comment to
+     * @param comment the comment to be created
+     * @return the created comment
+     */
+    public Comment createComment(Linkable parent, Comment comment);
+    
+    /**
+     * @param commentUri the uri of the comment
+     * @param params the query parameters
+     * @return the comment of the specified uri
+     */
+    public Comment getComment(String commentUri, String... params);
+    
+    /**
+     * @param parent the parent comment
+     * @param params the query parameters
+     * @return the comment replies feed of the specified comment
+     */
+    public Feed<Comment> getReplies(Linkable parent, String... params);
+    
+    /**
+     * create a reply of the specified comment
+     * @param parent the comment to create reply to
+     * @param comment the reply to be created
+     * @return the created reply
+     */
+    public Comment createReply(Linkable parent, Comment comment);
 }

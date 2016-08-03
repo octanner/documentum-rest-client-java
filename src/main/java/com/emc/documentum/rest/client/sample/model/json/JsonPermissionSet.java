@@ -21,6 +21,7 @@ public class JsonPermissionSet extends JsonInlineLinkableBase implements Permiss
     @JsonProperty
     private List<String> requiredGroupSet;
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public List<Permission> getPermitted() {
         return (List)permitted;
@@ -30,6 +31,7 @@ public class JsonPermissionSet extends JsonInlineLinkableBase implements Permiss
         this.permitted = permitted;
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public List<Permission> getRestricted() {
         return (List)restricted;

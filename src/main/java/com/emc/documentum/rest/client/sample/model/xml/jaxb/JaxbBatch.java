@@ -183,6 +183,7 @@ public class JaxbBatch implements SettableBatch {
         operations.add(op);
     }
     
+    @SuppressWarnings("deprecation")
     @Override
     public boolean hasAttachment() {
         for(Operation o : operations) {

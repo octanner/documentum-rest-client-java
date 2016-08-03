@@ -32,7 +32,7 @@ public enum LinkRelation {
     TYPES("types", true),
     ASPECT_TYPES("aspect-types", true),
     ASSIS_VALUES("assist-values", true),
-    OBJECT_ASPECTS("object-aspects", true),
+    ACL("acl", true),
     
     // Documentum specific link relations
     FOLDERS("folders", true),
@@ -50,7 +50,9 @@ public enum LinkRelation {
     ASSOCIATIONS("associations", true),
     PERMISSIONS("permissions", true),
     PERMISSION_SET("permission-set", true),
-    ACL("acl", true),
+    OBJECT_ASPECTS("object-aspects", true),
+    COMMENTS("comments", true),
+    REPLIES("replies", true),
 
     //Home Document link relations
     REPOSITORIES("repositories", true),

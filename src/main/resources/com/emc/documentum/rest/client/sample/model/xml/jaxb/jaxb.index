@@ -11,6 +11,7 @@ JaxbBatchOperation
 JaxbBatchRequest
 JaxbBatchResponse
 JaxbCabinet
+JaxbComment
 JaxbContent
 JaxbDocument
 JaxbEntry
@@ -25,6 +26,8 @@ JaxbHomeDocument
 JaxbItem
 JaxbLink
 JaxbNetworkLocation
+JaxbPermission
+JaxbPermissionSet
 JaxbPreference
 JaxbQueryResult
 JaxbRepository

@@ -22,4 +22,7 @@ public class JsonFeeds {
     
     public static class PreferenceFeed extends JsonFeed<JsonPreference>{
     }
+    
+    public static class CommentFeed extends JsonFeed<JsonComment>{
+    }
 }

@@ -18,6 +18,7 @@ import com.emc.documentum.rest.client.sample.client.DCTMRestClient;
 import com.emc.documentum.rest.client.sample.client.impl.AbstractRestTemplateClient;
 import com.emc.documentum.rest.client.sample.client.util.Headers;
 import com.emc.documentum.rest.client.sample.client.util.UriHelper;
+import com.emc.documentum.rest.client.sample.model.Comment;
 import com.emc.documentum.rest.client.sample.model.Entry;
 import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.FolderLink;
@@ -42,6 +43,7 @@ import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbAspectType;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbBatch;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbBatchCapabilities;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbCabinet;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbComment;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbContent;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbDocument;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbFeed;
@@ -78,6 +80,7 @@ import static com.emc.documentum.rest.client.sample.model.LinkRelation.CHECKIN_B
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CHECKIN_NEXT_MAJOR;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CHECKIN_NEXT_MINOR;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CHECKOUT;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.COMMENTS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CONTENTS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CURRENT_USER_PREFERENCES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.DELETE;
@@ -98,6 +101,7 @@ import static com.emc.documentum.rest.client.sample.model.LinkRelation.PAGING_PR
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.PRIMARY_CONTENT;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.RELATIONS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.RELATION_TYPES;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.REPLIES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.REPOSITORIES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SEARCH;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SELF;
@@ -579,6 +583,33 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     @Override
     public PermissionSet getPermissionSet(Linkable linkable, String... params) {
         return get(linkable.getHref(LinkRelation.PERMISSION_SET), false, JaxbPermissionSet.class, params);
+    }
+    
+    @Override
+    public Feed<Comment> getComments(Linkable parent, String... params) {
+        Feed<? extends Comment> feed = get(parent.getHref(COMMENTS), true, JaxbFeed.class, params);
+        return (Feed<Comment>)feed;
+    }
+
+    @Override
+    public Comment createComment(Linkable parent, Comment comment) {
+        return post(parent.getHref(COMMENTS), new JaxbComment(comment), JaxbComment.class);
+    }
+
+    @Override
+    public Comment getComment(String commentUri, String... params) {
+        return get(commentUri, false, JaxbComment.class, params);
+    }
+
+    @Override
+    public Feed<Comment> getReplies(Linkable parent, String... params) {
+        Feed<? extends Comment> feed = get(parent.getHref(REPLIES), true, JaxbFeed.class, params);
+        return (Feed<Comment>)feed;
+    }
+
+    @Override
+    public Comment createReply(Linkable parent, Comment comment) {
+        return post(parent.getHref(REPLIES), new JaxbComment(comment), JaxbComment.class);
     }
 
     @Override

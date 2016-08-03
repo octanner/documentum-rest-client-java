@@ -162,6 +162,7 @@ public class JsonBatch implements SettableBatch {
         operations.add((JsonBatchOperation)op);
     }
     
+    @SuppressWarnings("deprecation")
     @Override
     public boolean hasAttachment() {
         for(Operation o : operations) {
