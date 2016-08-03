@@ -47,4 +47,8 @@ public class Reader {
         }
         return value;
     }
+    
+    public static void readEnterToContinue() {
+        read("press \"Enter\" to continue", "");
+    }
 }

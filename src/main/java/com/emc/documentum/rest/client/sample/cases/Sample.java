@@ -25,6 +25,7 @@ import com.emc.documentum.rest.client.sample.client.annotation.RestServiceVersio
 import com.emc.documentum.rest.client.sample.client.util.Debug;
 
 import static com.emc.documentum.rest.client.sample.client.util.Debug.printNewLine;
+import static com.emc.documentum.rest.client.sample.client.util.Reader.readEnterToContinue;
 
 public abstract class Sample {
     protected DCTMRestClient client;
@@ -93,11 +94,17 @@ public abstract class Sample {
     @RestServiceSampleExclude
     public void run() {
         System.out.println("start " + name + " samples");
+        boolean needPressEnter = false;
         for(Method m : this.getClass().getMethods()) {
             if(!Object.class.equals(m.getDeclaringClass()) && m.getParameterTypes().length == 0
                     && m.getAnnotation(RestServiceSampleExclude.class)==null && void.class.equals(m.getReturnType())) {
                 RestServiceVersion serviceVersion = m.getAnnotation(RestServiceVersion.class);
                 if(serviceVersion == null || serviceVersion.value() <= version) {
+                    if(needPressEnter) {
+                        readEnterToContinue();
+                    } else {
+                        needPressEnter = true;
+                    }
                     try {
                         m.invoke(this);
                     } catch (Exception e) {

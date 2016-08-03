@@ -13,6 +13,7 @@ import static com.emc.documentum.rest.client.sample.cases.Sample.loadSamples;
 import static com.emc.documentum.rest.client.sample.client.DCTMRestClientBuilder.buildWithPrompt;
 import static com.emc.documentum.rest.client.sample.client.util.Debug.printNewLine;
 import static com.emc.documentum.rest.client.sample.client.util.Reader.read;
+import static com.emc.documentum.rest.client.sample.client.util.Reader.readEnterToContinue;
 
 /**
  * sample application uses DCTMRestClient
@@ -51,7 +52,7 @@ public class DCTMRestClientSample {
             } catch(Exception e) {
                 e.printStackTrace();
             }
-            read("press \"Enter\" to continue", "");
+            readEnterToContinue();
         }
     }
 }

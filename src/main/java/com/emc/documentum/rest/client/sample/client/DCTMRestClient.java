@@ -18,6 +18,8 @@ import com.emc.documentum.rest.client.sample.model.HomeDocument;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
 import com.emc.documentum.rest.client.sample.model.Linkable;
 import com.emc.documentum.rest.client.sample.model.ObjectAspects;
+import com.emc.documentum.rest.client.sample.model.Permission;
+import com.emc.documentum.rest.client.sample.model.PermissionSet;
 import com.emc.documentum.rest.client.sample.model.Preference;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestObject;
@@ -346,6 +348,20 @@ public interface DCTMRestClient {
      * @return the content in bytes
      */
     public byte[] getContentBytes(String uri);
+    
+    /**
+     * get current user
+     * @param params the query parameters
+     * @return the user RestObject
+     */
+    public RestObject getCurrentUser(String... params);
+    
+    /**
+     * get user default folder
+     * @param params the query parameters
+     * @return the user default folder
+     */
+    public RestObject getDefaultFolder(String... params);
     
     /**
      * get users of the repository
@@ -807,4 +823,20 @@ public interface DCTMRestClient {
      * @return the created acl
      */
     public RestObject createAcl(RestObject object);
+    
+    /**
+     * get the permission
+     * @param obj the object
+     * @param params the query parameters
+     * @return the permission object
+     */
+    public Permission getPermission(Linkable linkable, String... params);
+
+    /**
+     * get the permission-set
+     * @param linkable the object or the user
+     * @param params the query parameters
+     * @return the permission set object
+     */
+    public PermissionSet getPermissionSet(Linkable linkable, String... params);
 }

@@ -18,6 +18,8 @@ import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.Link;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
 import com.emc.documentum.rest.client.sample.model.Linkable;
+import com.emc.documentum.rest.client.sample.model.Permission;
+import com.emc.documentum.rest.client.sample.model.PermissionSet;
 import com.emc.documentum.rest.client.sample.model.Preference;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.batch.Batch;
@@ -135,6 +137,31 @@ public class Debug {
         System.out.println("preference: " + preference.getPreference());
     }
     
+    public static void print(Permission permission) {
+        System.out.println("accessor: " + permission.getAccessor() + ", basic: " + permission.getBasicPermission() + ", extended: " + permission.getExtendPermissions() + ", application: " + permission.getApplicationPermission());
+    }
+    
+    public static void print(PermissionSet permissionSet) {
+        if(permissionSet.getPermitted() != null) {
+            System.out.println("permitted:"); 
+            for(Permission p : permissionSet.getPermitted()) {
+                print(p);
+            }
+        }
+        if(permissionSet.getRestricted() != null) {
+            System.out.println("restricted:");
+            for(Permission p : permissionSet.getRestricted()) {
+                print(p);
+            }
+        }
+        if(permissionSet.getRequiredGroup() != null) {
+            System.out.println("required group: " + permissionSet.getRequiredGroup());
+        }
+        if(permissionSet.getRequiredGroupSet() != null) {
+            System.out.println("required group set: " + permissionSet.getRequiredGroupSet());
+        }
+    }
+
     public static void print(DCTMRestClient client) {
         System.out.println("http status: " + client.getStatus());
     }

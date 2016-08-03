@@ -26,6 +26,8 @@ import com.emc.documentum.rest.client.sample.model.HomeDocument;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
 import com.emc.documentum.rest.client.sample.model.Linkable;
 import com.emc.documentum.rest.client.sample.model.ObjectAspects;
+import com.emc.documentum.rest.client.sample.model.Permission;
+import com.emc.documentum.rest.client.sample.model.PermissionSet;
 import com.emc.documentum.rest.client.sample.model.Preference;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestObject;
@@ -42,6 +44,8 @@ import com.emc.documentum.rest.client.sample.model.json.JsonFolderLink;
 import com.emc.documentum.rest.client.sample.model.json.JsonHomeDocument;
 import com.emc.documentum.rest.client.sample.model.json.JsonObject;
 import com.emc.documentum.rest.client.sample.model.json.JsonObjectAspects;
+import com.emc.documentum.rest.client.sample.model.json.JsonPermission;
+import com.emc.documentum.rest.client.sample.model.json.JsonPermissionSet;
 import com.emc.documentum.rest.client.sample.model.json.JsonPreference;
 import com.emc.documentum.rest.client.sample.model.json.JsonRepository;
 import com.emc.documentum.rest.client.sample.model.json.JsonType;
@@ -410,6 +414,16 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     }
     
     @Override
+    public RestObject getCurrentUser(String... params) {
+        return get(getRepository().getHref(LinkRelation.CURRENT_USER), false, JsonObject.class, params);
+    }
+    
+    @Override
+    public RestObject getDefaultFolder(String... params) {
+        return get(getCurrentUser().getHref(LinkRelation.DEFAULT_FOLDER), false, JsonObject.class, params);
+    }
+
+    @Override
     public RestObject getUser(String userUri, String... params) {
         return get(userUri, false, JsonObject.class, params);
     }
@@ -557,6 +571,16 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     @Override
     public Preference updatePreference(Preference oldPreference, Preference newPreference) {
         return post(oldPreference.self(), new JsonPreference(newPreference), JsonPreference.class);
+    }
+    
+    @Override
+    public Permission getPermission(Linkable linkable, String... params) {
+        return get(linkable.getHref(LinkRelation.PERMISSIONS), false, JsonPermission.class, params);
+    }
+
+    @Override
+    public PermissionSet getPermissionSet(Linkable linkable, String... params) {
+        return get(linkable.getHref(LinkRelation.PERMISSION_SET), false, JsonPermissionSet.class, params);
     }
 
     @Override

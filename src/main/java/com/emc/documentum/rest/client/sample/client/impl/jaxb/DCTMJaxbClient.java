@@ -25,6 +25,8 @@ import com.emc.documentum.rest.client.sample.model.HomeDocument;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
 import com.emc.documentum.rest.client.sample.model.Linkable;
 import com.emc.documentum.rest.client.sample.model.ObjectAspects;
+import com.emc.documentum.rest.client.sample.model.Permission;
+import com.emc.documentum.rest.client.sample.model.PermissionSet;
 import com.emc.documentum.rest.client.sample.model.Preference;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestObject;
@@ -50,6 +52,8 @@ import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbGroup;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbHomeDocument;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbNetworkLocation;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbObjectAspects;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbPermission;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbPermissionSet;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbPreference;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbProductInfo;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbRelation;
@@ -408,6 +412,16 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     }
 
     @Override
+    public RestObject getCurrentUser(String... params) {
+        return get(getRepository().getHref(LinkRelation.CURRENT_USER), false, JaxbUser.class, params);
+    }
+
+    @Override
+    public RestObject getDefaultFolder(String... params) {
+        return get(getCurrentUser().getHref(LinkRelation.DEFAULT_FOLDER), false, JaxbFolder.class, params);
+    }
+
+    @Override
     public RestObject getUser(String userUri, String... params) {
         return get(userUri, false, JaxbUser.class, params);
     }
@@ -555,6 +569,16 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     @Override
     public Preference updatePreference(Preference oldPreference, Preference newPreference) {
         return post(oldPreference.self(), new JaxbPreference(newPreference), JaxbPreference.class);
+    }
+
+    @Override
+    public Permission getPermission(Linkable linkable, String... params) {
+        return get(linkable.getHref(LinkRelation.PERMISSIONS), false, JaxbPermission.class, params);
+    }
+    
+    @Override
+    public PermissionSet getPermissionSet(Linkable linkable, String... params) {
+        return get(linkable.getHref(LinkRelation.PERMISSION_SET), false, JaxbPermissionSet.class, params);
     }
 
     @Override
