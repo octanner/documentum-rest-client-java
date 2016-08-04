@@ -97,6 +97,22 @@ public class Debug {
         }
     }
     
+    public static void printEntry(Feed<?> feed, String... properties) {
+        for(Entry<?> e : feed.getEntries()) {
+            printFields(e, properties);
+        }
+    }
+    
+    public static void printEntryContent(Feed<?> feed, String... properties) {
+        for(Entry<?> e : feed.getEntries()) {
+            if(e.getContentObject() instanceof RestObject) {
+                print((RestObject)e.getContentObject(), properties);
+            } else {
+                printFields(e.getContentObject(), properties);
+            }
+        }
+    }
+
     public static void print(RestObject object) {
         print(object, "r_object_id", "object_name", "r_object_type");
     }

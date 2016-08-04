@@ -25,4 +25,7 @@ public class JsonFeeds {
     
     public static class CommentFeed extends JsonFeed<JsonComment>{
     }
+
+    public static class VirtualDocumentNodeFeed extends JsonFeed<JsonVirtualDocumentNode>{
+    }
 }

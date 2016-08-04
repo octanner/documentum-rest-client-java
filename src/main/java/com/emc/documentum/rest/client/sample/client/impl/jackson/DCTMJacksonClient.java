@@ -36,6 +36,7 @@ import com.emc.documentum.rest.client.sample.model.RestType;
 import com.emc.documentum.rest.client.sample.model.SearchFeed;
 import com.emc.documentum.rest.client.sample.model.ValueAssistant;
 import com.emc.documentum.rest.client.sample.model.ValueAssistantRequest;
+import com.emc.documentum.rest.client.sample.model.VirtualDocumentNode;
 import com.emc.documentum.rest.client.sample.model.batch.Batch;
 import com.emc.documentum.rest.client.sample.model.batch.Capabilities;
 import com.emc.documentum.rest.client.sample.model.json.JsonBatch;
@@ -97,6 +98,7 @@ import static com.emc.documentum.rest.client.sample.model.LinkRelation.SHARED_PA
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.TYPES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.USERS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.VERSIONS;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.VIRTUAL_DOCUMENT_NODES;
 
 /**
  * the DCTMRestClient implementation by Jackson json support
@@ -614,6 +616,12 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
         return post(parent.getHref(REPLIES), new JsonComment(comment), JsonComment.class);
     }
 
+    @Override
+    public Feed<VirtualDocumentNode> getVirtualDocumentNodes(Linkable linkable, String... params) {
+        Feed<? extends VirtualDocumentNode> feed = get(linkable.getHref(VIRTUAL_DOCUMENT_NODES), true, JsonFeeds.VirtualDocumentNodeFeed.class, params);
+        return (Feed<VirtualDocumentNode>)feed;
+    }
+    
     @Override
     public <T extends Linkable> Feed<T> nextPage(Feed<T> feed) {
         return page(feed.getHref(PAGING_NEXT), feed.getClass());

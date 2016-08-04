@@ -35,6 +35,7 @@ import com.emc.documentum.rest.client.sample.model.RestType;
 import com.emc.documentum.rest.client.sample.model.SearchFeed;
 import com.emc.documentum.rest.client.sample.model.ValueAssistant;
 import com.emc.documentum.rest.client.sample.model.ValueAssistantRequest;
+import com.emc.documentum.rest.client.sample.model.VirtualDocumentNode;
 import com.emc.documentum.rest.client.sample.model.batch.Batch;
 import com.emc.documentum.rest.client.sample.model.batch.Capabilities;
 import com.emc.documentum.rest.client.sample.model.plain.PlainRestObject;
@@ -109,6 +110,8 @@ import static com.emc.documentum.rest.client.sample.model.LinkRelation.SHARED_PA
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.TYPES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.USERS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.VERSIONS;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.VIRTUAL_DOCUMENT_NODES;
+
 /**
  * the DCTMRestClient implementation by JAXB xml support
  */
@@ -610,6 +613,12 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     @Override
     public Comment createReply(Linkable parent, Comment comment) {
         return post(parent.getHref(REPLIES), new JaxbComment(comment), JaxbComment.class);
+    }
+
+    @Override
+    public Feed<VirtualDocumentNode> getVirtualDocumentNodes(Linkable linkable, String... params) {
+        Feed<? extends VirtualDocumentNode> feed = get(linkable.getHref(VIRTUAL_DOCUMENT_NODES), true, JaxbFeed.class, params);
+        return (Feed<VirtualDocumentNode>)feed;
     }
 
     @Override

@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2016. EMC Corporation. All Rights Reserved.
+ */
 package com.emc.documentum.rest.client.sample.model;
 
 public interface Comment extends Linkable {

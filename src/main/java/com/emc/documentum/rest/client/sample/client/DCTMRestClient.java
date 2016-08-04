@@ -28,6 +28,7 @@ import com.emc.documentum.rest.client.sample.model.RestType;
 import com.emc.documentum.rest.client.sample.model.SearchFeed;
 import com.emc.documentum.rest.client.sample.model.ValueAssistant;
 import com.emc.documentum.rest.client.sample.model.ValueAssistantRequest;
+import com.emc.documentum.rest.client.sample.model.VirtualDocumentNode;
 import com.emc.documentum.rest.client.sample.model.batch.Batch;
 import com.emc.documentum.rest.client.sample.model.batch.Capabilities;
 
@@ -877,4 +878,11 @@ public interface DCTMRestClient {
      * @return the created reply
      */
     public Comment createReply(Linkable parent, Comment comment);
+    
+    /**
+     * @param linkable the virtual document object
+     * @param params the query parameters
+     * @return the virtual document nodes feed of the specified object
+     */
+    public Feed<VirtualDocumentNode> getVirtualDocumentNodes(Linkable linkable, String... params);
 }

@@ -39,3 +39,4 @@ JaxbRelation
 JaxbRelationType
 JaxbRestError
 JaxbUser
+JaxbVirtualDocumentNode

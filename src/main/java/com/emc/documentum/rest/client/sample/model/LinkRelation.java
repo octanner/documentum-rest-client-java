@@ -53,7 +53,8 @@ public enum LinkRelation {
     OBJECT_ASPECTS("object-aspects", true),
     COMMENTS("comments", true),
     REPLIES("replies", true),
-
+    VIRTUAL_DOCUMENT_NODES("virtual-document-nodes", true),
+    
     //Home Document link relations
     REPOSITORIES("repositories", true),
     ABOUT("about", false),
