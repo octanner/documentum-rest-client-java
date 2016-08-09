@@ -23,7 +23,7 @@ import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.RestType;
 import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
-@XmlRootElement(name = "type", namespace = XMLNamespace.DM_NAMESPACE)
+@XmlRootElement(name = "type")
 public class JaxbType extends JaxbDmLinkableBase implements RestType {
     private String name;
     private String label;

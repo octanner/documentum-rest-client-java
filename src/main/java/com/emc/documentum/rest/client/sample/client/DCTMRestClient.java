@@ -25,6 +25,7 @@ import com.emc.documentum.rest.client.sample.model.Preference;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.RestType;
+import com.emc.documentum.rest.client.sample.model.Search;
 import com.emc.documentum.rest.client.sample.model.SearchFeed;
 import com.emc.documentum.rest.client.sample.model.ValueAssistant;
 import com.emc.documentum.rest.client.sample.model.ValueAssistantRequest;
@@ -105,6 +106,14 @@ public interface DCTMRestClient {
      * @return the search result feed
      */
     public SearchFeed<RestObject> search(String search, String... params);
+    
+    /**
+     * execute the search
+     * @param search the Search object
+     * @param params the query parameters
+     * @return the search result feed
+     */
+    public SearchFeed<RestObject> search(Search search, String... params);
     
     /**
      * @param params the query parameters

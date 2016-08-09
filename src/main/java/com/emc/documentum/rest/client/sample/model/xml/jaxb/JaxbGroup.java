@@ -6,9 +6,8 @@ package com.emc.documentum.rest.client.sample.model.xml.jaxb;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.emc.documentum.rest.client.sample.model.RestObject;
-import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
-@XmlRootElement(name="group", namespace=XMLNamespace.DM_NAMESPACE)
+@XmlRootElement(name="group")
 public class JaxbGroup extends JaxbObject {
     public JaxbGroup() {
         super();

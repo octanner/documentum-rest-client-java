@@ -12,7 +12,7 @@ import com.emc.documentum.rest.client.sample.client.annotation.RestServiceVersio
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.batch.Batch;
 import com.emc.documentum.rest.client.sample.model.batch.Batch.OnError;
-import com.emc.documentum.rest.client.sample.model.batch.BatchBuilder;
+import com.emc.documentum.rest.client.sample.model.builder.BatchBuilder;
 import com.emc.documentum.rest.client.sample.model.batch.Capabilities;
 import com.emc.documentum.rest.client.sample.model.plain.PlainRestObject;
 

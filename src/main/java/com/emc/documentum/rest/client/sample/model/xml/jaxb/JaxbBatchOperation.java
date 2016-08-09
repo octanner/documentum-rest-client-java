@@ -15,9 +15,8 @@ import com.emc.documentum.rest.client.sample.model.batch.Batch;
 import com.emc.documentum.rest.client.sample.model.batch.Request;
 import com.emc.documentum.rest.client.sample.model.batch.Response;
 import com.emc.documentum.rest.client.sample.model.batch.SettableOperation;
-import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
-@XmlRootElement(name="operation", namespace=XMLNamespace.DM_NAMESPACE)
+@XmlRootElement(name="operation")
 public class JaxbBatchOperation implements SettableOperation {
     private String id;
     private String description;
@@ -93,7 +92,7 @@ public class JaxbBatchOperation implements SettableOperation {
         this.batchRequest = (JaxbBatchRequest)request;
     }
     
-    @XmlElement(name="request", namespace=XMLNamespace.DM_NAMESPACE)
+    @XmlElement(name="request")
     public JaxbBatchRequest getBatchRequest() {
         return batchRequest;
     }
@@ -113,7 +112,7 @@ public class JaxbBatchOperation implements SettableOperation {
         this.batchResponse = (JaxbBatchResponse)response;
     }
 
-    @XmlElement(name="response", namespace=XMLNamespace.DM_NAMESPACE)
+    @XmlElement(name="response")
     public JaxbBatchResponse getBatchResponse() {
         return batchResponse;
     }

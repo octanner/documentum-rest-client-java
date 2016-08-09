@@ -12,9 +12,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.Facet;
 import com.emc.documentum.rest.client.sample.model.FacetValue;
-import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
-@XmlRootElement(name = "facet", namespace = XMLNamespace.DM_NAMESPACE)
+@XmlRootElement(name = "facet")
 public class JaxbFacet extends JaxbDmLinkableBase implements Facet {
     private String id;
     private String label;

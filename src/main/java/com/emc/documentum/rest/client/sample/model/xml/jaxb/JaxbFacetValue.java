@@ -12,9 +12,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.Facet;
 import com.emc.documentum.rest.client.sample.model.FacetValue;
-import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
-@XmlRootElement(name = "facet-value", namespace = XMLNamespace.DM_NAMESPACE)
+@XmlRootElement(name = "facet-value")
 public class JaxbFacetValue extends JaxbDmLinkableBase implements FacetValue {
     private String facetId;
     private String id;
@@ -63,7 +62,7 @@ public class JaxbFacetValue extends JaxbDmLinkableBase implements FacetValue {
     }
 
     @Override
-    @XmlElement(name="facet", type=JaxbFacet.class, namespace=XMLNamespace.DM_NAMESPACE)
+    @XmlElement(name="facet", type=JaxbFacet.class)
     public List<Facet> getFacets() {
         return facets;
     }

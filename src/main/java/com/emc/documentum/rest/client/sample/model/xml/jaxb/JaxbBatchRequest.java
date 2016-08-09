@@ -17,9 +17,8 @@ import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.batch.Attachment;
 import com.emc.documentum.rest.client.sample.model.batch.Header;
 import com.emc.documentum.rest.client.sample.model.batch.SettableRequest;
-import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
-@XmlRootElement(name="request", namespace=XMLNamespace.DM_NAMESPACE)
+@XmlRootElement(name="request")
 public class JaxbBatchRequest implements SettableRequest {
     private String uri;
     private String method;
@@ -63,8 +62,8 @@ public class JaxbBatchRequest implements SettableRequest {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    @XmlElementWrapper(name = "attachments")
-    @XmlElement(name = "attachment", type = JaxbBatchAttachment.class, namespace = XMLNamespace.DM_NAMESPACE)
+    @XmlElementWrapper
+    @XmlElement(name = "attachment", type = JaxbBatchAttachment.class)
     public List<Attachment> getAttachments() {
         return (List)attachments;
     }

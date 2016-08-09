@@ -14,9 +14,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.batch.Operation;
 import com.emc.documentum.rest.client.sample.model.batch.SettableBatch;
-import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
-@XmlRootElement(name="batch", namespace=XMLNamespace.DM_NAMESPACE)
+@XmlRootElement(name="batch")
 public class JaxbBatch implements SettableBatch {
     private String id;
     private String description;
@@ -165,8 +164,8 @@ public class JaxbBatch implements SettableBatch {
     }
 
     @Override
-    @XmlElementWrapper(name="operations")
-    @XmlElement(name="operation", type = JaxbBatchOperation.class, namespace=XMLNamespace.DM_NAMESPACE) 
+    @XmlElementWrapper
+    @XmlElement(name="operation", type = JaxbBatchOperation.class) 
     public List<Operation> getOperations() {
         return operations;
     }

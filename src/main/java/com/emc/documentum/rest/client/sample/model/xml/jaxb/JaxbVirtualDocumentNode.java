@@ -12,9 +12,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.VirtualDocumentNode;
-import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
-@XmlRootElement(name="virtual-document-node", namespace=XMLNamespace.DM_NAMESPACE)
+@XmlRootElement(name="virtual-document-node")
 public class JaxbVirtualDocumentNode extends JaxbDmLinkableBase implements VirtualDocumentNode {
     private boolean areChildrenCompound;
     private List<String> availableVersions;
@@ -39,7 +38,7 @@ public class JaxbVirtualDocumentNode extends JaxbDmLinkableBase implements Virtu
     
     @Override
     @XmlElementWrapper(name="available-versions")
-    @XmlElement(name = "item", namespace = XMLNamespace.DM_NAMESPACE)
+    @XmlElement(name = "item")
     public List<String> getAvailableVersions() {
         return availableVersions;
     }

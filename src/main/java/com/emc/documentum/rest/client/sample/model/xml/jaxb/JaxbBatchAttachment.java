@@ -15,7 +15,7 @@ import com.emc.documentum.rest.client.sample.model.batch.Include;
 import com.emc.documentum.rest.client.sample.model.batch.SettableAttachment;
 import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
-@XmlRootElement(name="attachment", namespace=XMLNamespace.DM_NAMESPACE)
+@XmlRootElement(name="attachment")
 public class JaxbBatchAttachment implements SettableAttachment {
     private JaxbBatchInclude include;
     private String contentType;

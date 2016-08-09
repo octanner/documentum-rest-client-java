@@ -6,9 +6,8 @@ package com.emc.documentum.rest.client.sample.model.xml.jaxb;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.emc.documentum.rest.client.sample.model.RestObject;
-import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
-@XmlRootElement(name="query-result", namespace=XMLNamespace.DM_NAMESPACE)
+@XmlRootElement(name="query-result")
 public class JaxbQueryResult extends JaxbObject {
     public JaxbQueryResult() {
         super();

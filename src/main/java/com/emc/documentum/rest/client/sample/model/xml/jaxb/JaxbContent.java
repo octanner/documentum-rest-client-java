@@ -6,9 +6,8 @@ package com.emc.documentum.rest.client.sample.model.xml.jaxb;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.emc.documentum.rest.client.sample.model.RestObject;
-import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
-@XmlRootElement(name="content", namespace=XMLNamespace.DM_NAMESPACE)
+@XmlRootElement(name="content")
 public class JaxbContent extends JaxbObject {
     public JaxbContent() {
         super();

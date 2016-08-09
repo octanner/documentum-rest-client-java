@@ -14,9 +14,8 @@ import javax.xml.bind.annotation.XmlTransient;
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.batch.Header;
 import com.emc.documentum.rest.client.sample.model.batch.Response;
-import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
-@XmlRootElement(name="response", namespace=XMLNamespace.DM_NAMESPACE)
+@XmlRootElement(name="response")
 public class JaxbBatchResponse implements Response {
     private int status;
     private List<JaxbBatchHeader> headers;

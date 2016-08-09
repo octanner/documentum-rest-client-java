@@ -12,9 +12,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.ObjectAspects;
-import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
-@XmlRootElement(name="object-aspects", namespace=XMLNamespace.DM_NAMESPACE)
+@XmlRootElement(name="object-aspects")
 public class JaxbObjectAspects extends JaxbDmLinkableBase implements ObjectAspects {
 
     private List<String> aspects;

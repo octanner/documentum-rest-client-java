@@ -13,9 +13,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.Permission;
 import com.emc.documentum.rest.client.sample.model.PermissionSet;
-import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
-@XmlRootElement(name = "permission-set", namespace = XMLNamespace.DM_NAMESPACE)
+@XmlRootElement(name = "permission-set")
 public class JaxbPermissionSet extends JaxbDmLinkableBase implements PermissionSet {
     private List<Permission> permitted;
     private List<Permission> restricted;
@@ -23,8 +22,8 @@ public class JaxbPermissionSet extends JaxbDmLinkableBase implements PermissionS
     private List<String> requiredGroupSet;
     
     @Override
-    @XmlElementWrapper(name = "permitted")
-    @XmlElement(name = "permission", type = JaxbPermission.class, namespace = XMLNamespace.DM_NAMESPACE)
+    @XmlElementWrapper
+    @XmlElement(name = "permission", type = JaxbPermission.class)
     public List<Permission> getPermitted() {
         return permitted;
     }
@@ -34,8 +33,8 @@ public class JaxbPermissionSet extends JaxbDmLinkableBase implements PermissionS
     }
 
     @Override
-    @XmlElementWrapper(name = "restricted")
-    @XmlElement(name = "permission", type = JaxbPermission.class, namespace = XMLNamespace.DM_NAMESPACE)
+    @XmlElementWrapper
+    @XmlElement(name = "permission", type = JaxbPermission.class)
     public List<Permission> getRestricted() {
         return restricted;
     }
@@ -46,7 +45,7 @@ public class JaxbPermissionSet extends JaxbDmLinkableBase implements PermissionS
 
     @Override
     @XmlElementWrapper(name = "required-group")
-    @XmlElement(name = "group", namespace = XMLNamespace.DM_NAMESPACE)
+    @XmlElement(name = "group")
     public List<String> getRequiredGroup() {
         return requiredGroup;
     }
@@ -57,7 +56,7 @@ public class JaxbPermissionSet extends JaxbDmLinkableBase implements PermissionS
 
     @Override
     @XmlElementWrapper(name = "required-group-set")
-    @XmlElement(name = "group", namespace = XMLNamespace.DM_NAMESPACE)
+    @XmlElement(name = "group")
     public List<String> getRequiredGroupSet() {
         return requiredGroupSet;
     }

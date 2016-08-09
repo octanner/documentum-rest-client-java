@@ -10,9 +10,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.Comment;
-import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
-@XmlRootElement(name="comment", namespace=XMLNamespace.DM_NAMESPACE)
+@XmlRootElement(name="comment")
 public class JaxbComment extends JaxbDmLinkableBase implements Comment {
     private String objectId;
     private String commentId;

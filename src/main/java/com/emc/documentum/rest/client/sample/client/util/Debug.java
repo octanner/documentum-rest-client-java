@@ -3,6 +3,7 @@
  */
 package com.emc.documentum.rest.client.sample.client.util;
 
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +16,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 import com.emc.documentum.rest.client.sample.client.DCTMRestClient;
+import com.emc.documentum.rest.client.sample.client.impl.AbstractRestTemplateClient;
 import com.emc.documentum.rest.client.sample.model.Entry;
+import com.emc.documentum.rest.client.sample.model.Facet;
+import com.emc.documentum.rest.client.sample.model.FacetValue;
 import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.Link;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
@@ -24,6 +28,8 @@ import com.emc.documentum.rest.client.sample.model.Permission;
 import com.emc.documentum.rest.client.sample.model.PermissionSet;
 import com.emc.documentum.rest.client.sample.model.Preference;
 import com.emc.documentum.rest.client.sample.model.RestObject;
+import com.emc.documentum.rest.client.sample.model.SearchEntry;
+import com.emc.documentum.rest.client.sample.model.SearchFeed;
 import com.emc.documentum.rest.client.sample.model.batch.Batch;
 import com.emc.documentum.rest.client.sample.model.batch.Operation;
 
@@ -62,6 +68,12 @@ public class Debug {
         } else {
             debugContent(object);
         }
+    }
+    
+    public static void debugSerialize(DCTMRestClient client, Object object) {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ((AbstractRestTemplateClient)client).serialize(object, os);
+        System.out.println(os);
     }
     
     public static void debugRestObject(RestObject object) {
@@ -109,6 +121,32 @@ public class Debug {
                 print((RestObject)e.getContentObject(), properties);
             } else {
                 printFields(e.getContentObject(), properties);
+            }
+        }
+    }
+    
+    public static void printSearchFeed(SearchFeed<RestObject> result) {
+        if(result.getEntries() != null) {
+            for(SearchEntry<RestObject> e : result.getEntries()) {
+                if(e.getContentSrc() != null) {
+                    System.out.println(e.getTitle() + " -> " + e.getContentSrc());
+                } else {
+                    print(e.getContentObject());
+                }
+                System.out.println("score:" + e.getScore() + ", terms:" + e.getTerms());
+            }
+        } else {
+            System.out.println("no search result");
+        }
+        
+        if(result.getFacets() != null) {
+            for(Facet f : result.getFacets()) {
+                System.out.println("facet id:" + f.getId() + ", facet label:" + f.getLabel());
+                for(FacetValue fv : f.getValues()) {
+                    System.out.println("facet-id:" + fv.getFacetId() + ", facet-value-id:" + fv.getId()
+                        + ", facet-value-count:" + fv.getCount() + "facet-value-constraint:" + fv.getConstraint());
+                    print(fv);
+                }
             }
         }
     }

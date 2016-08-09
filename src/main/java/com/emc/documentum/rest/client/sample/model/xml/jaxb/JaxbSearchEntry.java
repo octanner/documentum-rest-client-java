@@ -24,8 +24,8 @@ public class JaxbSearchEntry<T extends Linkable> extends JaxbEntry<T> implements
         this.score = score;
     }
 
-    @XmlElementWrapper(name = "terms")
-    @XmlElement(name = "term", namespace=XMLNamespace.DM_NAMESPACE)
+    @XmlElementWrapper
+    @XmlElement(name = "term")
     @Override
     public List<String> getTerms() {
         return terms;

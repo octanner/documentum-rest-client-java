@@ -82,7 +82,7 @@ public abstract class JaxbFeedBase<T extends Linkable, E extends Entry<T>> exten
     }
 
     @Override
-    @XmlElement(name="items-per-page", namespace=XMLNamespace.DM_NAMESPACE)
+    @XmlElement(name="items-per-page")
     public Integer getItemsPerPage() {
         return itemsPerPage;
     }

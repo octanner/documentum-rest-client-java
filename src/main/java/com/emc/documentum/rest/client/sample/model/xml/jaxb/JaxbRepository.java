@@ -11,9 +11,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.Repository;
-import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
-@XmlRootElement(name = "repository", namespace = XMLNamespace.DM_NAMESPACE)
+@XmlRootElement(name = "repository")
 public class JaxbRepository extends JaxbDmLinkableBase implements Repository {
     private int id;
     private String name;

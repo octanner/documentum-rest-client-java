@@ -9,6 +9,7 @@ import java.util.List;
 import javax.annotation.concurrent.NotThreadSafe;
 
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
@@ -17,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import com.emc.documentum.rest.client.sample.client.DCTMRestClient;
 import com.emc.documentum.rest.client.sample.client.impl.AbstractRestTemplateClient;
 import com.emc.documentum.rest.client.sample.client.util.Headers;
+import com.emc.documentum.rest.client.sample.client.util.SupportedMediaTypes;
 import com.emc.documentum.rest.client.sample.client.util.UriHelper;
 import com.emc.documentum.rest.client.sample.model.Comment;
 import com.emc.documentum.rest.client.sample.model.Entry;
@@ -32,6 +34,7 @@ import com.emc.documentum.rest.client.sample.model.Preference;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.RestType;
+import com.emc.documentum.rest.client.sample.model.Search;
 import com.emc.documentum.rest.client.sample.model.SearchFeed;
 import com.emc.documentum.rest.client.sample.model.ValueAssistant;
 import com.emc.documentum.rest.client.sample.model.ValueAssistantRequest;
@@ -174,6 +177,11 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
         return get(getRepository().getHref(SEARCH), true, JaxbSearchFeed.class, UriHelper.append(params, "q", search));
     }
     
+    @Override
+    public SearchFeed<RestObject> search(Search search, String... params) {
+        return post(getRepository().getHref(SEARCH), search, new Headers().accept(MediaType.APPLICATION_ATOM_XML_VALUE).contentType(SupportedMediaTypes.APPLICATION_VND_DCTM_XML_VALUE).toHttpHeaders(), JaxbSearchFeed.class, params);
+    }
+
     @Override
     public Feed<RestObject> getCabinets(String... params) {
         Repository repository = getRepository();

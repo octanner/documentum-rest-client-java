@@ -33,6 +33,7 @@ import com.emc.documentum.rest.client.sample.model.Preference;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.RestType;
+import com.emc.documentum.rest.client.sample.model.Search;
 import com.emc.documentum.rest.client.sample.model.SearchFeed;
 import com.emc.documentum.rest.client.sample.model.ValueAssistant;
 import com.emc.documentum.rest.client.sample.model.ValueAssistantRequest;
@@ -165,6 +166,12 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     @Override
     public SearchFeed<RestObject> search(String search, String... params) {
         SearchFeed<? extends RestObject> feed = get(getRepository().getHref(SEARCH), true, JsonFeeds.SearchFeed.class, UriHelper.append(params, "q", search));
+        return (SearchFeed<RestObject>)feed;
+    }
+
+    @Override
+    public SearchFeed<RestObject> search(Search search, String... params) {
+        SearchFeed<? extends RestObject> feed = post(getRepository().getHref(SEARCH), search, JsonFeeds.SearchFeed.class, params);
         return (SearchFeed<RestObject>)feed;
     }
 

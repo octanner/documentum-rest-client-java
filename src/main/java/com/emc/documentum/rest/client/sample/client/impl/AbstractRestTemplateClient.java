@@ -414,6 +414,10 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
         return sendRequest(uri, POST, isXml()?ACCEPT_XML_HEADERS_WITH_CONTENT:ACCEPT_JSON_HEADERS_WITH_CONTENT, body, responseBodyClass, params);
     }
     
+    protected <T> T post(String uri, Object body, HttpHeaders headers, Class<? extends T> responseBodyClass, String... params) {
+        return sendRequest(uri, POST, headers, body, responseBodyClass, params);
+    }
+    
     protected <T> T post(String uri, Object content, String contentMediaType, Class<? extends T> responseBodyClass, String... params) {
         return sendRequest(uri, POST, new Headers().accept(isXml()?SupportedMediaTypes.APPLICATION_VND_DCTM_XML_VALUE:SupportedMediaTypes.APPLICATION_VND_DCTM_JSON_VALUE).contentType(contentMediaType).toHttpHeaders(),
                 content, responseBodyClass, params);

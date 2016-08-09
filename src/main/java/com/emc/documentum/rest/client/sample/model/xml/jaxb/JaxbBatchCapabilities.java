@@ -12,9 +12,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.batch.Capabilities;
-import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
-@XmlRootElement(name="batch-capabilities", namespace=XMLNamespace.DM_NAMESPACE)
+@XmlRootElement(name="batch-capabilities")
 public class JaxbBatchCapabilities extends JaxbDmLinkableBase implements Capabilities {
     private String transactions;
     private String sequence;
@@ -52,7 +51,7 @@ public class JaxbBatchCapabilities extends JaxbDmLinkableBase implements Capabil
 
     @Override
     @XmlElementWrapper(name="batchable-resources")
-    @XmlElement(name="batchable-resource", namespace=XMLNamespace.DM_NAMESPACE)
+    @XmlElement(name="batchable-resource")
     public List<String> getBatchable() {
         return this.batchable;
     }
@@ -63,7 +62,7 @@ public class JaxbBatchCapabilities extends JaxbDmLinkableBase implements Capabil
 
     @Override
     @XmlElementWrapper(name="non-batchable-resources")
-    @XmlElement(name="non-batchable-resource", namespace=XMLNamespace.DM_NAMESPACE)
+    @XmlElement(name="non-batchable-resource")
     public List<String> getNonBatchable() {
         return nonBatchable;
     }
