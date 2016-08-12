@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface Search extends Linkable {
+    public List<String> getRepositories();
     public List<String> getTypes();
     public List<Column> getColumns();
     public List<Sort> getSorts();
@@ -24,13 +25,14 @@ public interface Search extends Linkable {
     
     public interface Sort {
         public String getProperty();
-        public Boolean isAscending();
+        public Boolean getAscending();
         public String getLang();
-        public Boolean isAscii();
+        public Boolean getAscii();
     }
     
     public interface Location {
-        public boolean isDescendent();
+        public String getRepository();
+        public Boolean getDescendent();
     }
     
     public interface IdLocation extends Location {
@@ -40,7 +42,6 @@ public interface Search extends Linkable {
     public interface PathLocation extends Location {
         public String getPath();
     }
-    
     
     public interface FacetDefinition {
         public static final String SORT_FREQUENCY = "FREQUENCY";
@@ -66,6 +67,7 @@ public interface Search extends Linkable {
     }
     
     public interface Expression {
+        public Boolean getTemplate();
     }
     
     public interface ExpressionSet extends Expression {
@@ -92,14 +94,14 @@ public interface Search extends Linkable {
         public String getName();
         public String getValue();
         public String getOperator();
-        public boolean isExactMatch();
-        public boolean isRepeated();
-        public boolean isCaseSensitive();
-        public boolean isFuzzy();
+        public Boolean getExactMatch();
+        public Boolean getRepeating();
+        public Boolean getCaseSensitive();
+        public Boolean getFuzzy();
     }
     
     public interface FullTextExpression extends Expression {
-        public boolean isFuzzy();
+        public Boolean getFuzzy();
         public String getValue();
     }
     
@@ -119,6 +121,7 @@ public interface Search extends Linkable {
         public int getValue();
         public String getTimeUnit();
         public String getOperator();
+        public Boolean getRepeating();
     }
     
     public interface PropertyListExpression extends Expression {
@@ -127,7 +130,7 @@ public interface Search extends Linkable {
         public String getName();
         public String getOperator();
         public List<String> getValues();
-        public boolean isRepeated();
+        public Boolean getRepeating();
     }
     
     public interface PropertyRangeExpression extends Expression {
@@ -136,6 +139,6 @@ public interface Search extends Linkable {
         public String getOperator();
         public String getFrom();
         public String getTo();
-        public boolean isRepeated();
+        public Boolean getRepeating();
     }
 }

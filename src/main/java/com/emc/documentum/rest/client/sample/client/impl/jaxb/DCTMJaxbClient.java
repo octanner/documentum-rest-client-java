@@ -36,6 +36,7 @@ import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.RestType;
 import com.emc.documentum.rest.client.sample.model.Search;
 import com.emc.documentum.rest.client.sample.model.SearchFeed;
+import com.emc.documentum.rest.client.sample.model.SearchTemplate;
 import com.emc.documentum.rest.client.sample.model.ValueAssistant;
 import com.emc.documentum.rest.client.sample.model.ValueAssistantRequest;
 import com.emc.documentum.rest.client.sample.model.VirtualDocumentNode;
@@ -66,6 +67,7 @@ import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbRelation;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbRelationType;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbRepository;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSearchFeed;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSearchTemplate;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSysObject;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbType;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbUser;
@@ -108,6 +110,7 @@ import static com.emc.documentum.rest.client.sample.model.LinkRelation.RELATION_
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.REPLIES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.REPOSITORIES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SEARCH;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.SEARCH_TEMPLATES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SELF;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SHARED_PARENT;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.TYPES;
@@ -627,6 +630,22 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     public Feed<VirtualDocumentNode> getVirtualDocumentNodes(Linkable linkable, String... params) {
         Feed<? extends VirtualDocumentNode> feed = get(linkable.getHref(VIRTUAL_DOCUMENT_NODES), true, JaxbFeed.class, params);
         return (Feed<VirtualDocumentNode>)feed;
+    }
+
+    @Override
+    public Feed<SearchTemplate> getSearchTemplates(String... params) {
+        Feed<JaxbSearchTemplate> feed = get(getRepository().getHref(SEARCH_TEMPLATES), true, JaxbFeed.class, params);
+        return (Feed)feed;
+    }
+
+    @Override
+    public SearchTemplate getSearchTemplate(String uri, String... params) {
+        return get(uri, false, JaxbSearchTemplate.class, params);
+    }
+
+    @Override
+    public SearchTemplate createSearchTemmplate(SearchTemplate template) {
+        return post(getRepository().getHref(SEARCH_TEMPLATES), new JaxbSearchTemplate(template), JaxbSearchTemplate.class);
     }
 
     @Override

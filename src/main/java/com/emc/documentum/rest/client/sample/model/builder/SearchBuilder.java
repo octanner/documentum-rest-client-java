@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2016. EMC Corporation. All Rights Reserved.
+ */
 package com.emc.documentum.rest.client.sample.model.builder;
 
 import java.util.List;
@@ -40,4 +43,5 @@ public abstract class SearchBuilder {
     public abstract SearchBuilder propertyListExpression(String name, List<String> values, String operator, boolean repeated);
     public abstract SearchBuilder propertyRangeExpression(String name, String from, String to);
     public abstract SearchBuilder expression(Expression expression);
+    public abstract SearchBuilder asTemplate();
 }

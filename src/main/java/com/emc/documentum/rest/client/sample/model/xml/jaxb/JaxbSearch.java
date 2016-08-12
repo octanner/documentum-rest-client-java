@@ -4,14 +4,15 @@
 package com.emc.documentum.rest.client.sample.model.xml.jaxb;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
@@ -19,6 +20,7 @@ import javax.xml.bind.annotation.XmlValue;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.Search;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSearch.JaxbExpression;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSearch.JaxbFacetProperty;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSearch.JaxbFullTextExpression;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSearch.JaxbIdLocation;
@@ -30,8 +32,9 @@ import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSearch.JaxbRelat
 
 @XmlRootElement(name = "search")
 @XmlSeeAlso({JaxbFullTextExpression.class, JaxbPropertyExpression.class, JaxbPropertyListExpression.class, JaxbPropertyRangeExpression.class,
-            JaxbRelativeDateExpression.class, JaxbIdLocation.class, JaxbPathLocation.class, JaxbFacetProperty.class})
+            JaxbRelativeDateExpression.class, JaxbExpression.class, JaxbIdLocation.class, JaxbPathLocation.class, JaxbFacetProperty.class})
 public class JaxbSearch extends JaxbDmLinkableBase implements Search {
+    private List<String> repositories;
     private List<String> types;
     private List<Column> columns;
     private List<Sort> sorts;
@@ -42,6 +45,16 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
     private Boolean includeHiddenObjects;
     private Integer maxResultsForFacets;
     private List<FacetDefinition> facetDefinitions;
+
+    @XmlElementWrapper
+    @XmlElement(name = "repository")
+    public List<String> getRepositories() {
+        return repositories;
+    }
+
+    public void setRepositories(List<String> repositories) {
+        this.repositories = repositories;
+    }
 
     @XmlElementWrapper
     @XmlElement(name = "type")
@@ -74,7 +87,8 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
     }
     
     @XmlElementWrapper
-    @XmlAnyElement()
+    @XmlElements({@XmlElement(name="id-location", type=JaxbIdLocation.class),
+                  @XmlElement(name="path-location", type=JaxbPathLocation.class)})
     public List<Location> getLocations() {
         return locations;
     }
@@ -210,7 +224,7 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
             this.property = property;
         }
         @XmlAttribute
-        public Boolean isAscending() {
+        public Boolean getAscending() {
             return ascending;
         }
         public void setAscending(Boolean ascending) {
@@ -224,7 +238,7 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
             this.lang = lang;
         }
         @XmlAttribute
-        public Boolean isAscii() {
+        public Boolean getAscii() {
             return ascii;
         }
         public void setAscii(Boolean ascii) {
@@ -244,22 +258,43 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
         }
     }
     
-    @XmlRootElement(name = "id-location")
-    public static class JaxbIdLocation implements IdLocation {
-        private boolean descendent;
-        private String id;
-        public JaxbIdLocation() {
+    public static abstract class JaxbLocation implements Location {
+        private String repository;
+        private Boolean descendent;
+        public JaxbLocation() {
         }
-        public JaxbIdLocation(String id, boolean descendent) {
-            this.id = id;
+        public JaxbLocation(Boolean descendent) {
             this.descendent = descendent;
         }
         @XmlAttribute
-        public boolean isDescendent() {
+        public String getRepository() {
+            return repository;
+        }
+        public void setRepository(String repository) {
+            this.repository = repository;
+        }
+        @XmlAttribute
+        public Boolean getDescendent() {
             return descendent;
         }
-        public void setDescendent(boolean descendent) {
+        public void setDescendent(Boolean descendent) {
             this.descendent = descendent;
+        }
+        @Override
+        public boolean equals(Object obj) {
+            JaxbLocation that = (JaxbLocation) obj;
+            return Equals.equal(descendent, that.descendent);
+        }
+    }
+    
+    @XmlRootElement(name = "id-location")
+    public static class JaxbIdLocation extends JaxbLocation implements IdLocation {
+        private String id;
+        public JaxbIdLocation() {
+        }
+        public JaxbIdLocation(String id, Boolean descendent) {
+            super(descendent);
+            this.id = id;
         }
         @XmlElement
         public String getId() {
@@ -271,31 +306,23 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
         @Override
         public boolean equals(Object obj) {
             JaxbIdLocation that = (JaxbIdLocation) obj;
-            return Equals.equal(descendent, that.descendent)
+            return super.equals(that)
                     && Equals.equal(id, that.id);
         }
         @Override
         public int hashCode() {
-            return Objects.hash(descendent, id);
+            return Objects.hash(id);
         }
     }
     
     @XmlRootElement(name = "path-location")
-    public static class JaxbPathLocation implements PathLocation {
-        private boolean descendent;
+    public static class JaxbPathLocation extends JaxbLocation implements PathLocation {
         private String path;
         public JaxbPathLocation() {
         }
-        public JaxbPathLocation(String path, boolean descendent) {
+        public JaxbPathLocation(String path, Boolean descendent) {
+            super(descendent);
             this.path = path;
-            this.descendent = descendent;
-        }
-        @XmlAttribute
-        public boolean isDescendent() {
-            return descendent;
-        }
-        public void setDescendent(boolean descendent) {
-            this.descendent = descendent;
         }
         @XmlElement
         public String getPath() {
@@ -307,12 +334,12 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
         @Override
         public boolean equals(Object obj) {
             JaxbPathLocation that = (JaxbPathLocation) obj;
-            return Equals.equal(descendent, that.descendent)
+            return super.equals(that)
                     && Equals.equal(path, that.path);
         }
         @Override
         public int hashCode() {
-            return Objects.hash(descendent, path);
+            return Objects.hash(path);
         }
     }
     
@@ -374,6 +401,14 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
                 }
             }
             return list;
+        }
+        public void setPropertiesList(List<JaxbFacetProperty> list) {
+            if(list != null) {
+                properties = new HashMap<String, String>();
+                for(JaxbFacetProperty p : list) {
+                    properties.put(p.getName(), p.getValue());
+                }
+            }
         }
         @XmlTransient
         public Map<String, String> getProperties() {
@@ -439,8 +474,21 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
         }
     }
     
+    @XmlTransient
+    public static abstract class JaxbExpression implements Expression {
+        private Boolean template;
+        @XmlAttribute
+        public Boolean getTemplate() {
+            return template;
+        }
+        public void setTemplate(Boolean template) {
+            this.template = template;
+        }
+
+    }
+    
     @XmlRootElement(name = "expression-set")
-    public static class JaxbExpressionSet implements ExpressionSet{
+    public static class JaxbExpressionSet extends JaxbExpression implements ExpressionSet{
         private String operator;
         private List<Expression> expressions;
         public JaxbExpressionSet() {
@@ -460,7 +508,12 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
             this.operator = operator;
         }
         @XmlElementWrapper
-        @XmlAnyElement
+        @XmlElements({@XmlElement(name="expression-set", type=JaxbExpressionSet.class),
+            @XmlElement(name="fulltext", type=JaxbFullTextExpression.class),
+            @XmlElement(name="property", type=JaxbPropertyExpression.class),
+            @XmlElement(name="property-list", type=JaxbPropertyListExpression.class),
+            @XmlElement(name="property-range", type=JaxbPropertyRangeExpression.class),
+            @XmlElement(name="relative-date", type=JaxbRelativeDateExpression.class)})
         public List<Expression> getExpressions() {
             return expressions;
         }
@@ -480,14 +533,14 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
     }
     
     @XmlRootElement(name = "property")
-    public static class JaxbPropertyExpression implements PropertyExpression {
+    public static class JaxbPropertyExpression extends JaxbExpression implements PropertyExpression {
         private String name;
         private String value;
         private String operator;
-        private boolean exactMatch;
-        private boolean repeated;
-        private boolean caseSensitive;
-        private boolean fuzzy;
+        private Boolean exactMatch;
+        private Boolean repeating;
+        private Boolean caseSensitive;
+        private Boolean fuzzy;
         public JaxbPropertyExpression() {
         }
         public JaxbPropertyExpression(String name, String value, String operator) {
@@ -496,12 +549,12 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
             this.operator = operator;
         }
         public JaxbPropertyExpression(String name, String value, String operator,
-                boolean exactMatch, boolean repeated, boolean caseSensitive, boolean fuzzy) {
+                Boolean exactMatch, Boolean repeating, Boolean caseSensitive, Boolean fuzzy) {
             this.name = name;
             this.value = value;
             this.operator = operator;
             this.exactMatch = exactMatch;
-            this.repeated = repeated;
+            this.repeating = repeating;
             this.caseSensitive = caseSensitive;
             this.fuzzy = fuzzy;
         }
@@ -527,31 +580,31 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
             this.operator = operator;
         }
         @XmlAttribute(name="exact-match")
-        public boolean isExactMatch() {
+        public Boolean getExactMatch() {
             return exactMatch;
         }
-        public void setExactMatch(boolean exactMatch) {
+        public void setExactMatch(Boolean exactMatch) {
             this.exactMatch = exactMatch;
         }
         @XmlAttribute
-        public boolean isRepeated() {
-            return repeated;
+        public Boolean getRepeating() {
+            return repeating;
         }
-        public void setRepeated(boolean repeated) {
-            this.repeated = repeated;
+        public void setRepeating(Boolean repeating) {
+            this.repeating = repeating;
         }
         @XmlAttribute(name="case-sensitive")
-        public boolean isCaseSensitive() {
+        public Boolean getCaseSensitive() {
             return caseSensitive;
         }
-        public void setCaseSensitive(boolean caseSensitive) {
+        public void setCaseSensitive(Boolean caseSensitive) {
             this.caseSensitive = caseSensitive;
         }
         @XmlAttribute
-        public boolean isFuzzy() {
+        public Boolean getFuzzy() {
             return fuzzy;
         }
-        public void setFuzzy(boolean fuzzy) {
+        public void setFuzzy(Boolean fuzzy) {
             this.fuzzy = fuzzy;
         }
         @Override
@@ -561,7 +614,7 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
                     && Equals.equal(value, that.value)
                     && Equals.equal(operator, that.operator)
                     && Equals.equal(exactMatch, that.exactMatch)
-                    && Equals.equal(repeated, that.repeated)
+                    && Equals.equal(repeating, that.repeating)
                     && Equals.equal(caseSensitive, that.caseSensitive)
                     && Equals.equal(fuzzy, that.fuzzy);
         }
@@ -572,8 +625,8 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
     }
     
     @XmlRootElement(name = "fulltext")
-    public static class JaxbFullTextExpression implements FullTextExpression {
-        private boolean fuzzy;
+    public static class JaxbFullTextExpression extends JaxbExpression implements FullTextExpression {
+        private Boolean fuzzy;
         private String value;
         public JaxbFullTextExpression() {
         }
@@ -582,10 +635,10 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
             this.fuzzy = fuzzy;
         }
         @XmlAttribute
-        public boolean isFuzzy() {
+        public Boolean getFuzzy() {
             return fuzzy;
         }
-        public void setFuzzy(boolean fuzzy) {
+        public void setFuzzy(Boolean fuzzy) {
             this.fuzzy = fuzzy;
         }
         @XmlValue
@@ -608,11 +661,12 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
     }
     
     @XmlRootElement(name = "relative-date")
-    public static class JaxbRelativeDateExpression implements RelativeDateExpression {
+    public static class JaxbRelativeDateExpression extends JaxbExpression implements RelativeDateExpression {
         private String name;
         private int value;
         private String timeUnit;
         private String operator;
+        private Boolean repeating;
         public JaxbRelativeDateExpression() {
         }
         public JaxbRelativeDateExpression(String name, int value, String timeUnit, String operator) {
@@ -649,6 +703,13 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
         public void setOperator(String operator) {
             this.operator = operator;
         }
+        @XmlAttribute
+        public Boolean getRepeating() {
+            return repeating;
+        }
+        public void setRepeating(Boolean repeating) {
+            this.repeating = repeating;
+        }
         @Override
         public boolean equals(Object obj) {
             JaxbRelativeDateExpression that = (JaxbRelativeDateExpression) obj;
@@ -664,22 +725,22 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
     }
     
     @XmlRootElement(name = "property-list")
-    public static class JaxbPropertyListExpression implements PropertyListExpression {
+    public static class JaxbPropertyListExpression extends JaxbExpression implements PropertyListExpression {
         private String name;
         private String operator;
         private List<String> values;
-        private boolean repeated;
+        private Boolean repeating;
         public JaxbPropertyListExpression() {
         }
         public JaxbPropertyListExpression(String name, List<String> values) {
             this.name = name;
             this.values = values;
         }
-        public JaxbPropertyListExpression(String name, List<String> values, String operator, boolean repeated) {
+        public JaxbPropertyListExpression(String name, List<String> values, String operator, boolean repeating) {
             this.name = name;
             this.values = values;
             this.operator = operator;
-            this.repeated = repeated;
+            this.repeating = repeating;
         }
         @XmlAttribute
         public String getName() {
@@ -704,11 +765,11 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
             this.values = values;
         }
         @XmlAttribute
-        public boolean isRepeated() {
-            return repeated;
+        public Boolean getRepeating() {
+            return repeating;
         }
-        public void setRepeated(boolean repeated) {
-            this.repeated = repeated;
+        public void setRepeating(Boolean repeating) {
+            this.repeating = repeating;
         }
         @Override
         public boolean equals(Object obj) {
@@ -716,7 +777,7 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
             return Equals.equal(name, that.name)
                     && Equals.equal(operator, that.operator)
                     && Equals.equal(values, that.values)
-                    && Equals.equal(repeated, that.repeated);
+                    && Equals.equal(repeating, that.repeating);
         }
         @Override
         public int hashCode() {
@@ -725,12 +786,12 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
     }
     
     @XmlRootElement(name = "property-range")
-    public static class JaxbPropertyRangeExpression implements PropertyRangeExpression {
+    public static class JaxbPropertyRangeExpression extends JaxbExpression implements PropertyRangeExpression {
         private String name;
         private final String operator = OPERATOR_BETWEEN;
         private String from;
         private String to;
-        private boolean repeated;
+        private Boolean repeating;
         public JaxbPropertyRangeExpression() {
         }
         public JaxbPropertyRangeExpression(String name, String from, String to) {
@@ -764,11 +825,11 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
             this.to = to;
         }
         @XmlAttribute
-        public boolean isRepeated() {
-            return repeated;
+        public Boolean getRepeating() {
+            return repeating;
         }
-        public void setRepeated(boolean repeated) {
-            this.repeated = repeated;
+        public void setRepeating(Boolean repeating) {
+            this.repeating = repeating;
         }
         @Override
         public boolean equals(Object obj) {
@@ -777,7 +838,7 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
                     && Equals.equal(operator, that.operator)
                     && Equals.equal(from, that.from)
                     && Equals.equal(to, that.to)
-                    && Equals.equal(repeated, that.repeated);
+                    && Equals.equal(repeating, that.repeating);
         }
         @Override
         public int hashCode() {

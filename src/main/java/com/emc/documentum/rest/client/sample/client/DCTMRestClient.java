@@ -27,6 +27,7 @@ import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.RestType;
 import com.emc.documentum.rest.client.sample.model.Search;
 import com.emc.documentum.rest.client.sample.model.SearchFeed;
+import com.emc.documentum.rest.client.sample.model.SearchTemplate;
 import com.emc.documentum.rest.client.sample.model.ValueAssistant;
 import com.emc.documentum.rest.client.sample.model.ValueAssistantRequest;
 import com.emc.documentum.rest.client.sample.model.VirtualDocumentNode;
@@ -894,4 +895,26 @@ public interface DCTMRestClient {
      * @return the virtual document nodes feed of the specified object
      */
     public Feed<VirtualDocumentNode> getVirtualDocumentNodes(Linkable linkable, String... params);
+    
+    /**
+     * get search templates of the repository
+     * @param params the query parameters
+     * @return the search template feed
+     */
+    public Feed<SearchTemplate> getSearchTemplates(String... params);
+    
+    /**
+     * get single search template
+     * @param uri the uri of the search template
+     * @param params the query parameters
+     * @return the search template
+     */
+    public SearchTemplate getSearchTemplate(String uri, String... params);
+    
+    /**
+     * create a search template
+     * @param template the search template to be created
+     * @return the created search template
+     */
+    public SearchTemplate createSearchTemmplate(SearchTemplate template);
 }

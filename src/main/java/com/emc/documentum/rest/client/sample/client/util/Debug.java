@@ -6,6 +6,7 @@ package com.emc.documentum.rest.client.sample.client.util;
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.xml.transform.Source;
@@ -104,8 +105,12 @@ public class Debug {
     }
     
     public static void printEntryContentSrc(Feed<?> feed) {
-        for(Entry<?> e : feed.getEntries()) {
-            System.out.println(e.getTitle() + " -> " + e.getContentSrc());
+        if(feed.getEntries() != null) {
+            for(Entry<?> e : feed.getEntries()) {
+                System.out.println(e.getTitle() + " -> " + e.getContentSrc());
+            }
+        } else {
+            System.out.println("no entries");
         }
     }
     
@@ -166,6 +171,16 @@ public class Debug {
         System.out.println(sb);
     }
     
+    public static void printFields(Collection<?> objects, String... fields) {
+        if(objects == null || objects.isEmpty()) {
+            System.out.println("no result");
+        } else {
+            for(Object o : objects) {
+                printFields(o, fields);
+            }
+        }
+    }
+    
     public static void printFields(Object object, String... fields) {
         StringBuilder sb = new StringBuilder();
         if(fields == null || fields.length == 0) {
@@ -176,19 +191,33 @@ public class Debug {
             Arrays.sort(fields);
         }
         for(String p : fields) {
-            if(sb.length() > 0) {
-                sb.append(", ");
-            }
             try {
-                Field f = object.getClass().getDeclaredField(p);
-                f.setAccessible(true);
-                sb.append(p.replaceAll("([A-Z])", " $1").toLowerCase()).append(':').append(f.get(object));
+                Field f = getField(object.getClass(), p);
+                if(f != null) {
+                    if(sb.length() > 0) {
+                        sb.append(", ");
+                    }
+                    sb.append(p.replaceAll("([A-Z])", " $1").toLowerCase()).append(':').append(f.get(object));
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new IllegalArgumentException(p);
             }
         }
         System.out.println(sb);
+    }
+    
+    private static Field getField(Class<?> clazz, String field) {
+        if(clazz == null || field == null) {
+            return null;
+        }
+        try {
+            Field f = clazz.getDeclaredField(field);
+            f.setAccessible(true);
+            return f;
+        } catch(NoSuchFieldException no) {
+            return getField(clazz.getSuperclass(), field);
+        }
     }
     
     public static void print(Batch batch) {

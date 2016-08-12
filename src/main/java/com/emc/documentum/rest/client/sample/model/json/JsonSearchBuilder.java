@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2016. EMC Corporation. All Rights Reserved.
+ */
 package com.emc.documentum.rest.client.sample.model.json;
 
 import java.util.ArrayList;
@@ -14,10 +17,12 @@ import com.emc.documentum.rest.client.sample.model.Search.Location;
 import com.emc.documentum.rest.client.sample.model.Search.Sort;
 import com.emc.documentum.rest.client.sample.model.builder.SearchBuilder;
 import com.emc.documentum.rest.client.sample.model.json.JsonSearch.JsonColumn;
+import com.emc.documentum.rest.client.sample.model.json.JsonSearch.JsonExpression;
 import com.emc.documentum.rest.client.sample.model.json.JsonSearch.JsonExpressionSet;
 import com.emc.documentum.rest.client.sample.model.json.JsonSearch.JsonFacetDefinition;
 import com.emc.documentum.rest.client.sample.model.json.JsonSearch.JsonFullTextExpression;
 import com.emc.documentum.rest.client.sample.model.json.JsonSearch.JsonIdLocation;
+import com.emc.documentum.rest.client.sample.model.json.JsonSearch.JsonLocation;
 import com.emc.documentum.rest.client.sample.model.json.JsonSearch.JsonPathLocation;
 import com.emc.documentum.rest.client.sample.model.json.JsonSearch.JsonPropertyExpression;
 import com.emc.documentum.rest.client.sample.model.json.JsonSearch.JsonPropertyListExpression;
@@ -62,7 +67,7 @@ public class JsonSearchBuilder extends SearchBuilder {
     @Override
     public SearchBuilder sort(Sort sort) {
         if (search.getSorts() == null) {
-            search.setSorts(new ArrayList<Sort>());
+            search.setSorts(new ArrayList<JsonSort>());
         }
         search.getSorts().add(sort);
         return this;
@@ -81,7 +86,7 @@ public class JsonSearchBuilder extends SearchBuilder {
     @Override
     public SearchBuilder location(Location location) {
         if (search.getLocations() == null) {
-            search.setLocations(new ArrayList<Location>());
+            search.setLocations(new ArrayList<JsonLocation>());
         }
         search.getLocations().add(location);
         return this;
@@ -128,15 +133,16 @@ public class JsonSearchBuilder extends SearchBuilder {
     @Override
     public SearchBuilder facetDefinition(FacetDefinition facetDefinition) {
         if (search.getFacetDefinitions() == null) {
-            search.setFacetDefinitions(new ArrayList<FacetDefinition>());
+            search.setFacetDefinitions(new ArrayList<JsonFacetDefinition>());
         }
         search.getFacetDefinitions().add(facetDefinition);
         return this;
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public SearchBuilder expressionSet(List<Expression> expressions) {
-        search.setExpressionSet(new JsonExpressionSet(expressions));
+        search.setExpressionSet(new JsonExpressionSet((List)expressions));
         return this;
     }
 
@@ -170,10 +176,18 @@ public class JsonSearchBuilder extends SearchBuilder {
     public SearchBuilder expression(Expression expression) {
         if(search.getExpressionSet() == null) {
             JsonExpressionSet expressionSet = new JsonExpressionSet();
-            expressionSet.setExpressions(new ArrayList<Expression>());
+            expressionSet.setExpressions(new ArrayList<JsonExpression>());
             search.setExpressionSet(expressionSet);
         }
         search.getExpressionSet().getExpressions().add(expression);
+        return this;
+    }
+    
+    @Override
+    public SearchBuilder asTemplate() {
+        if(search.getExpressionSet() != null && search.getExpressionSet().getExpressions().size() > 0) {
+            ((JsonExpression)search.getExpressionSet().getExpressions().get(search.getExpressionSet().getExpressions().size() - 1)).setTemplate(true);
+        }
         return this;
     }
 }

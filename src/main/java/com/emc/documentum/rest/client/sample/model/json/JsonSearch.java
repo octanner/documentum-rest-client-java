@@ -11,14 +11,17 @@ import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.Search;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 public class JsonSearch extends JsonInlineLinkableBase implements Search {
+    private List<String> repositories;
     private List<String> types;
-    private List<Column> columns;
-    private List<Sort> sorts;
-    private List<Location> locations;
+    private List<JsonColumn> columns;
+    private List<JsonSort> sorts;
+    private List<JsonLocation> locations;
     @JsonProperty("expression-set")
-    private ExpressionSet expressionSet;
+    private JsonExpressionSet expressionSet;
     private List<String> collections;
     @JsonProperty("all-versions")
     private Boolean allVersions;
@@ -27,8 +30,16 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
     @JsonProperty("max-results-for-facets")
     private Integer maxResultsForFacets;
     @JsonProperty("facet-definitions")
-    private List<FacetDefinition> facetDefinitions;
+    private List<JsonFacetDefinition> facetDefinitions;
     
+    public List<String> getRepositories() {
+        return repositories;
+    }
+
+    public void setRepositories(List<String> repositories) {
+        this.repositories = repositories;
+    }
+
     public List<String> getTypes() {
         return types;
     }
@@ -37,27 +48,30 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
         this.types = types;
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public List<Column> getColumns() {
-        return columns;
+        return (List)columns;
     }
 
-    public void setColumns(List<Column> columns) {
+    public void setColumns(List<JsonColumn> columns) {
         this.columns = columns;
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public List<Sort> getSorts() {
-        return sorts;
+        return (List)sorts;
     }
 
-    public void setSorts(List<Sort> sorts) {
+    public void setSorts(List<JsonSort> sorts) {
         this.sorts = sorts;
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<Location> getLocations() {
-        return locations;
+        return (List)locations;
     }
 
-    public void setLocations(List<Location> locations) {
+    public void setLocations(List<JsonLocation> locations) {
         this.locations = locations;
     }
 
@@ -65,7 +79,7 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
         return expressionSet;
     }
 
-    public void setExpressionSet(ExpressionSet expressionSet) {
+    public void setExpressionSet(JsonExpressionSet expressionSet) {
         this.expressionSet = expressionSet;
     }
 
@@ -101,11 +115,12 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
         this.maxResultsForFacets = maxResultsForFacets;
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public List<FacetDefinition> getFacetDefinitions() {
-        return facetDefinitions;
+        return (List)facetDefinitions;
     }
 
-    public void setFacetDefinitions(List<FacetDefinition> facetDefinitions) {
+    public void setFacetDefinitions(List<JsonFacetDefinition> facetDefinitions) {
         this.facetDefinitions = facetDefinitions;
     }
 
@@ -175,7 +190,7 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
         public void setProperty(String property) {
             this.property = property;
         }
-        public Boolean isAscending() {
+        public Boolean getAscending() {
             return ascending;
         }
         public void setAscending(Boolean ascending) {
@@ -187,7 +202,7 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
         public void setLang(String lang) {
             this.lang = lang;
         }
-        public Boolean isAscii() {
+        public Boolean getAscii() {
             return ascii;
         }
         public void setAscii(Boolean ascii) {
@@ -207,23 +222,48 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
         }
     }
     
+    @JsonSubTypes({
+        @JsonSubTypes.Type(value = JsonIdLocation.class, name = "id-location"),
+        @JsonSubTypes.Type(value = JsonPathLocation.class, name = "path-location")
+    })
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "location-type")
+    public static abstract class JsonLocation {
+        private String repository;
+        private Boolean descendent;
+        public JsonLocation() {
+        }
+        public JsonLocation(boolean descendent) {
+            this.descendent = descendent;
+        }
+        public String getRepository() {
+            return repository;
+        }
+        public void setRepository(String repository) {
+            this.repository = repository;
+        }
+        public Boolean getDescendent() {
+            return descendent;
+        }
+        public void setDescendent(Boolean descendent) {
+            this.descendent = descendent;
+        }
+        @Override
+        public boolean equals(Object obj) {
+            JsonLocation that = (JsonLocation) obj;
+            return descendent == that.descendent;
+        }
+    }
+    
     @JsonPropertyOrder({ "locationType" })
-    public static class JsonIdLocation implements IdLocation {
-        private boolean descendent;
+    public static class JsonIdLocation extends JsonLocation implements IdLocation {
         private String id;
         @JsonProperty("location-type")
         private final String locationType = "id-location";
         public JsonIdLocation() {
         }
         public JsonIdLocation(String id, boolean descendent) {
+            super(descendent);
             this.id = id;
-            this.descendent = descendent;
-        }
-        public boolean isDescendent() {
-            return descendent;
-        }
-        public void setDescendent(boolean descendent) {
-            this.descendent = descendent;
         }
         public String getId() {
             return id;
@@ -237,32 +277,25 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
         @Override
         public boolean equals(Object obj) {
             JsonIdLocation that = (JsonIdLocation) obj;
-            return Equals.equal(descendent, that.descendent)
+            return super.equals(obj)
                     && Equals.equal(id, that.id);
         }
         @Override
         public int hashCode() {
-            return Objects.hash(descendent, id);
+            return Objects.hash(id);
         }
     }
     
     @JsonPropertyOrder({ "locationType" })
-    public static class JsonPathLocation implements PathLocation {
-        private boolean descendent;
+    public static class JsonPathLocation extends JsonLocation implements PathLocation {
         private String path;
         @JsonProperty("location-type")
         private final String locationType = "path-location";
         public JsonPathLocation() {
         }
         public JsonPathLocation(String path, boolean descendent) {
+            super(descendent);
             this.path = path;
-            this.descendent = descendent;
-        }
-        public boolean isDescendent() {
-            return descendent;
-        }
-        public void setDescendent(boolean descendent) {
-            this.descendent = descendent;
         }
         public String getPath() {
             return path;
@@ -276,12 +309,12 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
         @Override
         public boolean equals(Object obj) {
             JsonPathLocation that = (JsonPathLocation) obj;
-            return Equals.equal(descendent, that.descendent)
+            return super.equals(that)
                     && Equals.equal(path, that.path);
         }
         @Override
         public int hashCode() {
-            return Objects.hash(descendent, path);
+            return Objects.hash(path);
         }
     }
     
@@ -295,7 +328,7 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
         @JsonProperty("max-values")
         private Integer maxValues;
         @JsonProperty("facet-definition")
-        private FacetDefinition nestedFacetDefinition;
+        private JsonFacetDefinition nestedFacetDefinition;
         public JsonFacetDefinition() {
         }
         public JsonFacetDefinition(String id, List<String> attributes, String groupby, String sort, int maxValues) {
@@ -344,7 +377,7 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
         public FacetDefinition getNestedFacetDefinition() {
             return nestedFacetDefinition;
         }
-        public void setNestedFacetDefinition(FacetDefinition nestedFacetDefinition) {
+        public void setNestedFacetDefinition(JsonFacetDefinition nestedFacetDefinition) {
             this.nestedFacetDefinition = nestedFacetDefinition;
         }
         @Override
@@ -364,17 +397,46 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
         }
     }
     
-    @JsonPropertyOrder({ "name" })
-    public static class JsonExpressionSet implements ExpressionSet{
-        private final String name = "expression-set";
+    @JsonSubTypes({
+        @JsonSubTypes.Type(value = JsonExpressionSet.class, name = "expression-set"),
+        @JsonSubTypes.Type(value = JsonFullTextExpression.class, name = "fulltext"),
+        @JsonSubTypes.Type(value = JsonPropertyExpression.class, name = "property"),
+        @JsonSubTypes.Type(value = JsonPropertyListExpression.class, name = "property-list"),
+        @JsonSubTypes.Type(value = JsonPropertyRangeExpression.class, name = "property-range"),
+        @JsonSubTypes.Type(value = JsonRelativeDateExpression.class, name = "relative-date")
+    })
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "expression-type")
+    public static abstract class JsonExpression implements Expression {
+        @JsonProperty("expression-type")
+        private final String expressionType;
+        @JsonProperty
+        private Boolean template;
+        public JsonExpression(String expressionType) {
+            this.expressionType = expressionType;
+        }
+        public String getExpressionType() {
+            return expressionType;
+        }
+        public Boolean getTemplate() {
+            return template;
+        }
+        public void setTemplate(Boolean template) {
+            this.template = template;
+        }
+    }
+    
+    @JsonPropertyOrder({ "expression-type" })
+    public static class JsonExpressionSet extends JsonExpression implements ExpressionSet{
         private String operator;
-        private List<Expression> expressions;
+        private List<JsonExpression> expressions;
         public JsonExpressionSet() {
+            this(null, null);
         }
-        public JsonExpressionSet(List<Expression> expressions) {
-            this.expressions = expressions;
+        public JsonExpressionSet(List<JsonExpression> expressions) {
+            this(null, expressions);
         }
-        public JsonExpressionSet(String operator, List<Expression> expressions) {
+        public JsonExpressionSet(String operator, List<JsonExpression> expressions) {
+            super("expression-set");
             this.operator = operator;
             this.expressions = expressions;
         }
@@ -384,14 +446,12 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
         public void setOperator(String operator) {
             this.operator = operator;
         }
+        @SuppressWarnings({ "unchecked", "rawtypes" })
         public List<Expression> getExpressions() {
-            return expressions;
+            return (List)expressions;
         }
-        public void setExpressions(List<Expression> expressions) {
+        public void setExpressions(List<JsonExpression> expressions) {
             this.expressions = expressions;
-        }
-        public String getName() {
-            return name;
         }
         @Override
         public boolean equals(Object obj) {
@@ -406,32 +466,32 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
     }
     
     @JsonPropertyOrder({ "expressionType" })
-    public static class JsonPropertyExpression implements PropertyExpression {
+    public static class JsonPropertyExpression extends JsonExpression implements PropertyExpression {
         @JsonProperty("expression-type")
         private final String expressionType = "property";
         private String name;
         private String value;
         private String operator;
         @JsonProperty("exact-match")
-        private boolean exactMatch;
-        private boolean repeated;
+        private Boolean exactMatch;
+        private Boolean repeating;
         @JsonProperty("case-sensitive")
-        private boolean caseSensitive;
-        private boolean fuzzy;
+        private Boolean caseSensitive;
+        private Boolean fuzzy;
         public JsonPropertyExpression() {
+            this(null, null, null, null, null, null, null);
         }
         public JsonPropertyExpression(String name, String value, String operator) {
-            this.name = name;
-            this.value = value;
-            this.operator = operator;
+            this(name, value, operator, null, null, null, null);
         }
         public JsonPropertyExpression(String name, String value, String operator,
-                boolean exactMatch, boolean repeated, boolean caseSensitive, boolean fuzzy) {
+                Boolean exactMatch, Boolean repeating, Boolean caseSensitive, Boolean fuzzy) {
+            super("property");
             this.name = name;
             this.value = value;
             this.operator = operator;
             this.exactMatch = exactMatch;
-            this.repeated = repeated;
+            this.repeating = repeating;
             this.caseSensitive = caseSensitive;
             this.fuzzy = fuzzy;
         }
@@ -453,28 +513,28 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
         public void setOperator(String operator) {
             this.operator = operator;
         }
-        public boolean isExactMatch() {
+        public Boolean getExactMatch() {
             return exactMatch;
         }
-        public void setExactMatch(boolean exactMatch) {
+        public void setExactMatch(Boolean exactMatch) {
             this.exactMatch = exactMatch;
         }
-        public boolean isRepeated() {
-            return repeated;
+        public Boolean getRepeating() {
+            return repeating;
         }
-        public void setRepeated(boolean repeated) {
-            this.repeated = repeated;
+        public void setRepeating(Boolean repeating) {
+            this.repeating = repeating;
         }
-        public boolean isCaseSensitive() {
+        public Boolean getCaseSensitive() {
             return caseSensitive;
         }
-        public void setCaseSensitive(boolean caseSensitive) {
+        public void setCaseSensitive(Boolean caseSensitive) {
             this.caseSensitive = caseSensitive;
         }
-        public boolean isFuzzy() {
+        public Boolean getFuzzy() {
             return fuzzy;
         }
-        public void setFuzzy(boolean fuzzy) {
+        public void setFuzzy(Boolean fuzzy) {
             this.fuzzy = fuzzy;
         }
         public String getExpressionType() {
@@ -487,7 +547,7 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
                     && Equals.equal(value, that.value)
                     && Equals.equal(operator, that.operator)
                     && Equals.equal(exactMatch, that.exactMatch)
-                    && Equals.equal(repeated, that.repeated)
+                    && Equals.equal(repeating, that.repeating)
                     && Equals.equal(caseSensitive, that.caseSensitive)
                     && Equals.equal(fuzzy, that.fuzzy);
         }
@@ -498,21 +558,21 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
     }
     
     @JsonPropertyOrder({ "expressionType" })
-    public static class JsonFullTextExpression implements FullTextExpression {
-        @JsonProperty("expression-type")
-        private final String expressionType = "fulltext";
-        private boolean fuzzy;
+    public static class JsonFullTextExpression extends JsonExpression implements FullTextExpression {
+        private Boolean fuzzy;
         private String value;
         public JsonFullTextExpression() {
+            this(null, null);
         }
-        public JsonFullTextExpression(String value, boolean fuzzy) {
+        public JsonFullTextExpression(String value, Boolean fuzzy) {
+            super("fulltext");
             this.value = value;
             this.fuzzy = fuzzy;
         }
-        public boolean isFuzzy() {
+        public Boolean getFuzzy() {
             return fuzzy;
         }
-        public void setFuzzy(boolean fuzzy) {
+        public void setFuzzy(Boolean fuzzy) {
             this.fuzzy = fuzzy;
         }
         public String getValue() {
@@ -520,9 +580,6 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
         }
         public void setValue(String value) {
             this.value = value;
-        }
-        public String getExpressionType() {
-            return expressionType;
         }
         @Override
         public boolean equals(Object obj) {
@@ -537,17 +594,18 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
     }
     
     @JsonPropertyOrder({ "expressionType" })
-    public static class JsonRelativeDateExpression implements RelativeDateExpression {
-        @JsonProperty("expression-type")
-        private final String expressionType = "relative-date";
+    public static class JsonRelativeDateExpression extends JsonExpression implements RelativeDateExpression {
         private String name;
         private int value;
         @JsonProperty("time-unit")
         private String timeUnit;
         private String operator;
+        private Boolean repeating;
         public JsonRelativeDateExpression() {
+            this(null, 0, null, null);
         }
         public JsonRelativeDateExpression(String name, int value, String timeUnit, String operator) {
+            super("relative-date");
             this.name = name;
             this.value = value;
             this.timeUnit = timeUnit;
@@ -577,8 +635,11 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
         public void setOperator(String operator) {
             this.operator = operator;
         }
-        public String getExpressionType() {
-            return expressionType;
+        public Boolean getRepeating() {
+            return repeating;
+        }
+        public void setRepeating(Boolean repeating) {
+            this.repeating = repeating;
         }
         @Override
         public boolean equals(Object obj) {
@@ -595,24 +656,23 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
     }
     
     @JsonPropertyOrder({ "expressionType" })
-    public static class JsonPropertyListExpression implements PropertyListExpression {
-        @JsonProperty("expression-type")
-        private final String expressionType = "property-list";
+    public static class JsonPropertyListExpression extends JsonExpression implements PropertyListExpression {
         private String name;
         private String operator;
         private List<String> values;
-        private boolean repeated;
+        private Boolean repeating;
         public JsonPropertyListExpression() {
+            this(null, null, null, null);
         }
         public JsonPropertyListExpression(String name, List<String> values) {
-            this.name = name;
-            this.values = values;
+            this(name, values, null, null);
         }
-        public JsonPropertyListExpression(String name, List<String> values, String operator, boolean repeated) {
+        public JsonPropertyListExpression(String name, List<String> values, String operator, Boolean repeating) {
+            super("property-list");
             this.name = name;
             this.values = values;
             this.operator = operator;
-            this.repeated = repeated;
+            this.repeating = repeating;
         }
         public String getName() {
             return name;
@@ -632,14 +692,11 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
         public void setValues(List<String> values) {
             this.values = values;
         }
-        public boolean isRepeated() {
-            return repeated;
+        public Boolean getRepeating() {
+            return repeating;
         }
-        public void setRepeated(boolean repeated) {
-            this.repeated = repeated;
-        }
-        public String getExpressionType() {
-            return expressionType;
+        public void setRepeating(Boolean repeating) {
+            this.repeating = repeating;
         }
         @Override
         public boolean equals(Object obj) {
@@ -647,7 +704,7 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
             return Equals.equal(name, that.name)
                     && Equals.equal(operator, that.operator)
                     && Equals.equal(values, that.values)
-                    && Equals.equal(repeated, that.repeated);
+                    && Equals.equal(repeating, that.repeating);
         }
         @Override
         public int hashCode() {
@@ -656,18 +713,17 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
     }
     
     @JsonPropertyOrder({ "expressionType" })
-    public static class JsonPropertyRangeExpression implements PropertyRangeExpression {
-        @JsonProperty("expression-type")
-        private final String expressionType = "property-range";
+    public static class JsonPropertyRangeExpression extends JsonExpression implements PropertyRangeExpression {
         private String name;
-        private final String operator = OPERATOR_BETWEEN;
         private String from;
         private String to;
-        private boolean repeated;
+        private Boolean repeating;
 
         public JsonPropertyRangeExpression() {
+            this(null, null, null);
         }
         public JsonPropertyRangeExpression(String name, String from, String to) {
+            super("property-range");
             this.name = name;
             this.from = from;
             this.to = to;
@@ -679,7 +735,7 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
             this.name = name;
         }
         public String getOperator() {
-            return operator;
+            return OPERATOR_BETWEEN;
         }
         public String getFrom() {
             return from;
@@ -693,27 +749,23 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
         public void setTo(String to) {
             this.to = to;
         }
-        public boolean isRepeated() {
-            return repeated;
+        public Boolean getRepeating() {
+            return repeating;
         }
-        public void setRepeated(boolean repeated) {
-            this.repeated = repeated;
-        }
-        public String getExpressionType() {
-            return expressionType;
+        public void setRepeating(Boolean repeating) {
+            this.repeating = repeating;
         }
         @Override
         public boolean equals(Object obj) {
             JsonPropertyRangeExpression that = (JsonPropertyRangeExpression) obj;
             return Equals.equal(name, that.name)
-                    && Equals.equal(operator, that.operator)
                     && Equals.equal(from, that.from)
                     && Equals.equal(to, that.to)
-                    && Equals.equal(repeated, that.repeated);
+                    && Equals.equal(repeating, that.repeating);
         }
         @Override
         public int hashCode() {
-            return Objects.hash(name, operator, from, to);
+            return Objects.hash(name, from, to);
         }
     }
 }

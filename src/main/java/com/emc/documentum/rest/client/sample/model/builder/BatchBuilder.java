@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2016. EMC Corporation. All Rights Reserved.
+ */
 package com.emc.documentum.rest.client.sample.model.builder;
 
 import java.io.ByteArrayOutputStream;
@@ -22,13 +25,13 @@ import com.emc.documentum.rest.client.sample.client.impl.AbstractRestTemplateCli
 import com.emc.documentum.rest.client.sample.client.util.SupportedMediaTypes;
 import com.emc.documentum.rest.client.sample.model.batch.Attachment;
 import com.emc.documentum.rest.client.sample.model.batch.Batch;
+import com.emc.documentum.rest.client.sample.model.batch.Batch.OnError;
 import com.emc.documentum.rest.client.sample.model.batch.SettableAttachment;
 import com.emc.documentum.rest.client.sample.model.batch.SettableBatch;
 import com.emc.documentum.rest.client.sample.model.batch.SettableHeader;
 import com.emc.documentum.rest.client.sample.model.batch.SettableInclude;
 import com.emc.documentum.rest.client.sample.model.batch.SettableOperation;
 import com.emc.documentum.rest.client.sample.model.batch.SettableRequest;
-import com.emc.documentum.rest.client.sample.model.batch.Batch.OnError;
 import com.emc.documentum.rest.client.sample.model.json.JsonBatchBuilder;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbBatchBuilder;
 

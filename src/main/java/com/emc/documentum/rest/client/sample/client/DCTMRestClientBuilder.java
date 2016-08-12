@@ -24,7 +24,7 @@ public final class DCTMRestClientBuilder {
     private boolean ignoreAuthenticateServer;
     
     /**
-     * build the DCTMRestClient with the promption
+     * build the DCTMRestClient with the prompt
      * @return the DCTMRestClient
      */
     public static DCTMRestClient buildWithPrompt() {

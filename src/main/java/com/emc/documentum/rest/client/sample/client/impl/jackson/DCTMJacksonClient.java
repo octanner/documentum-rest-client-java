@@ -35,6 +35,7 @@ import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.RestType;
 import com.emc.documentum.rest.client.sample.model.Search;
 import com.emc.documentum.rest.client.sample.model.SearchFeed;
+import com.emc.documentum.rest.client.sample.model.SearchTemplate;
 import com.emc.documentum.rest.client.sample.model.ValueAssistant;
 import com.emc.documentum.rest.client.sample.model.ValueAssistantRequest;
 import com.emc.documentum.rest.client.sample.model.VirtualDocumentNode;
@@ -52,11 +53,11 @@ import com.emc.documentum.rest.client.sample.model.json.JsonPermission;
 import com.emc.documentum.rest.client.sample.model.json.JsonPermissionSet;
 import com.emc.documentum.rest.client.sample.model.json.JsonPreference;
 import com.emc.documentum.rest.client.sample.model.json.JsonRepository;
+import com.emc.documentum.rest.client.sample.model.json.JsonSearchTemplate;
 import com.emc.documentum.rest.client.sample.model.json.JsonType;
 import com.emc.documentum.rest.client.sample.model.json.JsonValueAssistance;
 import com.emc.documentum.rest.client.sample.model.json.JsonValueAssistantRequest;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.ABOUT;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.ACLS;
@@ -94,6 +95,7 @@ import static com.emc.documentum.rest.client.sample.model.LinkRelation.RELATION_
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.REPLIES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.REPOSITORIES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SEARCH;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.SEARCH_TEMPLATES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SELF;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SHARED_PARENT;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.TYPES;
@@ -106,8 +108,6 @@ import static com.emc.documentum.rest.client.sample.model.LinkRelation.VIRTUAL_D
  */
 @NotThreadSafe
 public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCTMRestClient {
-    private final ObjectMapper mapper = new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-
     public DCTMJacksonClient(String contextRoot, String repositoryName,
             String username, String password, boolean useFormatExtension) {
         super(contextRoot, repositoryName, username, password, useFormatExtension);
@@ -630,6 +630,22 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     }
     
     @Override
+    public Feed<SearchTemplate> getSearchTemplates(String... params) {
+        Feed<? extends SearchTemplate> feed = get(getRepository().getHref(SEARCH_TEMPLATES), true, JsonFeeds.SearchTemplateFeed.class, params);
+        return (Feed<SearchTemplate>)feed;
+    }
+
+    @Override
+    public SearchTemplate getSearchTemplate(String uri, String... params) {
+        return get(uri, false, JsonSearchTemplate.class, params);
+    }
+
+    @Override
+    public SearchTemplate createSearchTemmplate(SearchTemplate template) {
+        return post(getRepository().getHref(SEARCH_TEMPLATES), new JsonSearchTemplate(template), JsonSearchTemplate.class);
+    }
+
+    @Override
     public <T extends Linkable> Feed<T> nextPage(Feed<T> feed) {
         return page(feed.getHref(PAGING_NEXT), feed.getClass());
     }
@@ -685,7 +701,7 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     @Override
     public void serialize(Object object, OutputStream os) {
         try {
-            mapper.writeValue(os, object);
+            DCTMJacksonMapper.marshal(os, object);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }

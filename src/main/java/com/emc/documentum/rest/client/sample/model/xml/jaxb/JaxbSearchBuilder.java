@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2016. EMC Corporation. All Rights Reserved.
+ */
 package com.emc.documentum.rest.client.sample.model.xml.jaxb;
 
 import java.util.ArrayList;
@@ -14,6 +17,7 @@ import com.emc.documentum.rest.client.sample.model.Search.Location;
 import com.emc.documentum.rest.client.sample.model.Search.Sort;
 import com.emc.documentum.rest.client.sample.model.builder.SearchBuilder;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSearch.JaxbColumn;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSearch.JaxbExpression;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSearch.JaxbExpressionSet;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSearch.JaxbFacetDefinition;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSearch.JaxbFullTextExpression;
@@ -174,6 +178,14 @@ public class JaxbSearchBuilder extends SearchBuilder {
             search.setExpressionSet(expressionSet);
         }
         search.getExpressionSet().getExpressions().add(expression);
+        return this;
+    }
+
+    @Override
+    public SearchBuilder asTemplate() {
+        if(search.getExpressionSet() != null && search.getExpressionSet().getExpressions().size() > 0) {
+            ((JaxbExpression)search.getExpressionSet().getExpressions().get(search.getExpressionSet().getExpressions().size() - 1)).setTemplate(true);
+        }
         return this;
     }
 }

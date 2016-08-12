@@ -20,6 +20,9 @@ public class JsonFeeds {
     public static class SearchFeed extends JsonSearchFeed<JsonObject>{
     }
     
+    public static class SearchTemplateFeed extends JsonFeed<JsonSearchTemplate>{
+    }
+
     public static class PreferenceFeed extends JsonFeed<JsonPreference>{
     }
     

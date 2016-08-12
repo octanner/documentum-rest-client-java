@@ -3,6 +3,8 @@
  */
 package com.emc.documentum.rest.client.sample.client.impl.jaxb;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 import javax.xml.bind.JAXBContext;
@@ -32,12 +34,36 @@ public final class DCTMJaxbContext {
         try {
             obj = context.createUnmarshaller().unmarshal(node);
         } catch (JAXBException e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException(e);
         }
         return obj;
     }
     
-    public static void marshal(OutputStream os, Object object) throws Exception {
-         context.createMarshaller().marshal(object, os);
+    public static Object unmarshal(String xml) {
+        Object obj = null;
+        try {
+            obj = context.createUnmarshaller().unmarshal(new ByteArrayInputStream(xml.getBytes()));
+        } catch (JAXBException e) {
+            throw new IllegalArgumentException(e);
+        }
+        return obj;
+    }
+    
+    public static void marshal(OutputStream os, Object object) {
+         try {
+            context.createMarshaller().marshal(object, os);
+        } catch (JAXBException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+    
+    public static String marshal(Object object) {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        try {
+            context.createMarshaller().marshal(object, os);
+        } catch (JAXBException e) {
+            throw new IllegalArgumentException(e);
+        }
+        return os.toString();
     }
 }
