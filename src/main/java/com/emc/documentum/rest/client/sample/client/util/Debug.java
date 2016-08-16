@@ -29,8 +29,12 @@ import com.emc.documentum.rest.client.sample.model.Permission;
 import com.emc.documentum.rest.client.sample.model.PermissionSet;
 import com.emc.documentum.rest.client.sample.model.Preference;
 import com.emc.documentum.rest.client.sample.model.RestObject;
+import com.emc.documentum.rest.client.sample.model.SavedSearch;
+import com.emc.documentum.rest.client.sample.model.Search;
+import com.emc.documentum.rest.client.sample.model.Search.Searchable;
 import com.emc.documentum.rest.client.sample.model.SearchEntry;
 import com.emc.documentum.rest.client.sample.model.SearchFeed;
+import com.emc.documentum.rest.client.sample.model.SearchTemplate;
 import com.emc.documentum.rest.client.sample.model.batch.Batch;
 import com.emc.documentum.rest.client.sample.model.batch.Operation;
 
@@ -172,9 +176,7 @@ public class Debug {
     }
     
     public static void printFields(Collection<?> objects, String... fields) {
-        if(objects == null || objects.isEmpty()) {
-            System.out.println("no result");
-        } else {
+        if(objects != null) {
             for(Object o : objects) {
                 printFields(o, fields);
             }
@@ -269,6 +271,28 @@ public class Debug {
         }
         if(permissionSet.getRequiredGroupSet() != null) {
             System.out.println("required group set: " + permissionSet.getRequiredGroupSet());
+        }
+    }
+    
+    public static void print(DCTMRestClient client, SavedSearch savedSearch) {
+        print(savedSearch, "r_object_id", "object_name", "r_object_type", "r_is_public");
+        printSearchable(client, savedSearch);
+    }
+    
+    public static void print(DCTMRestClient client, SearchTemplate searchTemplate) {
+        print(searchTemplate, "r_object_id", "object_name", "r_object_type", "r_is_public");
+        printFields(searchTemplate.getExternalVariables(), "variableType", "id", "expressionType", "dataType", "propertyName", "operator", "variableValue");
+        printSearchable(client, searchTemplate);
+    }
+    
+    public static void printSearchable(DCTMRestClient client, Searchable searchable) {
+        print(client, searchable.getSearch());
+    }
+    
+    public static void print(DCTMRestClient client, Search search) {
+        if(search != null) {
+            System.out.println("The AQL is: ");
+            debugSerialize(client, search);
         }
     }
 

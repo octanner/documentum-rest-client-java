@@ -19,7 +19,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
-import com.emc.documentum.rest.client.sample.model.Link;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
@@ -28,8 +27,6 @@ public abstract class JaxbObject extends JaxbDmLinkableBase implements RestObjec
     protected String definition;
     protected Map<String, Object> properties;
     protected ObjectProperties objectProperties;
-
-    protected List<Link> links;
     protected String href;
     
     public JaxbObject() {

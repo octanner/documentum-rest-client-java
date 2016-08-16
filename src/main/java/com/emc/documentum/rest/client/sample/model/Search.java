@@ -141,4 +141,8 @@ public interface Search extends Linkable {
         public String getTo();
         public Boolean getRepeating();
     }
+    
+    public interface Searchable {
+        public Search getSearch();
+    }
 }

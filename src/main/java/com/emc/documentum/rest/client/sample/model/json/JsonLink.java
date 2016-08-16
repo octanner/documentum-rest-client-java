@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
 import com.emc.documentum.rest.client.sample.model.Link;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class JsonLink implements Link {
@@ -40,6 +41,7 @@ public class JsonLink implements Link {
     }
 
     @Override
+    @JsonIgnore
     public boolean isTemplate() {
         return hreftemplate != null;
     }

@@ -3,7 +3,6 @@
  */
 package com.emc.documentum.rest.client.sample.model.json;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,9 +24,10 @@ public class JsonBatchResponse implements Response {
         this.status = status;
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public List<Header> getHeaders() {
-        return headers==null?null:new ArrayList<Header>(headers);
+        return (List)headers;
     }
 
     public void setHeaders(List<JsonBatchHeader> headers) {

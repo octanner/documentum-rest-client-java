@@ -87,7 +87,7 @@ public enum LinkRelation {
     SEARCH("search", true),
     SAVED_SEARCHES("saved-searches", true),
     SAVED_SEARCH_SAVED_RESULTS("saved-search-results", true),
-    SAVED_SEARCH_EXECUTION("search-execution", true),
+    SEARCH_EXECUTION("search-execution", true),
     SEARCH_TEMPLATES("search-templates", true),
     CABINETS("cabinets", true),
     FORMATS("formats", true),

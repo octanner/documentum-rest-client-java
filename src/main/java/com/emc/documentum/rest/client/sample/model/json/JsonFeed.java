@@ -3,7 +3,6 @@
  */
 package com.emc.documentum.rest.client.sample.model.json;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.emc.documentum.rest.client.sample.model.Entry;
@@ -15,9 +14,10 @@ public class JsonFeed<T extends InlineLinkable> extends JsonFeedBase<T, Entry<T>
     @JsonProperty
     private List<JsonEntry<T>> entries;
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public List<Entry<T>> getEntries() {
-        return entries==null?null:new ArrayList<Entry<T>>(entries);
+        return (List)entries;
     }
 
     public void setEntries(List<JsonEntry<T>> entries) {

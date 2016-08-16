@@ -20,7 +20,7 @@ public class JsonSearchTemplate extends JsonObject implements SearchTemplate {
     @JsonProperty("query-document-template")
     private String queryDocumentTemplate;
     @JsonProperty("external-variables")
-    private List<JsonExternalVariable> externalVariables;
+    private List<JsonExternalVariable<?>> externalVariables;
     @JsonProperty("search-reference")
     private String searchReference;
     
@@ -30,6 +30,11 @@ public class JsonSearchTemplate extends JsonObject implements SearchTemplate {
     public JsonSearchTemplate(SearchTemplate template) {
         super(template);
         setSearch(template.getSearch());
+        setSearchReference(template.getSearchReference());
+    }
+    
+    public JsonSearchTemplate(String searchReference) {
+        this.searchReference = searchReference;
     }
 
     @Override
@@ -57,11 +62,11 @@ public class JsonSearchTemplate extends JsonObject implements SearchTemplate {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    public List<ExternalVariable> getExternalVariables() {
+    public List<ExternalVariable<?>> getExternalVariables() {
         return (List)externalVariables;
     }
 
-    public void setExternalVariables(List<JsonExternalVariable> externalVariables) {
+    public void setExternalVariables(List<JsonExternalVariable<?>> externalVariables) {
         this.externalVariables = externalVariables;
     }
 
@@ -81,7 +86,7 @@ public class JsonSearchTemplate extends JsonObject implements SearchTemplate {
         @JsonSubTypes.Type(value = JsonPropertyListVariable.class, name = "property-list-variable")
     })
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "variable-type")
-    public static abstract class JsonExternalVariable implements ExternalVariable {
+    public static abstract class JsonExternalVariable<T> implements ExternalVariable<T> {
         @JsonProperty
         private String id;
         @JsonProperty("expression-type")
@@ -111,7 +116,7 @@ public class JsonSearchTemplate extends JsonObject implements SearchTemplate {
         }
     }
     
-    public abstract static class JsonPropertyVariable extends JsonExternalVariable implements PropertyVariable {
+    public abstract static class JsonPropertyVariable<T> extends JsonExternalVariable<T> implements PropertyVariable<T> {
         @JsonProperty("property-name")
         private String propertyName;
         @JsonProperty
@@ -133,7 +138,7 @@ public class JsonSearchTemplate extends JsonObject implements SearchTemplate {
     }
     
     @JsonPropertyOrder({ "variableType" })
-    public static class JsonFullTextVariable extends JsonExternalVariable implements FullTextVariable {
+    public static class JsonFullTextVariable extends JsonExternalVariable<String> implements FullTextVariable {
         @JsonProperty("variable-type")
         private final String variableType = "fulltext-variable";
         @JsonProperty("variable-value")
@@ -151,7 +156,7 @@ public class JsonSearchTemplate extends JsonObject implements SearchTemplate {
     }
     
     @JsonPropertyOrder({ "variableType" })
-    public static class JsonPropertyValueVariable extends JsonPropertyVariable implements PropertyValueVariable {
+    public static class JsonPropertyValueVariable extends JsonPropertyVariable<String> implements PropertyValueVariable {
         @JsonProperty("variable-type")
         private final String variableType = "property-variable";
         @JsonProperty("variable-value")
@@ -169,7 +174,7 @@ public class JsonSearchTemplate extends JsonObject implements SearchTemplate {
     }
     
     @JsonPropertyOrder({ "variableType" })
-    public static class JsonRelativeDateVariable extends JsonPropertyVariable implements RelativeDateVariable {
+    public static class JsonRelativeDateVariable extends JsonPropertyVariable<String> implements RelativeDateVariable {
         @JsonProperty("variable-type")
         private final String variableType = "relative-date-variable";
         @JsonProperty("variable-value")
@@ -187,7 +192,7 @@ public class JsonSearchTemplate extends JsonObject implements SearchTemplate {
     }
     
     @JsonPropertyOrder({ "variableType" })
-    public static class JsonPropertyListVariable extends JsonPropertyVariable implements PropertyListVariable {
+    public static class JsonPropertyListVariable extends JsonPropertyVariable<List<String>> implements PropertyListVariable {
         @JsonProperty("variable-type")
         private final String variableType = "property-list-variable";
         @JsonProperty("variable-values")

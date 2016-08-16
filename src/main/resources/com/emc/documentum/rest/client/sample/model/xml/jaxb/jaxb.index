@@ -31,6 +31,7 @@ JaxbPermissionSet
 JaxbPreference
 JaxbQueryResult
 JaxbRepository
+JaxbSavedSearch
 JaxbSearch
 JaxbSearchEntry
 JaxbSearchFeed

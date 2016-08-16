@@ -34,6 +34,7 @@ import com.emc.documentum.rest.client.sample.model.Preference;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.RestType;
+import com.emc.documentum.rest.client.sample.model.SavedSearch;
 import com.emc.documentum.rest.client.sample.model.Search;
 import com.emc.documentum.rest.client.sample.model.SearchFeed;
 import com.emc.documentum.rest.client.sample.model.SearchTemplate;
@@ -66,6 +67,7 @@ import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbProductInfo;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbRelation;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbRelationType;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbRepository;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSavedSearch;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSearchFeed;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSearchTemplate;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSysObject;
@@ -74,6 +76,7 @@ import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbUser;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbValueAssistance;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbValueAssistantRequest;
 
+import static com.emc.documentum.rest.client.sample.client.util.Headers.ACCEPT_ATOM_HEADERS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.ABOUT;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.ACLS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.ASPECT_TYPES;
@@ -109,7 +112,10 @@ import static com.emc.documentum.rest.client.sample.model.LinkRelation.RELATIONS
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.RELATION_TYPES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.REPLIES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.REPOSITORIES;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.SAVED_SEARCHES;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.SAVED_SEARCH_SAVED_RESULTS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SEARCH;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.SEARCH_EXECUTION;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SEARCH_TEMPLATES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SELF;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SHARED_PARENT;
@@ -117,6 +123,7 @@ import static com.emc.documentum.rest.client.sample.model.LinkRelation.TYPES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.USERS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.VERSIONS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.VIRTUAL_DOCUMENT_NODES;
+import static org.springframework.http.HttpMethod.PUT;
 
 /**
  * the DCTMRestClient implementation by JAXB xml support
@@ -644,8 +651,54 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     }
 
     @Override
-    public SearchTemplate createSearchTemmplate(SearchTemplate template) {
+    public SearchTemplate createSearchTemplate(SearchTemplate template) {
         return post(getRepository().getHref(SEARCH_TEMPLATES), new JaxbSearchTemplate(template), JaxbSearchTemplate.class);
+    }
+    
+    @Override
+    public SearchFeed<RestObject> executeSearchTemplate(SearchTemplate toBeExecuted, String... params) {
+        return post(toBeExecuted.getHref(SEARCH_EXECUTION), toBeExecuted, new Headers().accept(MediaType.APPLICATION_ATOM_XML_VALUE).contentType(SupportedMediaTypes.APPLICATION_VND_DCTM_XML_VALUE).toHttpHeaders(), JaxbSearchFeed.class, params);
+    }
+    
+    @Override
+    public SearchFeed<RestObject> executeSavedSearch(SavedSearch toBeExecuted, String... params) {
+        return get(toBeExecuted.getHref(SEARCH_EXECUTION), true, JaxbSearchFeed.class, params);
+    }
+
+    @Override
+    public Feed<SavedSearch> getSavedSearches(String... params) {
+        Feed<SavedSearch> feed = get(getRepository().getHref(SAVED_SEARCHES), true, JaxbFeed.class, params);
+        return (Feed)feed;
+    }
+
+    @Override
+    public SavedSearch getSavedSearch(String uri, String... params) {
+        return get(uri, false, JaxbSavedSearch.class, params);
+    }
+
+    @Override
+    public SavedSearch createSavedSearch(SavedSearch savedSearch) {
+        return post(getRepository().getHref(SAVED_SEARCHES), new JaxbSavedSearch(savedSearch), JaxbSavedSearch.class);
+    }
+    
+    @Override
+    public SavedSearch updateSavedSearch(SavedSearch oldSavedSearch, SavedSearch newSavedSearch) {
+        return post(oldSavedSearch.self(), new JaxbSavedSearch(newSavedSearch), JaxbSavedSearch.class);
+    }
+
+    @Override
+    public SearchFeed<RestObject> enableSavedSearchResult(SavedSearch toBeExecuted, String... params) {
+        return sendRequest(toBeExecuted.getHref(SAVED_SEARCH_SAVED_RESULTS), PUT, ACCEPT_ATOM_HEADERS, null, JaxbSearchFeed.class, params);
+    }
+
+    @Override
+    public void disableSavedSearchResult(SavedSearch toBeExecuted) {
+        delete(toBeExecuted.getHref(SAVED_SEARCH_SAVED_RESULTS));
+    }
+
+    @Override
+    public SearchFeed<RestObject> getSavedSearchResult(SavedSearch toBeExecuted, String... params) {
+        return get(toBeExecuted.getHref(SAVED_SEARCH_SAVED_RESULTS), true, JaxbSearchFeed.class, params);
     }
 
     @Override

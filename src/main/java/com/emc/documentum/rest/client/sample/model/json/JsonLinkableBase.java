@@ -1,6 +1,5 @@
 package com.emc.documentum.rest.client.sample.model.json;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.emc.documentum.rest.client.sample.model.Link;
@@ -11,9 +10,10 @@ public abstract class JsonLinkableBase extends LinkableBase {
     @JsonProperty
     protected List<JsonLink> links;
     
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public List<Link> getLinks() {
-        return links==null?null:new ArrayList<Link>(links);
+        return (List)links;
     }
 
     public void setLinks(List<JsonLink> links) {

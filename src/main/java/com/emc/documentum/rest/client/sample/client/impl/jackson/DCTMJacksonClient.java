@@ -33,6 +33,7 @@ import com.emc.documentum.rest.client.sample.model.Preference;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.RestType;
+import com.emc.documentum.rest.client.sample.model.SavedSearch;
 import com.emc.documentum.rest.client.sample.model.Search;
 import com.emc.documentum.rest.client.sample.model.SearchFeed;
 import com.emc.documentum.rest.client.sample.model.SearchTemplate;
@@ -53,6 +54,7 @@ import com.emc.documentum.rest.client.sample.model.json.JsonPermission;
 import com.emc.documentum.rest.client.sample.model.json.JsonPermissionSet;
 import com.emc.documentum.rest.client.sample.model.json.JsonPreference;
 import com.emc.documentum.rest.client.sample.model.json.JsonRepository;
+import com.emc.documentum.rest.client.sample.model.json.JsonSavedSearch;
 import com.emc.documentum.rest.client.sample.model.json.JsonSearchTemplate;
 import com.emc.documentum.rest.client.sample.model.json.JsonType;
 import com.emc.documentum.rest.client.sample.model.json.JsonValueAssistance;
@@ -94,7 +96,10 @@ import static com.emc.documentum.rest.client.sample.model.LinkRelation.RELATIONS
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.RELATION_TYPES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.REPLIES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.REPOSITORIES;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.SAVED_SEARCHES;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.SAVED_SEARCH_SAVED_RESULTS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SEARCH;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.SEARCH_EXECUTION;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SEARCH_TEMPLATES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SELF;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SHARED_PARENT;
@@ -641,8 +646,58 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     }
 
     @Override
-    public SearchTemplate createSearchTemmplate(SearchTemplate template) {
+    public SearchTemplate createSearchTemplate(SearchTemplate template) {
         return post(getRepository().getHref(SEARCH_TEMPLATES), new JsonSearchTemplate(template), JsonSearchTemplate.class);
+    }
+    
+    @Override
+    public SearchFeed<RestObject> executeSearchTemplate(SearchTemplate toBeExecuted, String... params) {
+        SearchFeed<? extends RestObject> feed = post(toBeExecuted.getHref(SEARCH_EXECUTION), toBeExecuted, JsonFeeds.SearchFeed.class, params);
+        return (SearchFeed<RestObject>)feed;
+    }
+
+    @Override
+    public SearchFeed<RestObject> executeSavedSearch(SavedSearch toBeExecuted, String... params) {
+        SearchFeed<? extends RestObject> feed = get(toBeExecuted.getHref(SEARCH_EXECUTION), JsonFeeds.SearchFeed.class, params);
+        return (SearchFeed<RestObject>)feed;
+    }
+    
+    @Override
+    public Feed<SavedSearch> getSavedSearches(String... params) {
+        Feed<? extends SavedSearch> feed = get(getRepository().getHref(SAVED_SEARCHES), true, JsonFeeds.SavedSearchFeed.class, params);
+        return (Feed<SavedSearch>)feed;
+    }
+
+    @Override
+    public SavedSearch getSavedSearch(String uri, String... params) {
+        return get(uri, false, JsonSavedSearch.class, params);
+    }
+
+    @Override
+    public SavedSearch createSavedSearch(SavedSearch savedSearch) {
+        return post(getRepository().getHref(SAVED_SEARCHES), new JsonSavedSearch(savedSearch), JsonSavedSearch.class);
+    }
+    
+    @Override
+    public SavedSearch updateSavedSearch(SavedSearch oldSavedSearch, SavedSearch newSavedSearch) {
+        return post(oldSavedSearch.self(), new JsonSavedSearch(newSavedSearch), JsonSavedSearch.class);
+    }
+
+    @Override
+    public SearchFeed<RestObject> enableSavedSearchResult(SavedSearch toBeExecuted, String... params) {
+        SearchFeed<? extends RestObject> feed = put(toBeExecuted.getHref(SAVED_SEARCH_SAVED_RESULTS), JsonFeeds.SearchFeed.class, params);
+        return (SearchFeed<RestObject>)feed;
+    }
+
+    @Override
+    public void disableSavedSearchResult(SavedSearch toBeExecuted) {
+        delete(toBeExecuted.getHref(SAVED_SEARCH_SAVED_RESULTS));
+    }
+
+    @Override
+    public SearchFeed<RestObject> getSavedSearchResult(SavedSearch toBeExecuted, String... params) {
+        SearchFeed<? extends RestObject> feed = get(toBeExecuted.getHref(SAVED_SEARCH_SAVED_RESULTS), true, JsonFeeds.SearchFeed.class, params);
+        return (SearchFeed<RestObject>)feed;
     }
 
     @Override

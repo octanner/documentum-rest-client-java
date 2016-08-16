@@ -25,6 +25,7 @@ import com.emc.documentum.rest.client.sample.model.Preference;
 import com.emc.documentum.rest.client.sample.model.Repository;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.RestType;
+import com.emc.documentum.rest.client.sample.model.SavedSearch;
 import com.emc.documentum.rest.client.sample.model.Search;
 import com.emc.documentum.rest.client.sample.model.SearchFeed;
 import com.emc.documentum.rest.client.sample.model.SearchTemplate;
@@ -916,5 +917,75 @@ public interface DCTMRestClient {
      * @param template the search template to be created
      * @return the created search template
      */
-    public SearchTemplate createSearchTemmplate(SearchTemplate template);
+    public SearchTemplate createSearchTemplate(SearchTemplate template);
+
+    /**
+     * execute a search template
+     * @param toBeExecuted the search template to be execute
+     * @param params the query parameters
+     * @return the search result
+     */
+    public SearchFeed<RestObject> executeSearchTemplate(SearchTemplate toBeExecuted, String... params);
+
+    /**
+     * get saved searches of the repository
+     * @param params the query parameters
+     * @return the saved search feed
+     */
+    public Feed<SavedSearch> getSavedSearches(String... params);
+    
+    /**
+     * get single saved search
+     * @param uri the uri of the saved search
+     * @param params the query parameters
+     * @return the saved search
+     */
+    public SavedSearch getSavedSearch(String uri, String... params);
+    
+    /**
+     * create a saved search
+     * @param savedSearch the saved search to be created
+     * @return the created saved search
+     */
+    public SavedSearch createSavedSearch(SavedSearch savedSearch);
+
+    /**
+     * update a saved search
+     * @param oldSavedSearch the saved search to be updated
+     * @param newSavedSearch the new saved search
+     * @return updated saved search
+     */
+    public SavedSearch updateSavedSearch(SavedSearch oldSavedSearch, SavedSearch newSavedSearch);
+    
+    /**
+     * execute a saved search
+     * @param toBeExecuted the saved search to be execute
+     * @param params the query parameters
+     * @return the search result
+     */
+    public SearchFeed<RestObject> executeSavedSearch(SavedSearch toBeExecuted, String... params);
+    
+    /**
+     * enable and refresh the saved search result
+     * @param toBeExecuted the saved search to be enable
+     * @param params the query parameters
+     * @return the search result
+     */
+    public SearchFeed<RestObject> enableSavedSearchResult(SavedSearch toBeExecuted, String... params);
+
+    /**
+     * disable the saved search result
+     * @param toBeExecuted the saved search to be execute
+     * @param params the query parameters
+     * @return the search result
+     */
+    public void disableSavedSearchResult(SavedSearch toBeExecuted);
+
+    /**
+     * get the saved search result
+     * @param toBeExecuted the saved search to be execute
+     * @param params the query parameters
+     * @return the search result
+     */
+    public SearchFeed<RestObject> getSavedSearchResult(SavedSearch toBeExecuted, String... params);
 }

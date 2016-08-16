@@ -8,12 +8,12 @@ import com.emc.documentum.rest.client.sample.client.annotation.RestServiceVersio
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.SearchFeed;
 
-import static com.emc.documentum.rest.client.sample.client.util.Debug.printSearchFeed;
 import static com.emc.documentum.rest.client.sample.client.util.Debug.printNewLine;
+import static com.emc.documentum.rest.client.sample.client.util.Debug.printSearchFeed;
 import static com.emc.documentum.rest.client.sample.client.util.Debug.printStep;
 import static com.emc.documentum.rest.client.sample.client.util.Reader.read;
 
-@RestServiceSample("Simple Search")
+@RestServiceSample("Search (Simple)")
 @RestServiceVersion(7.2)
 public class SimpleSearchSample extends Sample {
     public void search() {

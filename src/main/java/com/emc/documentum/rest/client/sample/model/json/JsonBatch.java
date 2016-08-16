@@ -149,9 +149,10 @@ public class JsonBatch implements SettableBatch {
         this.onError = onError;
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public List<Operation> getOperations() {
-        return new ArrayList<Operation>(operations);
+        return (List)operations;
     }
 
     public void setOperations(List<JsonBatchOperation> operations) {

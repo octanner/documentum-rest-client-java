@@ -28,7 +28,7 @@ import static com.emc.documentum.rest.client.sample.client.impl.jaxb.DCTMJaxbCon
 @XmlSeeAlso({JaxbPropertyListVariable.class, JaxbRelativeDateVariable.class, JaxbPropertyValueVariable.class, JaxbFullTextVariable.class})
 public class JaxbSearchTemplate extends JaxbObject implements SearchTemplate {
     private String queryDocumentTemplate;
-    private List<ExternalVariable> externalVariables = new ArrayList<>();
+    private List<ExternalVariable<?>> externalVariables = new ArrayList<>();
     private String searchReference;
 
     public JaxbSearchTemplate() {
@@ -37,6 +37,11 @@ public class JaxbSearchTemplate extends JaxbObject implements SearchTemplate {
     public JaxbSearchTemplate(SearchTemplate template) {
         super(template);
         setSearch(template.getSearch());
+        setSearchReference(template.getSearchReference());
+    }
+
+    public JaxbSearchTemplate(String searchReference) {
+        this.searchReference = searchReference;
     }
 
     @Override
@@ -70,11 +75,11 @@ public class JaxbSearchTemplate extends JaxbObject implements SearchTemplate {
         @XmlElement(name="property-variable", type=JaxbPropertyValueVariable.class),
         @XmlElement(name="fulltext-variable", type=JaxbFullTextVariable.class)})
     @Override
-    public List<ExternalVariable> getExternalVariables() {
+    public List<ExternalVariable<?>> getExternalVariables() {
         return externalVariables;
     }
 
-    public void setExternalVariables(List<ExternalVariable> externalVariables) {
+    public void setExternalVariables(List<ExternalVariable<?>> externalVariables) {
         this.externalVariables = externalVariables;
     }
     
@@ -88,7 +93,7 @@ public class JaxbSearchTemplate extends JaxbObject implements SearchTemplate {
         this.searchReference = searchReference;
     }
     
-    public static abstract class JaxbExternalVariable implements ExternalVariable {
+    public static abstract class JaxbExternalVariable<T> implements ExternalVariable<T> {
         private String id;
         private String expressionType;
         private String dataType;
@@ -118,7 +123,7 @@ public class JaxbSearchTemplate extends JaxbObject implements SearchTemplate {
         }
     }
     
-    public abstract static class JaxbPropertyVariable extends JaxbExternalVariable implements PropertyVariable {
+    public abstract static class JaxbPropertyVariable<T> extends JaxbExternalVariable<T> implements PropertyVariable<T> {
         private String propertyName;
         private String operator;
         @Override
@@ -140,7 +145,7 @@ public class JaxbSearchTemplate extends JaxbObject implements SearchTemplate {
     }
     
     @XmlRootElement(name = "fulltext-variable")
-    public static class JaxbFullTextVariable extends JaxbExternalVariable implements FullTextVariable {
+    public static class JaxbFullTextVariable extends JaxbExternalVariable<String> implements FullTextVariable {
         private String variableValue;
         @Override
         @XmlElement(name = "variable-value")
@@ -153,7 +158,7 @@ public class JaxbSearchTemplate extends JaxbObject implements SearchTemplate {
     }
     
     @XmlRootElement(name = "property-variable")
-    public static class JaxbPropertyValueVariable extends JaxbPropertyVariable implements PropertyValueVariable {
+    public static class JaxbPropertyValueVariable extends JaxbPropertyVariable<String> implements PropertyValueVariable {
         private String variableValue;
         @Override
         @XmlElement(name = "variable-value")
@@ -166,7 +171,7 @@ public class JaxbSearchTemplate extends JaxbObject implements SearchTemplate {
     }
     
     @XmlRootElement(name = "relative-date-variable")
-    public static class JaxbRelativeDateVariable extends JaxbPropertyVariable implements RelativeDateVariable {
+    public static class JaxbRelativeDateVariable extends JaxbPropertyVariable<String> implements RelativeDateVariable {
         private String variableValue;
         @Override
         @XmlElement(name = "variable-value")
@@ -179,7 +184,7 @@ public class JaxbSearchTemplate extends JaxbObject implements SearchTemplate {
     }
     
     @XmlRootElement(name = "property-list-variable")
-    public static class JaxbPropertyListVariable extends JaxbPropertyVariable implements PropertyListVariable {
+    public static class JaxbPropertyListVariable extends JaxbPropertyVariable<List<String>> implements PropertyListVariable {
         private List<String> variableValue = new ArrayList<>();
         @Override
         @XmlElementWrapper(name = "variable-value")

@@ -3,7 +3,6 @@
  */
 package com.emc.documentum.rest.client.sample.model.json;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -45,9 +44,10 @@ public class JsonRepository extends JsonInlineLinkableBase implements Repository
         this.description = description;
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public List<Server> getServers() {
-        return servers==null?null:new ArrayList<Server>(servers);
+        return (List)servers;
     }
 
     public void setServers(List<JsonServer> servers) {

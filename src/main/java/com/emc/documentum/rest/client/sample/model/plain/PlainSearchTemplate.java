@@ -14,6 +14,12 @@ import com.emc.documentum.rest.client.sample.model.SearchTemplate;
  */
 public class PlainSearchTemplate extends PlainRestObject implements SearchTemplate {
     private Search search;
+    private String searchReference;
+    
+    public PlainSearchTemplate(String searchReference) {
+        this.searchReference = searchReference;
+    }
+    
     public PlainSearchTemplate(Search search, String...properties) {
         super(properties);
         this.search = search;
@@ -30,12 +36,12 @@ public class PlainSearchTemplate extends PlainRestObject implements SearchTempla
     }
     
     @Override
-    public List<ExternalVariable> getExternalVariables() {
+    public List<ExternalVariable<?>> getExternalVariables() {
         throw new UnsupportedOperationException();
     }
     
     @Override
     public String getSearchReference() {
-        throw new UnsupportedOperationException();
+        return searchReference;
     }
 }
