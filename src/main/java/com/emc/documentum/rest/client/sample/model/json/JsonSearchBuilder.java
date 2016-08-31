@@ -10,13 +10,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.emc.documentum.rest.client.sample.model.Search;
-import com.emc.documentum.rest.client.sample.model.Search.Column;
 import com.emc.documentum.rest.client.sample.model.Search.Expression;
 import com.emc.documentum.rest.client.sample.model.Search.FacetDefinition;
 import com.emc.documentum.rest.client.sample.model.Search.Location;
 import com.emc.documentum.rest.client.sample.model.Search.Sort;
 import com.emc.documentum.rest.client.sample.model.builder.SearchBuilder;
-import com.emc.documentum.rest.client.sample.model.json.JsonSearch.JsonColumn;
 import com.emc.documentum.rest.client.sample.model.json.JsonSearch.JsonExpression;
 import com.emc.documentum.rest.client.sample.model.json.JsonSearch.JsonExpressionSet;
 import com.emc.documentum.rest.client.sample.model.json.JsonSearch.JsonFacetDefinition;
@@ -52,10 +50,7 @@ public class JsonSearchBuilder extends SearchBuilder {
     
     @Override
     public SearchBuilder columns(String... columns) {
-        List<Column> list = new ArrayList<>();
-        for (String c : columns) {
-            list.add(new JsonColumn(c));
-        }
+        search.setColumns(new ArrayList<>(Arrays.asList(columns)));
         return this;
     }
     

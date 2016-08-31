@@ -9,7 +9,7 @@ import java.util.Map;
 public interface Search extends Linkable {
     public List<String> getRepositories();
     public List<String> getTypes();
-    public List<Column> getColumns();
+    public List<String> getColumns();
     public List<Sort> getSorts();
     public List<Location> getLocations();
     public ExpressionSet getExpressionSet();
@@ -19,10 +19,6 @@ public interface Search extends Linkable {
     public Integer getMaxResultsForFacets();
     public List<FacetDefinition> getFacetDefinitions();
 
-    public interface Column {
-        public String getName();
-    }
-    
     public interface Sort {
         public String getProperty();
         public Boolean getAscending();

@@ -36,7 +36,7 @@ import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSearch.JaxbRelat
 public class JaxbSearch extends JaxbDmLinkableBase implements Search {
     private List<String> repositories;
     private List<String> types;
-    private List<Column> columns;
+    private List<String> columns;
     private List<Sort> sorts;
     private List<Location> locations;
     private ExpressionSet expressionSet;
@@ -67,12 +67,12 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
     }
 
     @XmlElementWrapper
-    @XmlElement(name = "column", type=JaxbColumn.class)
-    public List<Column> getColumns() {
+    @XmlElement(name = "column")
+    public List<String> getColumns() {
         return columns;
     }
 
-    public void setColumns(List<Column> columns) {
+    public void setColumns(List<String> columns) {
         this.columns = columns;
     }
     
@@ -171,32 +171,6 @@ public class JaxbSearch extends JaxbDmLinkableBase implements Search {
     @Override
     public int hashCode() {
         return Objects.hash(types, expressionSet, locations, sorts, columns, facetDefinitions);
-    }
-
-    @XmlRootElement(name = "column")
-    public static class JaxbColumn implements Column {
-        private String name;
-        public JaxbColumn() {
-        }
-        public JaxbColumn(String name) {
-            this.name = name;
-        }
-        @XmlValue
-        public String getName() {
-            return name;
-        }
-        public void setName(String name) {
-            this.name = name;
-        }
-        @Override
-        public boolean equals(Object obj) {
-            JaxbColumn that = (JaxbColumn) obj;
-            return Equals.equal(name, that.name);
-        }
-        @Override
-        public int hashCode() {
-            return Objects.hash(name);
-        }
     }
 
     @XmlRootElement(name = "sort")

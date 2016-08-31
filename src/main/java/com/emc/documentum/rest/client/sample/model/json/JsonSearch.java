@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public class JsonSearch extends JsonInlineLinkableBase implements Search {
     private List<String> repositories;
     private List<String> types;
-    private List<JsonColumn> columns;
+    private List<String> columns;
     private List<JsonSort> sorts;
     private List<JsonLocation> locations;
     @JsonProperty("expression-set")
@@ -48,12 +48,11 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
         this.types = types;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List<Column> getColumns() {
-        return (List)columns;
+    public List<String> getColumns() {
+        return columns;
     }
 
-    public void setColumns(List<JsonColumn> columns) {
+    public void setColumns(List<String> columns) {
         this.columns = columns;
     }
 
@@ -142,30 +141,6 @@ public class JsonSearch extends JsonInlineLinkableBase implements Search {
     @Override
     public int hashCode() {
         return Objects.hash(types, expressionSet, locations, sorts, columns, facetDefinitions);
-    }
-
-    public static class JsonColumn implements Column {
-        private String name;
-        public JsonColumn() {
-        }
-        public JsonColumn(String name) {
-            this.name = name;
-        }
-        public String getName() {
-            return name;
-        }
-        public void setName(String name) {
-            this.name = name;
-        }
-        @Override
-        public boolean equals(Object obj) {
-            JsonColumn that = (JsonColumn) obj;
-            return Equals.equal(name, that.name);
-        }
-        @Override
-        public int hashCode() {
-            return Objects.hash(name);
-        }
     }
 
     public static class JsonSort implements Sort {
