@@ -23,6 +23,7 @@ import com.emc.documentum.rest.client.sample.client.util.UriHelper;
 import com.emc.documentum.rest.client.sample.model.Comment;
 import com.emc.documentum.rest.client.sample.model.Entry;
 import com.emc.documentum.rest.client.sample.model.Feed;
+import com.emc.documentum.rest.client.sample.model.FeedBase;
 import com.emc.documentum.rest.client.sample.model.FolderLink;
 import com.emc.documentum.rest.client.sample.model.HomeDocument;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
@@ -216,8 +217,8 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     }
     
     @Override
-    public RestObject get(RestObject object, String... params) {
-        return get(object.getHref(SELF), false, object.getClass(), params);
+    public <T extends Linkable> T get(T t, String... params) {
+        return (T)get(t.self(), t instanceof FeedBase, t.getClass(), params);
     }
     
     @Override

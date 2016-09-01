@@ -153,11 +153,12 @@ public interface DCTMRestClient {
     public Feed<RestObject> getObjects(Linkable parent, String... params);
     
     /**
-     * @param object the old object
+     * @param t the old resource representation
      * @param params the query parameters
-     * @return get the object by its self link
+     * @param <T> the linkable representation
+     * @return get the resource by its self link
      */
-    public RestObject get(RestObject object, String... params);
+    public <T extends Linkable> T get(T t, String... params);
     
     /**
      * @param uri the uri of the resource
