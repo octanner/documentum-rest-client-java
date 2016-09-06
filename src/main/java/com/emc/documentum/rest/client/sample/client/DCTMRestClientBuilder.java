@@ -3,10 +3,16 @@
  */
 package com.emc.documentum.rest.client.sample.client;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.emc.documentum.rest.client.sample.client.impl.AbstractRestTemplateClient;
 import com.emc.documentum.rest.client.sample.client.impl.jackson.DCTMJacksonClient;
 import com.emc.documentum.rest.client.sample.client.impl.jaxb.DCTMJaxbClient;
 import com.emc.documentum.rest.client.sample.client.util.Debug;
+import com.emc.documentum.rest.client.sample.model.Entry;
+import com.emc.documentum.rest.client.sample.model.Feed;
+import com.emc.documentum.rest.client.sample.model.Repository;
 
 import static com.emc.documentum.rest.client.sample.client.util.Reader.read;
 
@@ -37,7 +43,8 @@ public final class DCTMRestClientBuilder {
         DCTMRestClientBinding binding = DCTMRestClientBinding.valueOf(bindingStr.toUpperCase());
         String contextRoot = read("Please input the REST context path:", "http://localhost:8080/dctm-rest");
         boolean ignoreAuthenticateServer = ignoreAuthenticateServer(contextRoot);
-        String repository = read("Please input the repository name:");
+        List<String> repositories = getRepositories(binding, contextRoot);
+        String repository = read("Please input the repository name: " + repositories, repositories.get(0));
         String username = read("Please input the username:");
         String password = read("Please input the password:");
         String useFormatExtension = read("Please input the whether add format extension .xml or .json for URI:", "false");
@@ -60,6 +67,16 @@ public final class DCTMRestClientBuilder {
             }
         }
         return client;
+    }
+    
+    private static List<String> getRepositories(DCTMRestClientBinding binding, String contextRoot) {
+        DCTMRestClient client = new DCTMRestClientBuilder().bind(binding).contextRoot(contextRoot).build();
+        Feed<Repository> repositories = client.getRepositories();
+        List<String> list = new ArrayList<>();
+        for(Entry<Repository> r : repositories.getEntries()) {
+            list.add(r.getTitle());
+        }
+        return list;
     }
     
     private static boolean ignoreAuthenticateServer(String contextRoot) {
