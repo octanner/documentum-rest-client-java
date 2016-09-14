@@ -17,6 +17,10 @@ public class JaxbUser extends JaxbObject {
         super(object);
     }
 
+    public JaxbUser(String href) {
+        super(href);
+    }
+
     @Override
     public String getName() {
         return "user";

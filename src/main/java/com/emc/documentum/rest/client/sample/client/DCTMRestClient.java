@@ -400,6 +400,14 @@ public interface DCTMRestClient {
     public Feed<RestObject> getGroups(String... params);
     
     /**
+     * get groups of a parent
+     * @param parent the parent resource
+     * @param params the query parameters
+     * @return the groups collection
+     */
+    public Feed<RestObject> getGroups(Linkable parent, String... params);
+    
+    /**
      * get single user
      * @param userUri the uri of the user
      * @param params the query parameters
@@ -435,6 +443,13 @@ public interface DCTMRestClient {
      * @param user the user to be added
      */
     public void addUserToGroup(RestObject group, RestObject user);
+    
+    /**
+     * add the group to a parent group
+     * @param group the parent group to be added into
+     * @param subGroup the sub group to be added into parent group
+     */
+    public void addGroupToGroup(RestObject group, RestObject subGroup);
     
     /**
      * @param feed the current page

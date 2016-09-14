@@ -434,7 +434,12 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
 
     @Override
     public Feed<RestObject> getGroups(String... params) {
-        return get(getRepository().getHref(GROUPS), true, JaxbFeed.class, params);
+        return getGroups(getRepository(), params);
+    }
+    
+    @Override
+    public Feed<RestObject> getGroups(Linkable parent, String... params) {
+        return get(parent.getHref(GROUPS), true, JaxbFeed.class, params);
     }
 
     @Override
@@ -469,9 +474,12 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     
     @Override
     public void addUserToGroup(RestObject group, RestObject user) {
-        JaxbUser groupUser = new JaxbUser();
-        groupUser.setHref(user.getHref(SELF));
-        post(group.getHref(USERS), groupUser, null);
+        post(group.getHref(USERS), new JaxbUser(user.getHref(SELF)), null);
+    }
+    
+    @Override
+    public void addGroupToGroup(RestObject group, RestObject subGroup) {
+        post(group.getHref(GROUPS), new JaxbGroup(subGroup.getHref(SELF)), null);
     }
 
     @Override

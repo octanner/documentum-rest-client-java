@@ -93,8 +93,42 @@ public class UserGroupSample extends Sample {
         printHttpStatus();
         printNewLine();
         
+        printStep("get the group " + newGroup + " member groups");
+        Feed<RestObject> groupGroups = client.getGroups(updatedGroup);
+        if(groupGroups.getEntries() == null) {
+            System.out.println("there are 0 groups in the group " + newGroup);
+        }
+        printNewLine();
+
+        String newSubGroup = "sub_group_" + Randoms.nextString(10);
+        printStep("create the new group " + newSubGroup);
+        RestObject createdSubGroup = client.createGroup(new PlainRestObject("group_name", newSubGroup));
+        print(createdSubGroup, "group_name", "owner_name", "group_display_name");
+        printNewLine();
+        
+        printStep("add the group " + newSubGroup + " to the group " + newGroup);
+        client.addGroupToGroup(updatedGroup, createdSubGroup);
+        printHttpStatus();
+        printNewLine();
+        
+        printStep("get the group " + newGroup + " member groups");
+        groupGroups = client.getGroups(updatedGroup);
+        System.out.println("there are " + groupGroups.getEntries().size() + " groups in the group " + newGroup);
+        printEntryContentSrc(groupGroups);
+        printNewLine();
+        
+        printStep("remove the group " + newSubGroup + " from the group " + newGroup);
+        client.delete(groupGroups.getEntries().get(0));
+        printHttpStatus();
+        printNewLine();
+        
         printStep("delete user " + newUser);
         client.delete(updatedUser);
+        printHttpStatus();        
+        printNewLine();
+        
+        printStep("delete group " + newSubGroup);
+        client.delete(createdSubGroup);
         printHttpStatus();        
         printNewLine();
         

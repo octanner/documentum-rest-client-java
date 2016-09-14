@@ -20,6 +20,10 @@ public class JsonObject extends JsonInlineLinkableBase implements RestObject {
     public JsonObject() {
     }
     
+    public JsonObject(String href) {
+        this.href = href;
+    }
+    
     public JsonObject(RestObject object) {
         this.name = object.getName();
         this.type = object.getType();

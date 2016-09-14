@@ -17,6 +17,10 @@ public class JaxbGroup extends JaxbObject {
         super(object);
     }
 
+    public JaxbGroup(String href) {
+        super(href);
+    }
+
     @Override
     public String getName() {
         return "group";

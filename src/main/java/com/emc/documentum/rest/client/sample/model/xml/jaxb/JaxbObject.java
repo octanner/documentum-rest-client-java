@@ -32,6 +32,10 @@ public abstract class JaxbObject extends JaxbDmLinkableBase implements RestObjec
     public JaxbObject() {
     }
 
+    public JaxbObject(String href) {
+        this.href = href;
+    }
+    
     public JaxbObject(RestObject object) {
         setType(object.getType());
         setDefinition(object.getDefinition());

@@ -428,7 +428,12 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
 
     @Override
     public Feed<RestObject> getGroups(String... params) {
-        Feed<? extends RestObject> feed = get(getRepository().getHref(GROUPS), true, JsonFeeds.ObjectFeed.class, params);
+        return getGroups(getRepository(), params);
+    }
+    
+    @Override
+    public Feed<RestObject> getGroups(Linkable parent, String... params) {
+        Feed<? extends RestObject> feed = get(parent.getHref(GROUPS), true, JsonFeeds.ObjectFeed.class, params);
         return (Feed<RestObject>)feed;
     }
     
@@ -464,9 +469,12 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
 
     @Override
     public void addUserToGroup(RestObject group, RestObject user) {
-        JsonObject groupUser = new JsonObject();
-        groupUser.setHref(user.getHref(SELF));
-        post(group.getHref(USERS), groupUser, null);
+        post(group.getHref(USERS), new JsonObject(user.getHref(SELF)), null);
+    }
+    
+    @Override
+    public void addGroupToGroup(RestObject group, RestObject subGroup) {
+        post(group.getHref(GROUPS), new JsonObject(subGroup.getHref(SELF)), null);
     }
      
     @Override
