@@ -1004,4 +1004,13 @@ public interface DCTMRestClient {
      * @return the search result
      */
     public SearchFeed<RestObject> getSavedSearchResult(SavedSearch toBeExecuted, String... params);
+    
+    /**
+     * send put method to the server
+     * @param uri the request uri
+     * @param responseBodyClass the response
+     * @param params the query parameters
+     * @return the put result
+     */
+    public <T> T put(String uri, Class<? extends T> responseBodyClass, String... params);
 }
