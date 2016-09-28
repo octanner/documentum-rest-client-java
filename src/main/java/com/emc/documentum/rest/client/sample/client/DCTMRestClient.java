@@ -855,7 +855,7 @@ public interface DCTMRestClient {
     
     /**
      * get the permission
-     * @param obj the object
+     * @param linkable the object
      * @param params the query parameters
      * @return the permission object
      */
@@ -992,8 +992,6 @@ public interface DCTMRestClient {
     /**
      * disable the saved search result
      * @param toBeExecuted the saved search to be execute
-     * @param params the query parameters
-     * @return the search result
      */
     public void disableSavedSearchResult(SavedSearch toBeExecuted);
 
