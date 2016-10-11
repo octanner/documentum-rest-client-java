@@ -143,6 +143,11 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
         return this;
     }
     
+    @Override
+    public String getCurrentRepositoryName() {
+        return repositoryName;
+    }
+
     protected void initRestTemplate(RestTemplate restTemplate) {
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
         restTemplate.getMessageConverters().add(new MultipartBatchHttpMessageConverter());

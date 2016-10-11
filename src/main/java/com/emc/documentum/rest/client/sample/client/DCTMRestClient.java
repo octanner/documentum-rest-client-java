@@ -75,10 +75,10 @@ public interface DCTMRestClient {
     @NotBatchable
     public RestObject getProductInfo();
     
-    @NotBatchable
     /**
      * @return the major version of the rest services
      */
+    @NotBatchable
     public double getMajorVersion();
     
     /**
@@ -92,6 +92,12 @@ public interface DCTMRestClient {
      */
     @NotBatchable
     public Repository getRepository();
+    
+    /**
+     * @return the current selected repository name
+     */
+    @NotBatchable
+    public String getCurrentRepositoryName();
     
     /**
      * execute a readonly dql
