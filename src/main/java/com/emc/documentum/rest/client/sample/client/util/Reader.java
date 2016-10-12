@@ -51,4 +51,26 @@ public class Reader {
     public static void readEnterToContinue() {
         read("press \"Enter\" to continue", "");
     }
+    
+    public static int read(String prompt, int defaultValue) {
+        while(true) {
+            String value = read(prompt, String.valueOf(defaultValue));
+            try {
+                return Integer.parseInt(value);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static boolean read(String prompt, boolean defaultValue) {
+        while(true) {
+            String value = read(prompt, String.valueOf(defaultValue));
+            try {
+                return Boolean.parseBoolean(value);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

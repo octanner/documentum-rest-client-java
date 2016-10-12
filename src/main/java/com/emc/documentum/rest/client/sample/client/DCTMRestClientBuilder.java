@@ -69,6 +69,31 @@ public final class DCTMRestClientBuilder {
         return client;
     }
     
+    public static DCTMRestClient buildSilently(DCTMRestClientBinding binding, String contextRoot, String repository, String username, String password) {
+        return buildSilently(binding, contextRoot, repository, username, password, false, false, false);
+    }
+
+    public static DCTMRestClient buildSilently(DCTMRestClientBinding binding, String contextRoot, String repository, String username, String password,
+            boolean useFormatExtension, boolean debug, boolean enableCSRFClientToken) {
+        boolean ignoreAuthenticateServer = ignoreAuthenticateServer(contextRoot);
+        AbstractRestTemplateClient client = (AbstractRestTemplateClient)new DCTMRestClientBuilder().
+                   bind(binding).
+                   contextRoot(contextRoot).
+                   ignoreAuthenticateServer(ignoreAuthenticateServer).
+                   credentials(username, password).
+                   repository(repository).
+                   useFormatExtension(useFormatExtension).
+                   debug(debug).build();
+        client.getHomeDocument();
+        if(client.getMajorVersion() >= 7.2) {
+            client.enableCSRFClientToken(enableCSRFClientToken);
+            if(debug) {
+                Debug.debug("Enable CSRF Client Token=" + enableCSRFClientToken);
+            }
+        }
+        return client;
+    }
+    
     private static List<String> getRepositories(DCTMRestClientBinding binding, String contextRoot) {
         DCTMRestClient client = new DCTMRestClientBuilder().bind(binding).contextRoot(contextRoot).build();
         Feed<Repository> repositories = client.getRepositories();
