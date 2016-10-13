@@ -37,7 +37,9 @@ import com.emc.documentum.rest.client.sample.client.util.Debug;
 import com.emc.documentum.rest.client.sample.client.util.Headers;
 import com.emc.documentum.rest.client.sample.client.util.SupportedMediaTypes;
 import com.emc.documentum.rest.client.sample.client.util.UriHelper;
+import com.emc.documentum.rest.client.sample.model.Entry;
 import com.emc.documentum.rest.client.sample.model.Feed;
+import com.emc.documentum.rest.client.sample.model.FeedBase;
 import com.emc.documentum.rest.client.sample.model.HomeDocument;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
 import com.emc.documentum.rest.client.sample.model.Linkable;
@@ -59,6 +61,10 @@ import static com.emc.documentum.rest.client.sample.client.util.Headers.JSON_CON
 import static com.emc.documentum.rest.client.sample.client.util.Headers.XML_CONTENT;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.BATCHES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.EDIT;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.PAGING_FIRST;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.PAGING_LAST;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.PAGING_NEXT;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.PAGING_PREV;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SELF;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
@@ -604,5 +610,78 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
         public <T> ResponseEntity<T> process(String url, HttpMethod method, HttpEntity<?> requestEntity, Class<T> responseType) {
             return restTemplate.exchange(url, method, requestEntity, responseType);
         }
+    }
+    
+    protected Feed feed(Linkable parent, LinkRelation rel, Class<? extends Feed> clazz, String... params) {
+        return get(parent.getHref(rel), true, clazz, params);
+    }
+
+    protected Feed feed(LinkRelation rel, Class<? extends Feed> clazz, String... params) {
+        return feed(getRepository(), rel, clazz, params);
+    }
+
+    protected Repository getRepository(Class<? extends Repository> clazz) {
+        if(repository == null) {
+            boolean resetEnableStreaming = enableStreaming;
+            Feed<Repository> repositories = getRepositories();
+            for(Entry<Repository> e : repositories.getEntries()) {
+                if(repositoryName.equals(e.getTitle())) {
+                    repository = get(e.getContentSrc(), false, clazz);
+                }
+            }
+            if(resetEnableStreaming) {
+                enableStreaming = resetEnableStreaming;
+            }
+        }
+        return repository;
+    }
+    
+    protected RestObject getCabinet(String cabinet, Class<? extends RestObject> clazz, String... params) {
+        RestObject obj = null; 
+        Feed<RestObject> feed = getCabinets("filter", "starts-with(object_name,'" + cabinet + "')");
+        List<Entry<RestObject>> entries = feed.getEntries();
+        if(entries != null) {
+            for(Entry<RestObject> e : (List<Entry<RestObject>>)entries) {
+                if(cabinet.equals(e.getTitle())) {
+                    obj = get(e.getContentSrc(), false, clazz);
+                    break;
+                }
+            }
+        }
+        return obj;
+    }
+    
+    @Override
+    public <T extends Linkable> T get(T t, String... params) {
+        return (T)get(t.self(), t instanceof FeedBase, t.getClass(), params);
+    }
+    
+    @Override
+    public <T extends Linkable> Feed<T> nextPage(Feed<T> feed) {
+        return page(feed.getHref(PAGING_NEXT), feed.getClass());
+    }
+    
+    @Override
+    public <T extends Linkable> Feed<T> previousPage(Feed<T> feed) {
+        return page(feed.getHref(PAGING_PREV), feed.getClass());
+    }
+
+    @Override
+    public <T extends Linkable> Feed<T> firstPage(Feed<T> feed) {
+        return page(feed.getHref(PAGING_FIRST), feed.getClass());
+    }
+
+    @Override
+    public <T extends Linkable> Feed<T> lastPage(Feed<T> feed) {
+        return page(feed.getHref(PAGING_LAST), feed.getClass());
+    }
+    
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private <T extends Linkable> Feed<T> page(String uri, Class<? extends Feed> clazz) {
+        Feed<T> feed = null;
+        if(uri != null) {
+            feed = get(uri, true, clazz);
+        }
+        return feed;
     }
 }

@@ -21,9 +21,7 @@ import com.emc.documentum.rest.client.sample.client.util.Headers;
 import com.emc.documentum.rest.client.sample.client.util.SupportedMediaTypes;
 import com.emc.documentum.rest.client.sample.client.util.UriHelper;
 import com.emc.documentum.rest.client.sample.model.Comment;
-import com.emc.documentum.rest.client.sample.model.Entry;
 import com.emc.documentum.rest.client.sample.model.Feed;
-import com.emc.documentum.rest.client.sample.model.FeedBase;
 import com.emc.documentum.rest.client.sample.model.FolderLink;
 import com.emc.documentum.rest.client.sample.model.HomeDocument;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
@@ -104,10 +102,6 @@ import static com.emc.documentum.rest.client.sample.model.LinkRelation.MATERIALI
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.NETWORK_LOCATIONS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.OBJECTS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.OBJECT_ASPECTS;
-import static com.emc.documentum.rest.client.sample.model.LinkRelation.PAGING_FIRST;
-import static com.emc.documentum.rest.client.sample.model.LinkRelation.PAGING_LAST;
-import static com.emc.documentum.rest.client.sample.model.LinkRelation.PAGING_NEXT;
-import static com.emc.documentum.rest.client.sample.model.LinkRelation.PAGING_PREV;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.PRIMARY_CONTENT;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.RELATIONS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.RELATION_TYPES;
@@ -155,32 +149,19 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     @Override
     public Feed<Repository> getRepositories() {
         if(repositories == null) {
-            String repositoriesUri = getHomeDocument().getHref(REPOSITORIES);
-            repositories = get(repositoriesUri, true, JaxbFeed.class);
+            repositories = feed(getHomeDocument(), REPOSITORIES);
         }
         return repositories;
     }
     
     @Override
     public Repository getRepository() {
-        if(repository == null) {
-            boolean resetEnableStreaming = enableStreaming;
-            Feed<Repository> repositories = getRepositories();
-            for(Entry<Repository> e : repositories.getEntries()) {
-                if(repositoryName.equals(e.getTitle())) {
-                    repository = get(e.getContentSrc(), false, JaxbRepository.class);
-                }
-            }
-            if(resetEnableStreaming) {
-                enableStreaming = resetEnableStreaming;
-            }
-        }
-        return repository;
+        return getRepository(JaxbRepository.class);
     }
     
     @Override
     public Feed<RestObject> dql(String dql, String... params) {
-        return get(getRepository().getHref(SELF), true, JaxbFeed.class, UriHelper.append(params, "dql", dql));
+        return feed(SELF, UriHelper.append(params, "dql", dql));
     }
     
     @Override
@@ -195,45 +176,27 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
 
     @Override
     public Feed<RestObject> getCabinets(String... params) {
-        Repository repository = getRepository();
-        String cabinetsUri = repository.getHref(CABINETS);
-        return get(cabinetsUri, true, JaxbFeed.class, params);
+        return feed(CABINETS, params);
     }
     
     @Override
     public RestObject getCabinet(String cabinet, String... params) {
-        RestObject obj = null; 
-        Feed feed = getCabinets("filter", "starts-with(object_name,'" + cabinet + "')");
-        List<Entry> entries = feed.getEntries();
-        if(entries != null) {
-            for(Entry e : entries) {
-                if(cabinet.equals(e.getTitle())) {
-                    obj = get(e.getContentSrc(), false, JaxbCabinet.class);
-                    break;
-                }
-            }
-        }
-        return obj;
-    }
-    
-    @Override
-    public <T extends Linkable> T get(T t, String... params) {
-        return (T)get(t.self(), t instanceof FeedBase, t.getClass(), params);
+        return getCabinet(cabinet, JaxbCabinet.class, params);
     }
     
     @Override
     public Feed<RestObject> getFolders(Linkable parent, String... params) {
-        return get(parent.getHref(FOLDERS), true, JaxbFeed.class, params);
+        return feed(parent, FOLDERS, params);
     }
     
     @Override
     public Feed<RestObject> getObjects(Linkable parent, String... params) {
-        return get(parent.getHref(OBJECTS), true, JaxbFeed.class, params);
+        return feed(parent, OBJECTS, params);
     }
     
     @Override
     public Feed<RestObject> getDocuments(Linkable parent, String... params) {
-        return get(parent.getHref(DOCUMENTS), true, JaxbFeed.class, params);
+        return feed(parent, DOCUMENTS, params);
     }
     
     @Override
@@ -298,7 +261,7 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     
     @Override
     public Feed<RestObject> getContents(RestObject object, String... params) {
-        return get(object.getHref(CONTENTS), true, JaxbFeed.class, params);
+        return feed(object, CONTENTS, params);
     }
     
     @Override
@@ -360,7 +323,7 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     
     @Override
     public Feed<RestObject> getVersions(RestObject object, String... params) {
-        return get(object.getHref(VERSIONS), true, JaxbFeed.class, params);
+        return feed(object, VERSIONS, params);
     }
     
     @Override
@@ -390,16 +353,12 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     
     @Override
     public Feed<RestType> getTypes(String... params) {
-        Repository repository = getRepository();
-        String typesUri = repository.getHref(TYPES);
-        return get(typesUri, true, JaxbFeed.class, params);
+        return feed(TYPES, params);
     }
     
     @Override
     public Feed<RestObject> getAspectTypes(String... params) {
-        Repository repository = getRepository();
-        String aspectTypesUri = repository.getHref(ASPECT_TYPES);
-        return get(aspectTypesUri, true, JaxbFeed.class, params);
+        return feed(ASPECT_TYPES, params);
     }
     
     @Override
@@ -429,7 +388,7 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     
     @Override
     public Feed<RestObject> getUsers(Linkable parent, String... params) {
-        return get(parent.getHref(USERS), true, JaxbFeed.class, params);
+        return feed(parent, USERS, params);
     }
 
     @Override
@@ -439,7 +398,7 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     
     @Override
     public Feed<RestObject> getGroups(Linkable parent, String... params) {
-        return get(parent.getHref(GROUPS), true, JaxbFeed.class, params);
+        return feed(parent, GROUPS, params);
     }
 
     @Override
@@ -484,8 +443,7 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
 
     @Override
     public Feed<RestObject> getRelationTypes(String... params) {
-        Feed<? extends RestObject> feed = get(getRepository().getHref(RELATION_TYPES), true, JaxbFeed.class, params);
-        return (Feed<RestObject>)feed;
+        return feed(RELATION_TYPES, params);
     }
     
     @Override
@@ -495,8 +453,7 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
 
     @Override
     public Feed<RestObject> getRelations(String... params) {
-        Feed<? extends RestObject> feed = get(getRepository().getHref(RELATION_TYPES), true, JaxbFeed.class, params);
-        return (Feed<RestObject>)feed;
+        return feed(RELATION_TYPES, params);
     }
     
     @Override
@@ -511,8 +468,7 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     
     @Override
     public Feed<RestObject> getFormats(String... params) {
-        Feed<? extends RestObject> feed = get(getRepository().getHref(FORMATS), true, JaxbFeed.class, params);
-        return (Feed<RestObject>)feed;
+        return feed(FORMATS, params);
     }
     
     @Override
@@ -522,8 +478,7 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     
     @Override
     public Feed<RestObject> getNetworkLocations(String... params) {
-        Feed<? extends RestObject> feed = get(getRepository().getHref(NETWORK_LOCATIONS), true, JaxbFeed.class, params);
-        return (Feed<RestObject>)feed;
+        return feed(NETWORK_LOCATIONS, params);
     }
     
     @Override
@@ -533,8 +488,7 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     
     @Override
     public Feed<FolderLink> getFolderLinks(Linkable object, LinkRelation rel, String... params) {
-        Feed<? extends FolderLink> feed = get(object.getHref(rel), true, JaxbFeed.class, params);
-        return (Feed<FolderLink>)feed;
+        return feed(object, rel, params);
     }
     
     @Override
@@ -554,14 +508,12 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     
     @Override
     public Feed<RestObject> getAcls(String... params) {
-        Feed<? extends RestObject> feed = get(getRepository().getHref(ACLS), true, JaxbFeed.class, params);
-        return (Feed<RestObject>)feed;
+        return feed(ACLS, params);
     }
     
     @Override
     public Feed<RestObject> getAclAssociations(Linkable acl, String... params) {
-        Feed<? extends RestObject> feed = get(acl.getHref(ASSOCIATIONS), true, JaxbFeed.class, params);
-        return (Feed<RestObject>)feed;
+        return feed(acl, ASSOCIATIONS, params);
     }
     
     @Override
@@ -586,8 +538,7 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     
     @Override
     public Feed<Preference> getPreferences(String... params) {
-        Feed<? extends Preference> feed = get(getRepository().getHref(CURRENT_USER_PREFERENCES), true, JaxbFeed.class, params);
-        return (Feed<Preference>)feed;
+        return feed(CURRENT_USER_PREFERENCES, params);
     }
 
     @Override
@@ -617,8 +568,7 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     
     @Override
     public Feed<Comment> getComments(Linkable parent, String... params) {
-        Feed<? extends Comment> feed = get(parent.getHref(COMMENTS), true, JaxbFeed.class, params);
-        return (Feed<Comment>)feed;
+        return feed(parent, COMMENTS, params);
     }
 
     @Override
@@ -633,8 +583,7 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
 
     @Override
     public Feed<Comment> getReplies(Linkable parent, String... params) {
-        Feed<? extends Comment> feed = get(parent.getHref(REPLIES), true, JaxbFeed.class, params);
-        return (Feed<Comment>)feed;
+        return feed(parent, REPLIES, params);
     }
 
     @Override
@@ -644,14 +593,12 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
 
     @Override
     public Feed<VirtualDocumentNode> getVirtualDocumentNodes(Linkable linkable, String... params) {
-        Feed<? extends VirtualDocumentNode> feed = get(linkable.getHref(VIRTUAL_DOCUMENT_NODES), true, JaxbFeed.class, params);
-        return (Feed<VirtualDocumentNode>)feed;
+        return feed(linkable, VIRTUAL_DOCUMENT_NODES, params);
     }
 
     @Override
     public Feed<SearchTemplate> getSearchTemplates(String... params) {
-        Feed<JaxbSearchTemplate> feed = get(getRepository().getHref(SEARCH_TEMPLATES), true, JaxbFeed.class, params);
-        return (Feed)feed;
+        return feed(SEARCH_TEMPLATES, params);
     }
 
     @Override
@@ -676,8 +623,7 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
 
     @Override
     public Feed<SavedSearch> getSavedSearches(String... params) {
-        Feed<SavedSearch> feed = get(getRepository().getHref(SAVED_SEARCHES), true, JaxbFeed.class, params);
-        return (Feed)feed;
+        return feed(SAVED_SEARCHES, params);
     }
 
     @Override
@@ -709,34 +655,6 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     public SearchFeed<RestObject> getSavedSearchResult(SavedSearch toBeExecuted, String... params) {
         return get(toBeExecuted.getHref(SAVED_SEARCH_SAVED_RESULTS), true, JaxbSearchFeed.class, params);
     }
-
-    @Override
-    public <T extends Linkable> Feed<T> nextPage(Feed<T> feed) {
-        return page(feed.getHref(PAGING_NEXT));
-    }
-    
-    @Override
-    public <T extends Linkable> Feed<T> previousPage(Feed<T> feed) {
-        return page(feed.getHref(PAGING_PREV));
-    }
-
-    @Override
-    public <T extends Linkable> Feed<T> firstPage(Feed<T> feed) {
-        return page(feed.getHref(PAGING_FIRST));
-    }
-
-    @Override
-    public <T extends Linkable> Feed<T> lastPage(Feed<T> feed) {
-        return page(feed.getHref(PAGING_LAST));
-    }
-    
-    private Feed page(String uri) {
-        Feed feed = null;
-        if(uri != null) {
-            feed = get(uri, true, JaxbFeed.class);
-        }
-        return feed;
-    }
     
     @Override
     protected void initRestTemplate(RestTemplate restTemplate) {
@@ -749,11 +667,23 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
             }
         }
     }
+
+    @SuppressWarnings("rawtypes")
+    private Feed feed(Linkable parent, LinkRelation rel, String... params) {
+        return feed(parent, rel, JaxbFeed.class, params);
+    }
     
+    @SuppressWarnings("rawtypes")
+    private Feed feed(LinkRelation rel, String... params) {
+        return feed(rel, JaxbFeed.class, params);
+    }
+
     @Override
     public void serialize(Object object, OutputStream os) {
         try {
             DCTMJaxbContext.marshal(os, object);
+        } catch (RuntimeException re) {
+            throw (RuntimeException)re;
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
