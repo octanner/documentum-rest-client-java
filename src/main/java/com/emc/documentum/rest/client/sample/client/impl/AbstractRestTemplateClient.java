@@ -94,12 +94,13 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     protected boolean debug;
     protected boolean enableCSRFClientToken = true;
     
-    protected HttpHeaders headers;
-    protected HttpStatus status;
-    protected RequestProcessor requestProcessor;
     protected String clientToken;
     protected String csrfHeader;
     protected String csrfToken;
+    
+    protected HttpHeaders headers;
+    protected HttpStatus status;
+    protected RequestProcessor requestProcessor;
     
     protected final RequestProcessor defaultRequestProcessor = new DefaultRequestProcessor();
     
@@ -110,6 +111,21 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
         this.password = password;
         this.useFormatExtension = useFormatExtension;
         initRestTemplate(restTemplate);
+    }
+    
+    protected <T extends AbstractRestTemplateClient> T clone(T client) {
+        client.homeDocument = homeDocument;
+        client.productInfo = productInfo;
+        client.repositories = repositories;
+        client.repository = repository;
+        client.enableStreaming = enableStreaming;
+        client.debug = debug;
+        client.enableCSRFClientToken = enableCSRFClientToken;
+        
+        client.clientToken = clientToken;
+        client.csrfHeader = csrfHeader;
+        client.csrfToken = csrfToken;
+        return client;
     }
     
     /**

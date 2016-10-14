@@ -107,12 +107,17 @@ import static com.emc.documentum.rest.client.sample.model.LinkRelation.VIRTUAL_D
  * the DCTMRestClient implementation by Jackson json support
  */
 @NotThreadSafe
-public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCTMRestClient {
+public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCTMRestClient, Cloneable {
     public DCTMJacksonClient(String contextRoot, String repositoryName,
             String username, String password, boolean useFormatExtension) {
         super(contextRoot, repositoryName, username, password, useFormatExtension);
     }
     
+    @Override
+    public DCTMJacksonClient clone() {
+        return clone(new DCTMJacksonClient(contextRoot, repositoryName, username, password, useFormatExtension));
+    }
+
     @Override
     public HomeDocument getHomeDocument() {
         if(homeDocument == null) {

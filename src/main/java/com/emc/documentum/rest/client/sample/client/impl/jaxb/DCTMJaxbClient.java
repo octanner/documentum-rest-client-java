@@ -124,10 +124,15 @@ import static org.springframework.http.HttpMethod.PUT;
  * the DCTMRestClient implementation by JAXB xml support
  */
 @NotThreadSafe
-public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRestClient {
+public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRestClient, Cloneable {
     public DCTMJaxbClient(String contextRoot, String repositoryName,
             String username, String password, boolean useFormatExtension) {
         super(contextRoot, repositoryName, username, password, useFormatExtension);
+    }
+    
+    @Override
+    public DCTMJaxbClient clone() {
+        return clone(new DCTMJaxbClient(contextRoot, repositoryName, username, password, useFormatExtension));
     }
     
     @Override
