@@ -6,7 +6,7 @@ package com.emc.documentum.rest.client.sample.model.builder;
 import java.util.List;
 
 import com.emc.documentum.rest.client.sample.client.DCTMRestClient;
-import com.emc.documentum.rest.client.sample.client.impl.AbstractRestTemplateClient;
+import com.emc.documentum.rest.client.sample.client.impl.AbstractRestTemplateClient.ClientType;
 import com.emc.documentum.rest.client.sample.model.Search;
 import com.emc.documentum.rest.client.sample.model.Search.Expression;
 import com.emc.documentum.rest.client.sample.model.Search.FacetDefinition;
@@ -17,7 +17,7 @@ import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSearchBuilder;
 
 public abstract class SearchBuilder {
     public static SearchBuilder builder(DCTMRestClient client) {
-        return ((AbstractRestTemplateClient)client).isXml()?new JaxbSearchBuilder() : new JsonSearchBuilder(); 
+        return client.getClientType()==ClientType.XML?new JaxbSearchBuilder() : new JsonSearchBuilder(); 
     }
 
     public abstract Search build();

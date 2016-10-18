@@ -33,8 +33,7 @@ public class ContentManagementSample extends Sample {
         printNewLine();
 
         printStep("create a new rendition to the document");
-        client.enableStreamingForNextRequest();
-        client.createContent(createdObjectWithContent, "I'm the rendition content", "text/html", "primary", "false");
+        client.enableStreamingForNextRequest().createContent(createdObjectWithContent, "I'm the rendition content", "text/html", "primary", "false");
         printHttpStatus();
         printNewLine();
         

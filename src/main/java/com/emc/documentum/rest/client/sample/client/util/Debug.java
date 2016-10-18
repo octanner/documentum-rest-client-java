@@ -76,9 +76,11 @@ public class Debug {
     }
     
     public static void debugSerialize(DCTMRestClient client, Object object) {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ((AbstractRestTemplateClient)client).serialize(object, os);
-        System.out.println(os);
+        if(client instanceof AbstractRestTemplateClient) {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            ((AbstractRestTemplateClient)client).serialize(object, os);
+            System.out.println(os);
+        }
     }
     
     public static void debugRestObject(RestObject object) {

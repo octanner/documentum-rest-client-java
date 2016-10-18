@@ -347,7 +347,7 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
             RestObject newRestObject = newRestObject(oldObject, new PlainRestObject(newParent.getHref(SELF)));
             return post(oldObject.getHref(SHARED_PARENT), newRestObject, newRestObject.getClass());
         } catch (Exception e) {
-            throw new IllegalArgumentException(oldObject.getClass().getName());
+            throw new IllegalArgumentException(getModelClass(oldObject).getName());
         }
     }
     

@@ -11,7 +11,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
+import com.emc.documentum.rest.client.sample.client.annotation.ClientAsyncOption;
 import com.emc.documentum.rest.client.sample.client.annotation.NotBatchable;
+import com.emc.documentum.rest.client.sample.client.impl.AbstractRestTemplateClient.ClientType;
 import com.emc.documentum.rest.client.sample.model.Comment;
 import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.FolderLink;
@@ -39,7 +41,7 @@ import com.emc.documentum.rest.client.sample.model.batch.Capabilities;
  * The sample REST client library 
  */
 @NotThreadSafe
-public interface DCTMRestClient {
+public interface DCTMRestClient extends Cloneable {
 
     /**
      * @return the http headers of the previous operation 
@@ -52,6 +54,12 @@ public interface DCTMRestClient {
      */
     @NotBatchable
     public HttpStatus getStatus();
+
+    /**
+     * @return the client type
+     */
+    @NotBatchable @ClientAsyncOption(false)
+    public ClientType getClientType();
     
     /**
      * enable streaming for the binary content transfer.
@@ -60,43 +68,43 @@ public interface DCTMRestClient {
      * will be automatically disabled after the operation.
      * @return the DCTMRestClient itself
      */
-    @NotBatchable
+    @NotBatchable @ClientAsyncOption(retainClient=true)
     public DCTMRestClient enableStreamingForNextRequest();
     
     /**
      * @return the cached HomeDocument object
      */
-    @NotBatchable
+    @NotBatchable @ClientAsyncOption(false)
     public HomeDocument getHomeDocument();
 
     /**
      * @return the product info
      */
-    @NotBatchable
+    @NotBatchable @ClientAsyncOption(false)
     public RestObject getProductInfo();
     
     /**
      * @return the major version of the rest services
      */
-    @NotBatchable
+    @NotBatchable @ClientAsyncOption(false)
     public double getMajorVersion();
     
     /**
      * @return the cached Repositories feed
      */
-    @NotBatchable
+    @NotBatchable @ClientAsyncOption(false)
     public Feed<Repository> getRepositories();
     
     /**
      * @return the cached Repository object
      */
-    @NotBatchable
+    @NotBatchable @ClientAsyncOption(false)
     public Repository getRepository();
     
     /**
      * @return the current selected repository name
      */
-    @NotBatchable
+    @NotBatchable @ClientAsyncOption(false)
     public String getCurrentRepositoryName();
     
     /**
@@ -367,6 +375,7 @@ public interface DCTMRestClient {
      * @param uri the uri of the content media
      * @return the content in bytes
      */
+    @ClientAsyncOption(false)
     public byte[] getContentBytes(String uri);
     
     /**

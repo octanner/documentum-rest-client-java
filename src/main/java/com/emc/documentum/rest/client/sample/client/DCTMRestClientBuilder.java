@@ -3,10 +3,12 @@
  */
 package com.emc.documentum.rest.client.sample.client;
 
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.emc.documentum.rest.client.sample.client.impl.AbstractRestTemplateClient;
+import com.emc.documentum.rest.client.sample.client.impl.ClientAsyncRestTemplateClient;
 import com.emc.documentum.rest.client.sample.client.impl.jackson.DCTMJacksonClient;
 import com.emc.documentum.rest.client.sample.client.impl.jaxb.DCTMJaxbClient;
 import com.emc.documentum.rest.client.sample.client.util.Debug;
@@ -69,10 +71,18 @@ public final class DCTMRestClientBuilder {
         return client;
     }
     
+    /**
+     * build the DCTMRestClient without the prompt
+     * @return the DCTMRestClient
+     */
     public static DCTMRestClient buildSilently(DCTMRestClientBinding binding, String contextRoot, String repository, String username, String password) {
         return buildSilently(binding, contextRoot, repository, username, password, false, false, false);
     }
 
+    /**
+     * build the DCTMRestClient without the prompt
+     * @return the DCTMRestClient
+     */
     public static DCTMRestClient buildSilently(DCTMRestClientBinding binding, String contextRoot, String repository, String username, String password,
             boolean useFormatExtension, boolean debug, boolean enableCSRFClientToken) {
         boolean ignoreAuthenticateServer = ignoreAuthenticateServer(contextRoot);
@@ -92,6 +102,17 @@ public final class DCTMRestClientBuilder {
             }
         }
         return client;
+    }
+    
+    /**
+     * build the async DCTMRestClient
+     * @return the DCTMRestClient
+     */
+    public static DCTMRestClient buildAsyncClient(DCTMRestClient client) {
+        if(!(client instanceof AbstractRestTemplateClient)) {
+            throw new UnsupportedOperationException(client.getClass().getName());
+        }
+        return (DCTMRestClient)Proxy.newProxyInstance(DCTMRestClient.class.getClassLoader(), new Class[]{DCTMRestClient.class}, new ClientAsyncRestTemplateClient(100, client));
     }
     
     private static List<String> getRepositories(DCTMRestClientBinding binding, String contextRoot) {

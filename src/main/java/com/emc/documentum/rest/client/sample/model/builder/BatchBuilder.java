@@ -42,6 +42,9 @@ public abstract class BatchBuilder {
     private int operationId = 1;
     
     public static BatchBuilder builder(DCTMRestClient client) {
+        if(!(client instanceof AbstractRestTemplateClient)) {
+            throw new UnsupportedOperationException(client.getClass().getName());
+        }
         client.getRepository();
         if(((AbstractRestTemplateClient)client).isXml()) {
             return new JaxbBatchBuilder(client);

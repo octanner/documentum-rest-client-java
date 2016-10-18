@@ -40,6 +40,7 @@ import com.emc.documentum.rest.client.sample.client.util.UriHelper;
 import com.emc.documentum.rest.client.sample.model.Entry;
 import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.FeedBase;
+import com.emc.documentum.rest.client.sample.model.FutureModel;
 import com.emc.documentum.rest.client.sample.model.HomeDocument;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
 import com.emc.documentum.rest.client.sample.model.Linkable;
@@ -160,6 +161,8 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
         return status;
     }
     
+    public abstract AbstractRestTemplateClient clone();
+    
     public AbstractRestTemplateClient debug(boolean debug) {
         this.debug = debug;
         return this;
@@ -174,8 +177,6 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
         restTemplate.getMessageConverters().add(new MultipartBatchHttpMessageConverter());
     }
-    
-    public abstract ClientType getClientType();
     
     private void setupHttp(ResponseEntity<?> entity) {
         if(entity == null) {
@@ -300,7 +301,7 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
         }
         HttpEntity<Object> requestEntity = requestBody == null ? 
                 new HttpEntity<Object>(headers) :
-                new HttpEntity<Object>(requestBody, headers);
+                new HttpEntity<Object>(requestBody instanceof FutureModel?((FutureModel)requestBody).getModel():requestBody, headers);
         String requestUri = UriHelper.appendQueryString(uri, params);
         if(debug && noRequestProcessor) {
             Debug.debug("Sending " + httpMethod + " request to " + uri);
@@ -371,9 +372,9 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
      */
     protected RestObject newRestObject(RestObject oldObject, RestObject newObject) {
         try {
-            return oldObject.getClass().getConstructor(RestObject.class).newInstance(newObject);
+            return getModelClass(oldObject).getConstructor(RestObject.class).newInstance(newObject);
         } catch (Exception e) {
-            throw new IllegalArgumentException(oldObject.getClass().getName());
+            throw new IllegalArgumentException(getModelClass(oldObject).getName());
         }
     }
     
@@ -460,12 +461,12 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
         try {
             RestObject newRestObject = newRestObject(oldObject, newObject);
             if(method == PUT) {
-                return put(oldObject.getHref(rel), newRestObject, newRestObject.getClass(), params);
+                return put(oldObject.getHref(rel), newRestObject, getModelClass(newRestObject), params);
             } else  {
-                return post(oldObject.getHref(rel), newRestObject, newRestObject.getClass(), params);
+                return post(oldObject.getHref(rel), newRestObject, getModelClass(newRestObject), params);
             }
         } catch (Exception e) {
-            throw new IllegalArgumentException(oldObject.getClass().getName());
+            throw new IllegalArgumentException(getModelClass(oldObject).getName());
         }
     }
     
@@ -669,27 +670,38 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     
     @Override
     public <T extends Linkable> T get(T t, String... params) {
-        return (T)get(t.self(), t instanceof FeedBase, t.getClass(), params);
+        return (T)get(t.self(), t instanceof FeedBase, getModelClass(t), params);
     }
     
     @Override
     public <T extends Linkable> Feed<T> nextPage(Feed<T> feed) {
-        return page(feed.getHref(PAGING_NEXT), feed.getClass());
+        return page(feed.getHref(PAGING_NEXT), getModelClass(feed));
     }
     
     @Override
     public <T extends Linkable> Feed<T> previousPage(Feed<T> feed) {
-        return page(feed.getHref(PAGING_PREV), feed.getClass());
+        return page(feed.getHref(PAGING_PREV), getModelClass(feed));
     }
 
     @Override
     public <T extends Linkable> Feed<T> firstPage(Feed<T> feed) {
-        return page(feed.getHref(PAGING_FIRST), feed.getClass());
+        return page(feed.getHref(PAGING_FIRST), getModelClass(feed));
     }
 
     @Override
     public <T extends Linkable> Feed<T> lastPage(Feed<T> feed) {
-        return page(feed.getHref(PAGING_LAST), feed.getClass());
+        return page(feed.getHref(PAGING_LAST), getModelClass(feed));
+    }
+    
+    @SuppressWarnings("unchecked")
+    protected <T> Class<T> getModelClass(T model) {
+        if(model == null) {
+            return null;
+        }
+        if(model instanceof FutureModel) {
+            return (Class<T>)((FutureModel)model).getModelClass();
+        }
+        return (Class<T>)model.getClass();
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
