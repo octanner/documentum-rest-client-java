@@ -31,6 +31,7 @@ public abstract class Sample {
     protected DCTMRestClient client;
     protected double version;
     protected String name;
+    protected boolean throwException = false;
     
     public Sample() {
         name = ((RestServiceSample)this.getClass().getAnnotation(RestServiceSample.class)).value();
@@ -110,6 +111,9 @@ public abstract class Sample {
                     } catch (Exception e) {
                         Debug.error(m.toString());
                         e.printStackTrace();
+                        if(throwException) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 }
             }
@@ -120,5 +124,10 @@ public abstract class Sample {
     
     protected void printHttpStatus() {
         Debug.print(client);
+    }
+    
+    public Sample throwException() {
+        throwException = true;
+        return this;
     }
 }

@@ -5,6 +5,8 @@ package com.emc.documentum.rest.client.sample.cases;
 
 import java.util.Map;
 
+import org.springframework.util.StringUtils;
+
 import com.emc.documentum.rest.client.sample.client.annotation.RestServiceSample;
 import com.emc.documentum.rest.client.sample.client.annotation.RestServiceVersion;
 import com.emc.documentum.rest.client.sample.model.Feed;
@@ -27,26 +29,28 @@ public class AspectSample extends Sample {
         printNewLine();
         
         printStep("attach an aspect to an object");
-        String aspectType = read("Please input the aspect type to be attached:");
-        RestObject aspect = client.getAspectType(aspectType);
-        for(Map.Entry<String, Object> entry : aspect.getProperties().entrySet()) {
-            System.out.println(entry.getKey() + ": " + entry.getValue());
+        String aspectType = read("Please input the aspect type to be attached (return to skip):", "");
+        if(!StringUtils.isEmpty(aspectType)) {
+            RestObject aspect = client.getAspectType(aspectType);
+            for(Map.Entry<String, Object> entry : aspect.getProperties().entrySet()) {
+                System.out.println(entry.getKey() + ": " + entry.getValue());
+            }
+            
+            RestObject tempCabinet = client.getCabinet("Temp");
+            RestObject object = client.createObject(tempCabinet, new PlainRestObject("object_name", "obj_to_be_attached"));
+            System.out.println(object.getObjectId() + " is created to attach " + aspectType);
+            
+            ObjectAspects objectAspects = client.attach(object, aspectType);
+            System.out.println("attached aspects: " + objectAspects.getAspects());
+            printNewLine();
+    
+            printStep("detach an aspect from an object");
+            client.detach(objectAspects, aspectType);
+            printHttpStatus();
+    
+            printStep("delete the created object " + object.getObjectId());
+            client.delete(object);
+            printHttpStatus();
         }
-        
-        RestObject tempCabinet = client.getCabinet("Temp");
-        RestObject object = client.createObject(tempCabinet, new PlainRestObject("object_name", "obj_to_be_attached"));
-        System.out.println(object.getObjectId() + " is created to attach " + aspectType);
-        
-        ObjectAspects objectAspects = client.attach(object, aspectType);
-        System.out.println("attached aspects: " + objectAspects.getAspects());
-        printNewLine();
-
-        printStep("detach an aspect from an object");
-        client.detach(objectAspects, aspectType);
-        printHttpStatus();
-
-        printStep("delete the created object " + object.getObjectId());
-        client.delete(object);
-        printHttpStatus();
     }
 }

@@ -3,6 +3,8 @@
  */
 package com.emc.documentum.rest.client.sample.cases;
 
+import org.springframework.util.StringUtils;
+
 import com.emc.documentum.rest.client.sample.client.annotation.RestServiceSample;
 import com.emc.documentum.rest.client.sample.client.annotation.RestServiceVersion;
 import com.emc.documentum.rest.client.sample.model.Feed;
@@ -23,7 +25,7 @@ public class VirtualDocumentNodeSample extends Sample {
         RestObject object = null;
         while(object == null) {
             String vdId = read("Please input the object id of the virtual document object (press 'return' to skip sample):", "");
-            if(vdId.isEmpty()) {
+            if(StringUtils.isEmpty(vdId)) {
                 return;
             }
             Feed<RestObject> feed = client.dql("select r_object_id from dm_sysobject where r_object_id='" + vdId + "'");

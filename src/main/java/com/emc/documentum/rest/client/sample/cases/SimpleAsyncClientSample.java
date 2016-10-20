@@ -17,6 +17,7 @@ import static com.emc.documentum.rest.client.sample.client.util.Debug.printStep;
 
 @RestServiceSample("Simple async client")
 public class SimpleAsyncClientSample extends Sample {
+    @SuppressWarnings("unused")
     public void asyncCall() {
         printStep("build up async client based on the sync client");
         DCTMRestClient asyncClinet = DCTMRestClientBuilder.buildAsyncClient(client);
