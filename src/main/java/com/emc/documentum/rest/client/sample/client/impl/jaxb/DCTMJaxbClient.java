@@ -129,10 +129,15 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
             String username, String password, boolean useFormatExtension) {
         super(contextRoot, repositoryName, username, password, useFormatExtension);
     }
+
+    public DCTMJaxbClient(String contextRoot, String repositoryName,
+            String username, String password, boolean useFormatExtension, boolean ignoreSslWarning) {
+        super(contextRoot, repositoryName, username, password, useFormatExtension, ignoreSslWarning);
+    }
     
     @Override
     public DCTMJaxbClient clone() {
-        return clone(new DCTMJaxbClient(contextRoot, repositoryName, username, password, useFormatExtension));
+        return clone(new DCTMJaxbClient(contextRoot, repositoryName, username, password, useFormatExtension, ignoreSslWarning));
     }
     
     @Override

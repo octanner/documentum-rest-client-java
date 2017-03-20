@@ -112,10 +112,15 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
             String username, String password, boolean useFormatExtension) {
         super(contextRoot, repositoryName, username, password, useFormatExtension);
     }
+
+    public DCTMJacksonClient(String contextRoot, String repositoryName,
+            String username, String password, boolean useFormatExtension, boolean ignoreSslWarning) {
+        super(contextRoot, repositoryName, username, password, useFormatExtension, ignoreSslWarning);
+    }
     
     @Override
     public DCTMJacksonClient clone() {
-        return clone(new DCTMJacksonClient(contextRoot, repositoryName, username, password, useFormatExtension));
+        return clone(new DCTMJacksonClient(contextRoot, repositoryName, username, password, useFormatExtension, ignoreSslWarning));
     }
 
     @Override

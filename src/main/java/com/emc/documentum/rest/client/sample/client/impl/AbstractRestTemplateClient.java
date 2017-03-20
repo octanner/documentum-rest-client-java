@@ -8,15 +8,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
-
 import javax.annotation.concurrent.NotThreadSafe;
+import javax.net.ssl.SSLContext;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.client.HttpClient;
+import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
+import org.apache.http.conn.ssl.BrowserCompatHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -94,6 +97,7 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     protected boolean enableStreaming = false;
     protected boolean debug;
     protected boolean enableCSRFClientToken = true;
+    protected boolean ignoreSslWarning = false;
     
     protected String clientToken;
     protected String csrfHeader;
@@ -106,11 +110,16 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     protected final RequestProcessor defaultRequestProcessor = new DefaultRequestProcessor();
     
     public AbstractRestTemplateClient(String contextRoot, String repositoryName, String username, String password, boolean useFormatExtension) {
+        this(contextRoot, repositoryName, username, password, useFormatExtension, false);
+    }
+
+    public AbstractRestTemplateClient(String contextRoot, String repositoryName, String username, String password, boolean useFormatExtension, boolean ignoreSslWarning) {
         this.contextRoot = contextRoot;
         this.repositoryName = repositoryName;
         this.username = username;
         this.password = password;
         this.useFormatExtension = useFormatExtension;
+        this.ignoreSslWarning = ignoreSslWarning;
         initRestTemplate(restTemplate);
     }
     
@@ -606,11 +615,14 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
         this.csrfHeader = null;
         this.csrfToken = null;
     }
-    
+
     public AbstractRestTemplateClient ignoreAuthenticateServer() {
+        //backward compatible with android httpclient 4.3.x
         if(restTemplate.getRequestFactory() instanceof HttpComponentsClientHttpRequestFactory) {
             try {
-                SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(new SSLContextBuilder().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build());
+                SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
+                X509HostnameVerifier verifier = ignoreSslWarning ? new AllowAllHostnameVerifier() : new BrowserCompatHostnameVerifier();
+                SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext, verifier);
                 HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
                 ((HttpComponentsClientHttpRequestFactory)restTemplate.getRequestFactory()).setHttpClient(httpClient);
             } catch (Exception e) {

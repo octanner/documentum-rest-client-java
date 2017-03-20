@@ -29,6 +29,7 @@ public final class DCTMRestClientBuilder {
     private DCTMRestClientBinding binding;
     private boolean useFormatExtension;
     private boolean debug;
+    private boolean ignoreSslWarning;
     private boolean ignoreAuthenticateServer;
     
     /**
@@ -175,7 +176,17 @@ public final class DCTMRestClientBuilder {
         this.binding = binding;
         return this;
     }
-    
+
+    /**
+     * Ignore SSL certificate warning even when the certificate is untrusted. This should be used only in test environment.
+     * @param ignoreSslWarning boolean to indicate ignoring the ssl warning
+     * @return
+     */
+    public DCTMRestClientBuilder ignoreSslWarning(boolean ignoreSslWarning) {
+        this.ignoreSslWarning = ignoreSslWarning;
+        return this;
+    }
+
     /**
      * whether append .xml or .json extension to the uri
      * e.g.
@@ -231,13 +242,13 @@ public final class DCTMRestClientBuilder {
                 if(debug) {
                     Debug.debug("Build DCTMRestClient with JAXB implementation");
                 }
-                client = new DCTMJaxbClient(contextRoot, repository, username, password, useFormatExtension);
+                client = new DCTMJaxbClient(contextRoot, repository, username, password, useFormatExtension, ignoreSslWarning);
                 break;
             case JSON:
                 if(debug) {
                     Debug.debug("Build DCTMRestClient with Jackson implementation");
                 }
-                client = new DCTMJacksonClient(contextRoot, repository, username, password, useFormatExtension);
+                client = new DCTMJacksonClient(contextRoot, repository, username, password, useFormatExtension, ignoreSslWarning);
                 break;
             default:
                 throw new IllegalArgumentException(binding + " binding is not supported yet");    
