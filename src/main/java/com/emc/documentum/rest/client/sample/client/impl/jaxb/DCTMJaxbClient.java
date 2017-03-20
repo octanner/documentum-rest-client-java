@@ -5,7 +5,6 @@ package com.emc.documentum.rest.client.sample.client.impl.jaxb;
 
 import java.io.OutputStream;
 import java.util.List;
-
 import javax.annotation.concurrent.NotThreadSafe;
 
 import org.springframework.http.HttpMethod;
@@ -182,6 +181,11 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     @Override
     public SearchFeed<RestObject> search(Search search, String... params) {
         return post(getRepository().getHref(SEARCH), search, new Headers().accept(MediaType.APPLICATION_ATOM_XML_VALUE).contentType(SupportedMediaTypes.APPLICATION_VND_DCTM_XML_VALUE).toHttpHeaders(), JaxbSearchFeed.class, params);
+    }
+
+    @Override
+    public RestObject createCabinet(RestObject cabinetToCreate) {
+        return post(getRepository().getHref(CABINETS), new JaxbCabinet(cabinetToCreate), JaxbCabinet.class);
     }
 
     @Override

@@ -177,6 +177,11 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     public RestObject getCabinet(String cabinet, String... params) {
         return getCabinet(cabinet, JsonObject.class, params);
     }
+
+    @Override
+    public RestObject createCabinet(RestObject cabinetToCreate) {
+        return post(getRepository().getHref(CABINETS), new JsonObject(cabinetToCreate), JsonObject.class);
+    }
     
     @Override
     public Feed<RestObject> getFolders(Linkable parent, String... params) {

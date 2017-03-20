@@ -132,19 +132,29 @@ public interface DCTMRestClient extends Cloneable {
     public SearchFeed<RestObject> search(Search search, String... params);
     
     /**
+     * get cabinets
      * @param params the query parameters
      * @return the cabinets feed based on query parameters
      */
     public Feed<RestObject> getCabinets(String... params);
     
     /**
+     * get a cabinet by name
      * @param cabinet the cabinet name
      * @param params the query parameters
      * @return the cabinet by its name
      */
     @NotBatchable
     public RestObject getCabinet(String cabinet, String... params);
-    
+
+    /**
+     * create a new cabinet
+     * @param cabinetToCreate the new cabinet object
+     * @return the created cabinet
+     */
+
+    RestObject createCabinet(RestObject cabinetToCreate);
+
     /**
      * @param parent the parent object, e.g. cabinet, folder
      * @param params the query parameters
