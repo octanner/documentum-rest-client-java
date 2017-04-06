@@ -17,13 +17,16 @@ EMC shares the source code of this project for the technology sharing. If users 
 ## Overview
 This Documentum REST Services client is written with Java code. Underlying it leverages Spring *RestTemplate* to send
 the REST messages. It supports both `XML` and `JSON` representations. `JAXB` is used to bind XML object, and `Jackson`
-for JSON. Both http and https are supported. Supported features are listed in the below table.
+for JSON. Both http and https are supported. The Java client's supported features are listed in below tables.
 
-
-Supported Features | Description 
---- | ---
+Overall Characteristic | Description 
+:--- | :---
 API Version | ![REST API Version](https://img.shields.io/badge/rest--api-7.2-brightgreen.png) ![REST API Version](https://img.shields.io/badge/rest--api-7.3-brightgreen.png)
-Formats | JSON and XML
+API Formats | JSON and XML
+
+
+Supported ECM Features | Description 
+:--- | :---
 Authentication | <ul><li>Basic</li><li>Basic plus client token cookie</li></ul>
 Fundamental Services | <ul><li>Home document</li><li>Product information</li><li>Batch execution</li></ul>
 Folder Services | <ul><li>Cabinet CRUD</li><li>Folder CRUD</li><li>Folder navigation</li><li>Copy, move, link, unlink</li></ul>
