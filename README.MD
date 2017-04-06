@@ -1,4 +1,4 @@
-Documentum REST Java Client Samples
+Documentum REST Java Client Reference Implementation
 =========
 
 [![Build Status](https://travis-ci.org/Enterprise-Content-Management/documentum-rest-client-java.svg?branch=master)](https://travis-ci.org/Enterprise-Content-Management/documentum-rest-client-java) 
@@ -9,7 +9,7 @@ This Java project contains a reference implementation of Documentum REST Service
 purpose of this project is to demonstrate one way to develop a hypermedia driven REST client to consume Documentum
 REST Services. It does NOT indicate that users could not develop a REST client using other technologies.
 
-EMC shares the source code of this project for the technology sharing. If users plan to migrate the sample code to their
+OpenText shares the source code of this project for the technology sharing. If users plan to migrate the sample code to their
  products, they are responsible to maintain this part of the code in their products and should agree with license polices
   of the referenced libraries used by this sample project.
 
@@ -19,15 +19,15 @@ This Documentum REST Services client is written with Java code. Underlying it le
 the REST messages. It supports both `XML` and `JSON` representations. `JAXB` is used to bind XML object, and `Jackson`
 for JSON. Both http and https are supported. The Java client's supported features are listed in below tables.
 
-Overall Characteristic | Description 
+API Spec | Description 
 :--- | :---
-API Version | ![REST API Version](https://img.shields.io/badge/rest--api-7.2-brightgreen.png) ![REST API Version](https://img.shields.io/badge/rest--api-7.3-brightgreen.png)
-API Formats | JSON and XML
+Supported Servers | ![REST API Version](https://img.shields.io/badge/rest--api-7.2-brightgreen.png), ![REST API Version](https://img.shields.io/badge/rest--api-7.3-brightgreen.png)
+Supported Formats | <ul><li>JSON</li><li>XML</li></ul>
+Supported Authentications | <ul><li>Basic</li><li>Basic plus client token cookie</li></ul>
 
 
-Supported ECM Features | Description 
+Service Spec | Description 
 :--- | :---
-Authentication | <ul><li>Basic</li><li>Basic plus client token cookie</li></ul>
 Fundamental Services | <ul><li>Home document</li><li>Product information</li><li>Batch execution</li></ul>
 Folder Services | <ul><li>Cabinet CRUD</li><li>Folder CRUD</li><li>Folder navigation</li><li>Copy, move, link, unlink</li></ul>
 Document / Sysobject Services | <ul><li>Document CRUD</li><li>Checkout, cancel checkout, checkin</li><li>Copy, move, link, unlink</li></ul>
@@ -52,6 +52,17 @@ Type services | <ul><li>List types</li><li>List relation types</li><li>List aspe
 2. Java 7 or later is installed.
 3. Maven 3 is required to build the project.
 
+## Build the project
+1. Build the project with maven
+>       mvn clean install
+
+2. There will be several files built in target directory:
+ * *rest-api-client-sample-7.3.jar* --> the sample client jar file
+ * *lib* -> the lib directory contains all other required third party library
+ * *rest-api-client-sample-7.3-all-in-one.jar* -> the sample client jar file, with all other third party classes embedded
+ * *rest-api-client-sample-7.3-javadoc.jar* -> javadoc of the sample client
+ * *rest-api-client-sample-7.3-sources.jar* -> source code of the sample client
+
 ## Use the API
 The class **DCTMRestClient** is the client stub class for the client application to call REST APIs. We can use **DCTMRestClientBuilder** to build a REST client instance.
 ```java
@@ -63,17 +74,6 @@ DCTMRestClient client = new DCTMRestClientBuilder().bind(DCTMRestClientBinding.J
 RestObject productInfo = client.getProductInfo();
 ```
 
-## Build the project
-1. Build the project with maven
->       mvn clean install
-
-2. There will be several files built in target directory:
- * *rest-api-client-sample-7.3.jar* --> the sample client jar file
- * *lib* -> the lib directory contains all other required third party library
- * *rest-api-client-sample-7.3-all-in-one.jar* -> the sample client jar file, with all other third party classes embedded
- * *rest-api-client-sample-7.3-javadoc.jar* -> javadoc of the sample client
- * *rest-api-client-sample-7.3-sources.jar* -> source code of the sample client
- 
 ## Run samples
 1. Run the project
  execute rest-api-client-sample-7.3.jar, with lib directory at the same place
