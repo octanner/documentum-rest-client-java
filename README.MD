@@ -21,14 +21,14 @@ for JSON. Both http and https are supported. The Java client's supported feature
 
 API Spec | Description 
 :--- | :---
-Supported Servers | ![REST API Version](https://img.shields.io/badge/rest--api-7.2-brightgreen.png), ![REST API Version](https://img.shields.io/badge/rest--api-7.3-brightgreen.png)
+Supported Servers | ![REST API Version](https://img.shields.io/badge/rest--api-7.1-brightgreen.png) ![REST API Version](https://img.shields.io/badge/rest--api-7.2-brightgreen.png), ![REST API Version](https://img.shields.io/badge/rest--api-7.3-brightgreen.png)
 Supported Formats | <ul><li>JSON</li><li>XML</li></ul>
-Supported Authentications | <ul><li>Basic</li><li>Basic plus client token cookie</li></ul>
-
+Supported Authentications | <ul><li>Basic</li><li>Basic plus client token cookie</li><li>Basic plus client token cookie + CSRF</li></ul>
+Call Mode| <ul><li>Synchronous</li><li>Asynchronous</li></ul>
 
 Service Spec | Description 
 :--- | :---
-Fundamental Services | <ul><li>Home document</li><li>Product information</li><li>Batch execution</li></ul>
+Fundamental Services | <ul><li>Home document</li><li>Product information</li><li>Repositories</li><li>Batch execution</li></ul>
 Folder Services | <ul><li>Cabinet CRUD</li><li>Folder CRUD</li><li>Folder navigation</li><li>Copy, move, link, unlink</li></ul>
 Document / Sysobject Services | <ul><li>Document CRUD</li><li>Checkout, cancel checkout, checkin</li><li>Copy, move, link, unlink</li></ul>
 Content Services | <ul><li>Import contents</li><li>Update contents</li><li>Export contents</li></ul>
@@ -66,11 +66,13 @@ Type services | <ul><li>List types</li><li>List relation types</li><li>List aspe
 ## Use the API
 The class **DCTMRestClient** is the client stub class for the client application to call REST APIs. We can use **DCTMRestClientBuilder** to build a REST client instance.
 ```java
+// new a simple rest client instance
 DCTMRestClient client = new DCTMRestClientBuilder().bind(DCTMRestClientBinding.JSON)
                 .contextRoot("http://localhost:8080/dctm-rest")
                 .repository("ACME")
                 .credentials("username", "password")
                 .build();
+// get product info resource                
 RestObject productInfo = client.getProductInfo();
 ```
 
