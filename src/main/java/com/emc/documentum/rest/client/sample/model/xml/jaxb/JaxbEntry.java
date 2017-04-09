@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
 import com.emc.documentum.rest.client.sample.client.impl.jaxb.DCTMJaxbContext;
@@ -113,6 +114,9 @@ public class JaxbEntry<T extends Linkable> extends JaxbAtomLinkableBase implemen
         private String src;
         private String type;
         private Element element;
+
+        @XmlAttribute(name="content-type")
+        private String legacyContentType;
         
         @XmlAnyElement
         public Element getElement() {
@@ -130,17 +134,25 @@ public class JaxbEntry<T extends Linkable> extends JaxbAtomLinkableBase implemen
         }
         @XmlAttribute(name="type")
         public String getContentType() {
-            return type;
+            return StringUtils.isEmpty(type) ? legacyContentType : type;
         }
+
         public void setContentType(String type) {
             this.type = type;
+            this.legacyContentType = type;
         }
         
         @Override
         public boolean equals(Object obj) {
             EntryContent<?> that = (EntryContent<?>)obj;
             return Equals.equal(src, that.src) 
-                && Equals.equal(type, that.type);
+                && Equals.equal(type, that.type)
+                && Equals.equal(legacyContentType, that.legacyContentType);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(src, type, legacyContentType);
         }
         
         @SuppressWarnings("unchecked")
