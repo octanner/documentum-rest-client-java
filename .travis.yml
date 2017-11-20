@@ -1,6 +1,6 @@
 language: java
 jdk:
-- oraclejdk7
+-  openjdk8
 script: mvn install -DskipTests
 deploy:
   provider: releases
