@@ -1,19 +1,15 @@
 /*
- * Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+ * Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
  */
 package com.emc.documentum.rest.client.sample.model.plain;
 
-import java.util.List;
-
 import com.emc.documentum.rest.client.sample.model.FolderLink;
-import com.emc.documentum.rest.client.sample.model.Link;
-import com.emc.documentum.rest.client.sample.model.LinkRelation;
 
 
 /**
  * the plain FolderLink implementation
  */
-public class PlainFolderLink implements FolderLink {
+public class PlainFolderLink extends PlainLinkableBase implements FolderLink {
     private String href;
     private String parentId;
     private String childId;
@@ -55,25 +51,5 @@ public class PlainFolderLink implements FolderLink {
 
     public void setChildId(String childId) {
         this.childId = childId;
-    }
-
-    @Override
-    public List<Link> getLinks() {
-        return null;
-    }
-
-    @Override
-    public String getHref(LinkRelation rel) {
-        return null;
-    }
-
-    @Override
-    public String getHref(LinkRelation rel, String title) {
-        return null;
-    }
-
-    @Override
-    public String self() {
-        return null;
     }
 }

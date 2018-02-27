@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+ * Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
  */
 package com.emc.documentum.rest.client.sample.model.json;
 
@@ -29,7 +29,7 @@ public class JsonValueAssistance extends JsonLinkableBase implements ValueAssist
                 JsonAssistantAttribute a = new JsonAssistantAttribute(entry.getKey());
                 a.allowUserValues((boolean)entry.getValue().get("allow-user-values"));
                 for(Map<String, String> v : (List<Map<String, String>>)entry.getValue().get("values")) {
-                    a.addValue(new JsonValue(v.get("value"), v.get("label")));
+                    a.addValue(new JsonValue(String.valueOf(v.get("value")), v.get("label")));
                 }
                 properties.add(a);
             }

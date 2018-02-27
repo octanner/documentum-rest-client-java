@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+ * Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
  */
 package com.emc.documentum.rest.client.sample.model.xml.jaxb;
 
@@ -19,6 +19,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
+import com.emc.documentum.rest.client.sample.model.ObjectAspects;
+import com.emc.documentum.rest.client.sample.model.ObjectLifecycle;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.xml.XMLNamespace;
 
@@ -28,6 +30,9 @@ public abstract class JaxbObject extends JaxbDmLinkableBase implements RestObjec
     protected Map<String, Object> properties;
     protected ObjectProperties objectProperties;
     protected String href;
+    
+    protected JaxbObjectAspects objectAspects;
+    protected JaxbObjectLifecycle objectLifecycle;
     
     public JaxbObject() {
     }
@@ -41,6 +46,12 @@ public abstract class JaxbObject extends JaxbDmLinkableBase implements RestObjec
         setDefinition(object.getDefinition());
         setProperties(object.getProperties());
         setHref(object.getHref());
+        if(object.getObjectAspects() != null) {
+            this.objectAspects = new JaxbObjectAspects(object.getObjectAspects());
+        }
+        if(object.getObjectLifecycle() != null) {
+            this.objectLifecycle = new JaxbObjectLifecycle(object.getObjectLifecycle());
+        }
     }
     
     @Override
@@ -141,6 +152,24 @@ public abstract class JaxbObject extends JaxbDmLinkableBase implements RestObjec
     @Override
     public String getPropertiesType() {
         return objectProperties==null?null:objectProperties.getPropertiesType();
+    }
+
+    @XmlElement(type = JaxbObjectAspects.class, name = "object-aspects")
+    public ObjectAspects getObjectAspects() {
+        return objectAspects;
+    }
+
+    public void setObjectAspects(JaxbObjectAspects objectAspects) {
+        this.objectAspects = objectAspects;
+    }
+
+    @XmlElement(type = JaxbObjectLifecycle.class, name = "object-lifecycle")
+    public ObjectLifecycle getObjectLifecycle() {
+        return objectLifecycle;
+    }
+
+    public void setObjectLifecycle(JaxbObjectLifecycle objectLifecycle) {
+        this.objectLifecycle = objectLifecycle;
     }
 
     @XmlRootElement(name = "properties")

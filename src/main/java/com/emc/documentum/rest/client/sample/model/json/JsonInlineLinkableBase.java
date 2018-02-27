@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+ * Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
  */
 package com.emc.documentum.rest.client.sample.model.json;
 
@@ -37,7 +37,7 @@ public abstract class JsonInlineLinkableBase extends JsonLinkableBase implements
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
-        this.legacyContentType = legacyContentType;
+        this.legacyContentType = contentType;
     }
     
     @Override

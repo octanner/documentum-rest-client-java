@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+ * Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
  */
 package com.emc.documentum.rest.client.sample;
 
@@ -58,6 +58,9 @@ public class DCTMRestClientSampleTest {
         map.put("Please input the dependency name of " + p.getProperty("type.with.value.assistance.dependencies") + "." + p.getProperty("type.with.value.assistance.dependencies.attribute") + ":", p.getProperty("type.with.value.assistance.dependencies.dependency"));
         map.put("Please input the dependency value of " + p.getProperty("type.with.value.assistance.dependencies.dependency") + ":", p.getProperty("type.with.value.assistance.dependencies.dependency.value"));
         map.put("Please input the object id of the virtual document object (press 'return' to skip sample):", p.getProperty("virtual.document.object.id"));
+        map.put("Please input the lifecycle name to be attached to the document (return to skip):", p.getProperty("lifecycle.name"));
+        map.put("Please input the aspect type to be attached (return to skip):", p.getProperty("aspect.name"));
+        map.put("Please input the lifecycle name to be attached (return to skip):", p.getProperty("lifecycle.name"));
         Reader.setInputMap(map);
     }
     

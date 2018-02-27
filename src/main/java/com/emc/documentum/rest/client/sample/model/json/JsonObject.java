@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+ * Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
  */
 package com.emc.documentum.rest.client.sample.model.json;
 
@@ -7,8 +7,12 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.emc.documentum.rest.client.sample.client.util.Equals;
+import com.emc.documentum.rest.client.sample.model.ObjectAspects;
+import com.emc.documentum.rest.client.sample.model.ObjectLifecycle;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 public class JsonObject extends JsonInlineLinkableBase implements RestObject {
     private String name;
@@ -16,6 +20,10 @@ public class JsonObject extends JsonInlineLinkableBase implements RestObject {
     private String definition;
     private Map<String, Object> properties;
     private String href;
+    @JsonProperty(value = "object-aspects", access = Access.READ_ONLY)
+    private JsonObjectAspects objectAspects;
+    @JsonProperty(value = "object-lifecycle", access = Access.READ_ONLY)
+    private JsonObjectLifecycle objectLifecycle;
     
     public JsonObject() {
     }
@@ -30,6 +38,12 @@ public class JsonObject extends JsonInlineLinkableBase implements RestObject {
         this.definition = object.getDefinition();
         this.properties = object.getProperties();
         this.href = object.getHref();
+        if(object.getObjectAspects() != null) {
+            this.objectAspects = new JsonObjectAspects(object.getObjectAspects());
+        }
+        if(object.getObjectLifecycle() != null) {
+            this.objectLifecycle = new JsonObjectLifecycle(object.getObjectLifecycle());
+        }
     }
     
     @Override
@@ -97,6 +111,24 @@ public class JsonObject extends JsonInlineLinkableBase implements RestObject {
     @Override
     public String getPropertiesType() {
         return null;
+    }
+
+    @Override
+    public ObjectAspects getObjectAspects() {
+        return objectAspects;
+    }
+
+    public void setObjectAspects(JsonObjectAspects objectAspects) {
+        this.objectAspects = objectAspects;
+    }
+
+    @Override
+    public ObjectLifecycle getObjectLifecycle() {
+        return objectLifecycle;
+    }
+
+    public void setObjectLifecycle(JsonObjectLifecycle objectLifecycle) {
+        this.objectLifecycle = objectLifecycle;
     }
 
     @Override

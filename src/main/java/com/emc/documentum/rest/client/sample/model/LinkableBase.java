@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+ * Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
  */
 package com.emc.documentum.rest.client.sample.model;
 
@@ -30,6 +30,11 @@ public abstract class LinkableBase implements Linkable {
     @Override
     public String self() {
         return getHref(LinkRelation.SELF);
+    }
+
+    @Override
+    public boolean hasHref(LinkRelation rel) {
+        return getHref(rel) != null;
     }
 
     private String getValue(LinkRelation rel, String title) {

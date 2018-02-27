@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+ * Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
  */
 package com.emc.documentum.rest.client.sample.client.impl;
 
@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.net.ssl.SSLContext;
 
@@ -99,6 +100,9 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     protected boolean enableCSRFClientToken = true;
     protected boolean ignoreSslWarning = false;
     
+    protected String ifMatch;
+    protected String ifNoneMatch;
+    
     protected String clientToken;
     protected String csrfHeader;
     protected String csrfToken;
@@ -170,6 +174,16 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
         return status;
     }
     
+    @Override
+    public void ifMatch(String ifMatch) {
+        this.ifMatch = ifMatch;
+    }
+
+    @Override
+    public void ifNoneMatch(String ifNoneMatch) {
+        this.ifNoneMatch = ifNoneMatch;
+    }
+
     public abstract AbstractRestTemplateClient clone();
     
     public AbstractRestTemplateClient debug(boolean debug) {
@@ -240,11 +254,10 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
         }
     }
     
-    private HttpHeaders setupAuthentication(HttpHeaders headers) {
+    private HttpHeaders setupRequestHeader(HttpHeaders headers) {
         HttpHeaders result = headers;
         if(enableCSRFClientToken && clientToken != null) {
-            result = new HttpHeaders();
-            result.putAll(headers);
+            result = clone(headers);
             //the cookie is already processed by HttpComponentsClientHttpRequestFactory, need not to set client token header
             //otherwise, the header has to be set (or cookie)
             result.set(CLIENT_TOKEN_NAME, clientToken);
@@ -258,15 +271,40 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
                 }
             }
         } else if(username != null && password != null) {
-            result = new HttpHeaders();
-            result.putAll(headers);
+            result = clone(headers);
             String usernameAndPassword = username + ":" + password;
             result.set(HttpHeaders.AUTHORIZATION, "Basic " + new String(Base64.encodeBase64(usernameAndPassword.getBytes())));
             if(debug) {
                 Debug.debug("Authenticate with Basic " + new String(Base64.encodeBase64(usernameAndPassword.getBytes())));
             }
         }
+        if(ifMatch != null) {
+            result = clone(headers, result);
+            result.setIfMatch(ifMatch);
+            if(debug) {
+                Debug.debug("Set the if-match header " + ifMatch);
+            }
+            ifMatch = null;
+        }
+        if(ifNoneMatch != null) {
+            result = clone(headers, result);
+            result.setIfNoneMatch(ifNoneMatch);
+            if(debug) {
+                Debug.debug("Set the if-none-match header " + ifNoneMatch);
+            }
+            ifNoneMatch = null;
+        }
         return result;
+    }
+    
+    private HttpHeaders clone(HttpHeaders headers) {
+        HttpHeaders result = new HttpHeaders();
+        result.putAll(headers);
+        return result;
+    }
+    
+    private HttpHeaders clone(HttpHeaders headers, HttpHeaders cloned) {
+        return (cloned == null || headers == cloned)?clone(headers):cloned;
     }
         
     /**
@@ -306,7 +344,7 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
         }
         uri = UriHelper.decode(uri);
         if(noRequestProcessor) {
-            headers = setupAuthentication(headers);
+            headers = setupRequestHeader(headers);
         }
         HttpEntity<Object> requestEntity = requestBody == null ? 
                 new HttpEntity<Object>(headers) :
@@ -467,15 +505,11 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     
     @Override
     public RestObject update(RestObject oldObject, LinkRelation rel, RestObject newObject, HttpMethod method, String... params) {
-        try {
-            RestObject newRestObject = newRestObject(oldObject, newObject);
-            if(method == PUT) {
-                return put(oldObject.getHref(rel), newRestObject, getModelClass(newRestObject), params);
-            } else  {
-                return post(oldObject.getHref(rel), newRestObject, getModelClass(newRestObject), params);
-            }
-        } catch (Exception e) {
-            throw new IllegalArgumentException(getModelClass(oldObject).getName());
+        RestObject newRestObject = newRestObject(oldObject, newObject);
+        if(method == PUT) {
+            return put(oldObject.getHref(rel), newRestObject, getModelClass(newRestObject), params);
+        } else  {
+            return post(oldObject.getHref(rel), newRestObject, getModelClass(newRestObject), params);
         }
     }
     

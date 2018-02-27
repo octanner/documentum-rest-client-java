@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+ * Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
  */
 package com.emc.documentum.rest.client.sample.model;
 
@@ -36,7 +36,62 @@ public interface RestType extends Linkable {
     String getCategory();
     
     /**
-     * @return all attributes of item
+     * @return the type help text
      */
-    List<Map<String, Object>> getProperties();
+    public String getHelpText();
+
+    /**
+     * @return the type comment text
+     */
+    public String getCommentText();
+
+    /**
+     * @return the default lifecycle id
+     */
+    public String getDefaultLifecycle();
+
+    /**
+     * @return the default lifecycle version
+     */
+    public String getDefaultLifecycleVersion();
+
+    /**
+     * @return the list of the auditable system events
+     */
+    public List<String> getAuditableSystemEvents();
+
+    /**
+     * @return the list of the auditable application events
+     */
+    public List<String> getAuditableAppEvents();
+
+    /**
+     * @return the type level info based on different lifecycle states
+     */
+    public Map<String, Map<String, RestTypeLifecycleInfo>> getTypeLifecycles();
+
+    /**
+     * @return the mapping tables of a type
+     */
+    public List<RestTypeMappingTable> getMappingTables();
+    
+    /**
+     * @return the value constraints of a type
+     */
+    public List<RestTypeValueConstraint> getConstraints();
+
+    /**
+     * @return whether ignore parent type constraints
+     */
+    public boolean isIgnoreConstraints();
+
+    /**
+     * @return the display configs of a type
+     */
+    public List<RestTypeScopeConfig> getScopeConfigs();
+    
+    /**
+     * @return the type properties
+     */
+    public List<RestProperty> getProperties();
 }

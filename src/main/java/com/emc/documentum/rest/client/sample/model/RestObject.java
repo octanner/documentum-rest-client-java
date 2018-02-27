@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+ * Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
  */
 package com.emc.documentum.rest.client.sample.model;
 
@@ -53,4 +53,14 @@ public interface RestObject extends Linkable {
      * @return the xsi:type properties, valid for xml only
      */
     String getPropertiesType();
+    
+    /**
+     * @return the lifecycle to be attached with the creation of the object
+     */
+    ObjectLifecycle getObjectLifecycle();
+    
+    /**
+     * @return the aspects to be attached with the creation of the object
+     */
+    ObjectAspects getObjectAspects();
 }

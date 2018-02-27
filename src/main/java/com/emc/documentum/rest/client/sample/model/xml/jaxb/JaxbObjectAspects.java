@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+ * Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
  */
 package com.emc.documentum.rest.client.sample.model.xml.jaxb;
 
@@ -23,6 +23,10 @@ public class JaxbObjectAspects extends JaxbDmLinkableBase implements ObjectAspec
 
     public JaxbObjectAspects(String... aspects) {
         this.aspects = Arrays.asList(aspects);
+    }
+    
+    public JaxbObjectAspects(ObjectAspects aspects) {
+        this.aspects = aspects.getAspects();
     }
     
     @Override

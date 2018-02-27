@@ -1,19 +1,17 @@
 /*
- * Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+ * Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
  */
 package com.emc.documentum.rest.client.sample.model.plain;
 
 import java.util.List;
 
-import com.emc.documentum.rest.client.sample.model.Link;
-import com.emc.documentum.rest.client.sample.model.LinkRelation;
 import com.emc.documentum.rest.client.sample.model.Preference;
 
 /**
  * the plain Preference implementation which has properties only
  * normally used when create/update the Preference
  */
-public class PlainPreference implements Preference {
+public class PlainPreference extends PlainLinkableBase implements Preference {
     private String client;
     private String owner;
     private String title;
@@ -93,25 +91,5 @@ public class PlainPreference implements Preference {
 
     public void setPreference(String preference) {
         this.preference = preference;
-    }
-
-    @Override
-    public List<Link> getLinks() {
-        return null;
-    }
-
-    @Override
-    public String getHref(LinkRelation rel) {
-        return null;
-    }
-
-    @Override
-    public String getHref(LinkRelation rel, String title) {
-        return null;
-    }
-
-    @Override
-    public String self() {
-        return null;
     }
 }

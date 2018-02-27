@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+ * Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
  */
 package com.emc.documentum.rest.client.sample.client.impl.jaxb;
 
 import java.io.OutputStream;
 import java.util.List;
+
 import javax.annotation.concurrent.NotThreadSafe;
 
 import org.springframework.http.HttpMethod;
@@ -16,16 +17,22 @@ import org.springframework.web.client.RestTemplate;
 
 import com.emc.documentum.rest.client.sample.client.DCTMRestClient;
 import com.emc.documentum.rest.client.sample.client.impl.AbstractRestTemplateClient;
+import com.emc.documentum.rest.client.sample.client.util.Collections;
 import com.emc.documentum.rest.client.sample.client.util.Headers;
 import com.emc.documentum.rest.client.sample.client.util.SupportedMediaTypes;
 import com.emc.documentum.rest.client.sample.client.util.UriHelper;
+import com.emc.documentum.rest.client.sample.model.AuditPolicy;
+import com.emc.documentum.rest.client.sample.model.AuditTrail;
+import com.emc.documentum.rest.client.sample.model.AvailableAuditEvents;
 import com.emc.documentum.rest.client.sample.model.Comment;
 import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.FolderLink;
 import com.emc.documentum.rest.client.sample.model.HomeDocument;
+import com.emc.documentum.rest.client.sample.model.Lifecycle;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
 import com.emc.documentum.rest.client.sample.model.Linkable;
 import com.emc.documentum.rest.client.sample.model.ObjectAspects;
+import com.emc.documentum.rest.client.sample.model.ObjectLifecycle;
 import com.emc.documentum.rest.client.sample.model.Permission;
 import com.emc.documentum.rest.client.sample.model.PermissionSet;
 import com.emc.documentum.rest.client.sample.model.Preference;
@@ -44,6 +51,10 @@ import com.emc.documentum.rest.client.sample.model.batch.Capabilities;
 import com.emc.documentum.rest.client.sample.model.plain.PlainRestObject;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbAcl;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbAspectType;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbAuditEvent;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbAuditPolicy;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbAuditTrail;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbAvailableAuditEvents;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbBatch;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbBatchCapabilities;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbCabinet;
@@ -56,8 +67,10 @@ import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbFolderLink;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbFormat;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbGroup;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbHomeDocument;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbLifecycle;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbNetworkLocation;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbObjectAspects;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbObjectLifecycle;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbPermission;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbPermissionSet;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbPreference;
@@ -68,6 +81,7 @@ import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbRepository;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSavedSearch;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSearchFeed;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSearchTemplate;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSubscribers;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbSysObject;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbType;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbUser;
@@ -75,14 +89,21 @@ import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbValueAssistance;
 import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbValueAssistantRequest;
 
 import static com.emc.documentum.rest.client.sample.client.util.Headers.ACCEPT_ATOM_HEADERS;
+import static com.emc.documentum.rest.client.sample.client.util.SupportedMediaTypes.APPLICATION_VND_DCTM_XML_VALUE;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.ABOUT;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.ACLS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.ASPECT_TYPES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.ASSIS_VALUES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.ASSOCIATIONS;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.AUDIT_POLICIES;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.AVAILABLE_AUDIT_EVENTS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.BATCH_CAPABILITIES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CABINETS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CANCEL_CHECKOUT;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.CANCEL_DEMOTION;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.CANCEL_PROMOTION;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.CANCEL_RESUMPTION;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.CANCEL_SUSPENSION;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CHECKIN_BRANCH_VERSION;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CHECKIN_NEXT_MAJOR;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CHECKIN_NEXT_MINOR;
@@ -92,20 +113,27 @@ import static com.emc.documentum.rest.client.sample.model.LinkRelation.CONTENTS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CURRENT_USER_PREFERENCES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.DELETE;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.DEMATERIALIZE;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.DEMOTION;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.DOCUMENTS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.EDIT;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.FOLDERS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.FORMATS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.GROUPS;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.LIFECYCLES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.MATERIALIZE;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.NETWORK_LOCATIONS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.OBJECTS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.OBJECT_ASPECTS;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.OBJECT_LIFECYCLE;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.PRIMARY_CONTENT;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.PROMOTION;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.RECENT_TRAILS;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.REGISTERED_AUDIT_EVENTS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.RELATIONS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.RELATION_TYPES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.REPLIES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.REPOSITORIES;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.RESUMPTION;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SAVED_SEARCHES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SAVED_SEARCH_SAVED_RESULTS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SEARCH;
@@ -113,11 +141,16 @@ import static com.emc.documentum.rest.client.sample.model.LinkRelation.SEARCH_EX
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SEARCH_TEMPLATES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SELF;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SHARED_PARENT;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.SUBSCRIBE;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.SUBSCRIPTIONS;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.SUSPENSION;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.TYPES;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.UNSUBSCRIBE;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.USERS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.VERSIONS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.VIRTUAL_DOCUMENT_NODES;
 import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.MediaType.APPLICATION_ATOM_XML_VALUE;
 
 /**
  * the DCTMRestClient implementation by JAXB xml support
@@ -393,6 +426,11 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     @Override
     public void detach(ObjectAspects objectAspects, String aspect) {
         delete(objectAspects.getHref(DELETE, aspect));
+    }
+    
+    @Override
+    public ObjectAspects getObjectAspects(RestObject object, String... params) {
+        return get(object.getHref(OBJECT_ASPECTS), JaxbObjectAspects.class, params);        
     }
     
     @Override
@@ -706,5 +744,162 @@ public class DCTMJaxbClient extends AbstractRestTemplateClient implements DCTMRe
     @Override
     public ClientType getClientType() {
         return ClientType.XML;
+    }
+
+    @Override
+    public Feed<Lifecycle> getLifecycles(String... params) {
+        return feed(LIFECYCLES, params);
+    }
+    
+    @Override
+    public Lifecycle getLifecycle(String uri, String... params) {
+        return get(uri, false, JaxbLifecycle.class, params);
+    }
+
+    @Override
+    public ObjectLifecycle attach(RestObject object, ObjectLifecycle objectLifecycle) {
+        return put(object.getHref(OBJECT_LIFECYCLE), objectLifecycle==null?null:new JaxbObjectLifecycle(objectLifecycle), JaxbObjectLifecycle.class);
+    }
+
+    @Override
+    public void detach(ObjectLifecycle objectLifecycle) {
+        delete(objectLifecycle.self());
+    }
+    
+    @Override
+    public ObjectLifecycle getObjectLifecycle(RestObject object, String... params) {
+        return get(object.getHref(OBJECT_LIFECYCLE), JaxbObjectLifecycle.class, params);
+    }
+
+    @Override
+    public ObjectLifecycle promote(ObjectLifecycle objectLifecycle, String... params) {
+        return put(objectLifecycle.getHref(PROMOTION), JaxbObjectLifecycle.class, params);
+    }
+
+    @Override
+    public ObjectLifecycle demote(ObjectLifecycle objectLifecycle, String... params) {
+        return put(objectLifecycle.getHref(DEMOTION), JaxbObjectLifecycle.class, params);
+    }
+
+    @Override
+    public ObjectLifecycle suspend(ObjectLifecycle objectLifecycle, String... params) {
+        return put(objectLifecycle.getHref(SUSPENSION), JaxbObjectLifecycle.class, params);
+    }
+
+    @Override
+    public ObjectLifecycle resume(ObjectLifecycle objectLifecycle, String... params) {
+        return put(objectLifecycle.getHref(RESUMPTION), JaxbObjectLifecycle.class, params);
+    }
+
+    @Override
+    public void cancel(ObjectLifecycle objectLifecycle) {
+        if(objectLifecycle.hasHref(CANCEL_PROMOTION)) {
+            delete(objectLifecycle.getHref(CANCEL_PROMOTION));
+        }
+        if(objectLifecycle.hasHref(CANCEL_DEMOTION)) {
+            delete(objectLifecycle.getHref(CANCEL_DEMOTION));
+        }
+        if(objectLifecycle.hasHref(CANCEL_SUSPENSION)) {
+            delete(objectLifecycle.getHref(CANCEL_SUSPENSION));
+        }
+        if(objectLifecycle.hasHref(CANCEL_RESUMPTION)) {
+            delete(objectLifecycle.getHref(CANCEL_RESUMPTION));
+        }
+    }
+
+    @Override
+    public RestObject subscribe(RestObject object, String... subscribers) {
+        if(!object.hasHref(SUBSCRIBE)) {
+            object = get(object, "check-subscription", "true");
+        }
+        if(object.hasHref(SUBSCRIBE)) {
+            return Collections.isEmpty(subscribers) ?
+                    put(object.getHref(SUBSCRIBE), object.getClass()):
+                    put(object.getHref(SUBSCRIBE),  new JaxbSubscribers(subscribers), object.getClass());
+        } else if(object.hasHref(UNSUBSCRIBE)) {
+            throw new IllegalArgumentException("the object is already subscribed");
+        } else {
+            throw new IllegalArgumentException("the object is not subscribable");
+        }
+    }
+
+    @Override
+    public void unsubscribe(RestObject object) {
+        if(!object.hasHref(UNSUBSCRIBE)) {
+            object = get(object, "check-subscription", "true");
+        }
+        if(object.hasHref(UNSUBSCRIBE)) {
+            delete(object.getHref(UNSUBSCRIBE));
+        } else if(object.hasHref(SUBSCRIBE)) {
+            throw new IllegalArgumentException("the object is not subscribed");
+        } else {
+            throw new IllegalArgumentException("the object is not unsubscribable");
+        }
+    }
+
+    @Override
+    public Feed<RestObject> getSubscriptions(String... params) {
+        return feed(SUBSCRIPTIONS, params);
+    }
+
+    @Override
+    public Feed<AuditPolicy> getAuditPolicies(String... params) {
+        return feed(AUDIT_POLICIES, params);
+    }
+
+    @Override
+    public AuditPolicy createAuditPolicy(AuditPolicy auditPolicy) {
+        return post(getRepository().getHref(AUDIT_POLICIES), new JaxbAuditPolicy(auditPolicy), JaxbAuditPolicy.class);
+    }
+
+    @Override
+    public AuditPolicy getAuditPolicy(String uri, String... params) {
+        return get(uri, JaxbAuditPolicy.class, params);
+    }
+
+    @Override
+    public AuditPolicy updateAuditPolicy(AuditPolicy oldPolicy, AuditPolicy newPolicy) {
+        return post(oldPolicy.getHref(EDIT), new JaxbAuditPolicy(newPolicy), JaxbAuditPolicy.class);
+    }
+
+    @Override
+    public void deleteAuditPolicy(AuditPolicy auditPolicy) {
+        delete(auditPolicy);
+    }
+
+    @Override
+    public Feed<RestObject> getRecentAuditTrails(String... params) {
+        return feed(getCurrentUser(), RECENT_TRAILS, params);
+    }
+
+    @Override
+    public AuditTrail getAuditTrail(String auditTrailUri, String... params) {
+        return get(auditTrailUri, JaxbAuditTrail.class, params);
+    }
+
+    @Override
+    public AvailableAuditEvents getAvailableAuditEvents(String... params) {
+        return getRepository().hasHref(AVAILABLE_AUDIT_EVENTS)?
+            get(getRepository().getHref(AVAILABLE_AUDIT_EVENTS), new Headers().accept(APPLICATION_VND_DCTM_XML_VALUE+","+APPLICATION_ATOM_XML_VALUE).toHttpHeaders(), JaxbAvailableAuditEvents.class, params):null;
+    }
+
+    @Override
+    public Feed<RestObject> getRegisteredAuditEvents(String... params) {
+        return feed(getRepository(), REGISTERED_AUDIT_EVENTS, params);
+    }
+
+    @Override
+    public RestObject registerAuditEvent(RestObject auditEvent, String... params) {
+        return post(getRepository().getHref(REGISTERED_AUDIT_EVENTS), new JaxbAuditEvent(auditEvent), JaxbAuditEvent.class, params);
+    }
+
+    @Override
+    public RestObject getRegisteredAuditEvent(String uri, String... params) {
+        return get(uri, JaxbAuditEvent.class, params);
+    }
+
+    @Override
+    public void unregisterAuditEvent(RestObject auditEvent) {
+        delete(auditEvent);
     }
 }

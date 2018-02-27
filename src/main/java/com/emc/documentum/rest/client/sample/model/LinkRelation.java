@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+ * Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
  */
 package com.emc.documentum.rest.client.sample.model;
 
@@ -93,7 +93,34 @@ public enum LinkRelation {
     FORMATS("formats", true),
     NETWORK_LOCATIONS("network-locations", true),
     PARENT_LINKS("parent-links", true),
-    CHILD_LINKS("child-links", true);
+    CHILD_LINKS("child-links", true),
+    
+    //for lifecycle
+    LIFECYCLES("lifecycles", true),
+    LIFECYCLE("lifecycle", true),
+    OBJECT_LIFECYCLE("object-lifecycle", true),
+    PROMOTION("promotion", true),
+    DEMOTION("demotion", true),
+    SUSPENSION("suspension", true),
+    RESUMPTION("resumption", true),
+    CANCEL_PROMOTION("cancel-promotion", true),
+    CANCEL_DEMOTION("cancel-demotion", true),
+    CANCEL_SUSPENSION("cancel-suspension", true),
+    CANCEL_RESUMPTION("cancel-resumption", true),
+    
+    //subscription
+    SUBSCRIPTIONS("subscriptions", true),
+    SUBSCRIBE("subscribe", true),
+    UNSUBSCRIBE("unsubscribe", true),
+    
+    //audit
+    AUDIT_TRAILS("audit-trails", true),
+    RECENT_TRAILS("recent-trails", true),
+    AUDITED_OBJECT("audited-object", true),
+    AVAILABLE_AUDIT_EVENTS("available-audit-events", true),
+    REGISTERED_AUDIT_EVENTS("registered-audit-events", true),
+    UNREGISTER_ALL_AUDIT_EVENTS("unregister-all-audit-events", true),
+    AUDIT_POLICIES("audit-policies", true);
     
     private static final String PREFIX = "http://identifiers.emc.com/linkrel/";
     private final String rel;

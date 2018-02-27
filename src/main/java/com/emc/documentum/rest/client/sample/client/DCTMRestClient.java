@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+ * Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
  */
 package com.emc.documentum.rest.client.sample.client;
 
@@ -14,13 +14,18 @@ import org.springframework.http.HttpStatus;
 import com.emc.documentum.rest.client.sample.client.annotation.ClientAsyncOption;
 import com.emc.documentum.rest.client.sample.client.annotation.NotBatchable;
 import com.emc.documentum.rest.client.sample.client.impl.AbstractRestTemplateClient.ClientType;
+import com.emc.documentum.rest.client.sample.model.AuditPolicy;
+import com.emc.documentum.rest.client.sample.model.AuditTrail;
+import com.emc.documentum.rest.client.sample.model.AvailableAuditEvents;
 import com.emc.documentum.rest.client.sample.model.Comment;
 import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.FolderLink;
 import com.emc.documentum.rest.client.sample.model.HomeDocument;
+import com.emc.documentum.rest.client.sample.model.Lifecycle;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
 import com.emc.documentum.rest.client.sample.model.Linkable;
 import com.emc.documentum.rest.client.sample.model.ObjectAspects;
+import com.emc.documentum.rest.client.sample.model.ObjectLifecycle;
 import com.emc.documentum.rest.client.sample.model.Permission;
 import com.emc.documentum.rest.client.sample.model.PermissionSet;
 import com.emc.documentum.rest.client.sample.model.Preference;
@@ -48,6 +53,20 @@ public interface DCTMRestClient extends Cloneable {
      */
     @NotBatchable
     public HttpHeaders getHeaders();
+    
+    /**
+     * set the if match header for the next operation
+     * @param ifMatch the if-match header value
+     */
+    @NotBatchable @ClientAsyncOption(retainClient=true)
+    public void ifMatch(String ifMatch);
+
+    /**
+     * set the if none match header for the next operation
+     * @param ifNoneMatch the if-none-match header value
+     */
+    @NotBatchable @ClientAsyncOption(retainClient=true)
+    public void ifNoneMatch(String ifNoneMatch);
     
     /**
      * @return the http status of the previous operation
@@ -702,6 +721,14 @@ public interface DCTMRestClient extends Cloneable {
      * @param aspect the aspect name
      */
     public void detach(ObjectAspects objectAspects, String aspect);
+    
+    /**
+     * get object aspects
+     * @param object the object
+     * @param params the query parameters
+     * @return the attached aspects
+     */
+    public ObjectAspects getObjectAspects(RestObject object, String... params);
 
     /**
      * get relation types of the repository
@@ -1036,4 +1063,187 @@ public interface DCTMRestClient extends Cloneable {
      * @return the put result
      */
     public <T> T put(String uri, Class<? extends T> responseBodyClass, String... params);
+
+    /**
+     * get lifecycles of the repository
+     * @param params the query parameters
+     * @return the lifecycle collection
+     */
+    public Feed<Lifecycle> getLifecycles(String... params);
+    
+    /**
+     * get single Lifecycle
+     * @param uri the uri of the lifecycle
+     * @param params the query parameters
+     * @return the lifecycle object
+     */
+    public Lifecycle getLifecycle(String uri, String... params);
+    
+    /**
+     * attach a lifecycle to the object
+     * @param object the RestObject
+     * @param objectLifecycle the lifecycle info to be attached
+     * @return the object lifecycle state
+     */
+    public ObjectLifecycle attach(RestObject object, ObjectLifecycle objectLifecycle);
+    
+    /**
+     * detach the lifecycle from the object
+     * @param objectLifecycle the object lifecycle state
+     */
+    public void detach(ObjectLifecycle objectLifecycle);
+    
+    /**
+     * get the current object lifecycle state
+     * @param object the RestObject
+     * @param params the query parameters
+     * @return the object lifecycle state
+     */
+    public ObjectLifecycle getObjectLifecycle(RestObject object, String... params);
+
+    /**
+     * promote the object lifecycle
+     * @param objectLifecycle the object lifecycle state
+     * @param params query params
+     * @return the object lifecycle state 
+     */
+    public ObjectLifecycle promote(ObjectLifecycle objectLifecycle, String... params);
+    
+    /**
+     * demote the object lifecycle
+     * @param objectLifecycle the object lifecycle state
+     * @param params query params
+     * @return the object lifecycle state 
+     */
+    public ObjectLifecycle demote(ObjectLifecycle objectLifecycle, String... params);
+
+    /**
+     * suspend the object lifecycle
+     * @param objectLifecycle the object lifecycle state
+     * @param params query params
+     * @return the object lifecycle state 
+     */
+    public ObjectLifecycle suspend(ObjectLifecycle objectLifecycle, String... params);
+
+    /**
+     * resume the object lifecycle
+     * @param objectLifecycle the object lifecycle state
+     * @param params query params
+     * @return the object lifecycle state 
+     */
+    public ObjectLifecycle resume(ObjectLifecycle objectLifecycle, String... params);
+    
+    /**
+     * cancel all scheduled operation
+     * @param objectLifecycle the object lifecycle state
+     */
+    public void cancel(ObjectLifecycle objectLifecycle);
+    
+    /**
+     * subscribe the object for subscribes
+     * @param object the object to be subscribed
+     * @param subscribers the subscribers, if no subscribers provided, then subscriber for current user
+     * @return the subscribed object
+     */
+    public RestObject subscribe(RestObject object, String... subscribers);
+    
+    /**
+     * unsubscribe the object for the current user
+     * @param object the object to be unsubscribed
+     */
+    public void unsubscribe(RestObject object);
+
+    /**
+     * get user subscriptions
+     * @param params the query parameters
+     * @return the subscribed objects
+     */
+    public Feed<RestObject> getSubscriptions(String... params);
+    
+    /**
+     * get audit policies
+     * @param params the query parameters
+     * @return the audit policies
+     */
+    public Feed<AuditPolicy> getAuditPolicies(String... params);
+    
+    /**
+     * create an audit policy
+     * @param auditPolicy the audit policy to be created
+     * @return the created audit policy
+     */
+    public AuditPolicy createAuditPolicy(AuditPolicy auditPolicy);
+    
+    /**
+     * get audit policy
+     * @param uri the audit policy uri
+     * @param params the query parameters
+     * @return the audit policy
+     */
+    public AuditPolicy getAuditPolicy(String uri, String... params);
+    
+    /**
+     * update the audit policy
+     * @param oldPolicy the old audit policy
+     * @param newPolicy the new audit policy
+     * @return the updated audit policy
+     */
+    public AuditPolicy updateAuditPolicy(AuditPolicy oldPolicy, AuditPolicy newPolicy);
+    
+    /**
+     * delete the audit policy
+     * @param auditPolicy to be deleted
+     */
+    public void deleteAuditPolicy(AuditPolicy auditPolicy);
+
+    /**
+     * get the current user's recent audit trails
+     * @param params the query parameters
+     * @return the audit trails collection
+     */
+    public Feed<RestObject> getRecentAuditTrails(String... params);
+
+    /**
+     * get single audit trail
+     * @param auditTrailUri the uri of the audit trail
+     * @param params the query parameters
+     * @return the audit trail object
+     */
+    public AuditTrail getAuditTrail(String auditTrailUri, String... params);
+    
+    /**
+     * get available audit events
+     * @param params the query parameters
+     * @return all available audit events
+     */
+    public AvailableAuditEvents getAvailableAuditEvents(String... params);
+    
+    /**
+     * get all the registered audit events
+     * @param params the query parameters
+     * @return the registered audit events
+     */
+    public Feed<RestObject> getRegisteredAuditEvents(String... params);
+    
+    /**
+     * register an audit event
+     * @param auditEvent the audit event to be registered
+     * @param params the query parameters
+     * @return the registered audit event
+     */
+    public RestObject registerAuditEvent(RestObject auditEvent, String... params);
+    
+    /**
+     * get the single registered audit event
+     * @param uri the uri
+     * @param params the query parameters
+     * @return the registered audit event
+     */
+    public RestObject getRegisteredAuditEvent(String uri, String... params);
+    
+    /**
+     * unregister the audit event
+     * @param auditEvent the audit event to be unregistered
+     */
+    public void unregisterAuditEvent(RestObject auditEvent);
 }

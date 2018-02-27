@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+ * Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
  */
 package com.emc.documentum.rest.client.sample.client.impl;
 
@@ -53,15 +53,14 @@ public class ClientAsyncRestTemplateClient implements InvocationHandler {
     
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        ClientAsyncOption asyncOption = AnnotationUtils.getAnnotation(method, ClientAsyncOption.class);
-        boolean sync = asyncOption != null && (asyncOption.value() || asyncOption.retainClient());
-        
         if("getHeaders".equals(method.getName())) {
             return latestResponse == null ? null : latestResponse.getHeaders();
         }
         if("getStatus".equals(method.getName())) {
             return latestResponse == null ? null : latestResponse.getStatus();
         }
+        ClientAsyncOption asyncOption = AnnotationUtils.getAnnotation(method, ClientAsyncOption.class);
+        boolean sync = asyncOption != null && (asyncOption.value() || asyncOption.retainClient());
         
         DCTMRestClient client = null;
         if(latestClient == null) {

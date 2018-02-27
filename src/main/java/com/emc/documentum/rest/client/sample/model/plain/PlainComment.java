@@ -1,15 +1,11 @@
 /*
- * Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+ * Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
  */
 package com.emc.documentum.rest.client.sample.model.plain;
 
-import java.util.List;
-
 import com.emc.documentum.rest.client.sample.model.Comment;
-import com.emc.documentum.rest.client.sample.model.Link;
-import com.emc.documentum.rest.client.sample.model.LinkRelation;
 
-public class PlainComment implements Comment {
+public class PlainComment extends PlainLinkableBase implements Comment {
     private String objectId;
     private String commentId;
     private String ownerName;
@@ -116,25 +112,5 @@ public class PlainComment implements Comment {
 
     public void setCanReply(boolean canReply) {
         this.canReply = canReply;
-    }
-
-    @Override
-    public List<Link> getLinks() {
-        return null;
-    }
-
-    @Override
-    public String getHref(LinkRelation rel) {
-        return null;
-    }
-
-    @Override
-    public String getHref(LinkRelation rel, String title) {
-        return null;
-    }
-
-    @Override
-    public String self() {
-        return null;
     }
 }

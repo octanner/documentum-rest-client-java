@@ -1,25 +1,26 @@
 /*
- * Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+ * Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
  */
 package com.emc.documentum.rest.client.sample.model.plain;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import com.emc.documentum.rest.client.sample.model.Link;
-import com.emc.documentum.rest.client.sample.model.LinkRelation;
+import com.emc.documentum.rest.client.sample.model.ObjectAspects;
+import com.emc.documentum.rest.client.sample.model.ObjectLifecycle;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 
 /**
  * the plain RestObject implementation which has properties only
  * normally used when create/update the RestObject
  */
-public class PlainRestObject implements RestObject {
+public class PlainRestObject extends PlainLinkableBase implements RestObject {
     private final String type;
     private final Map<String, Object> properties;
     private final String href;
-
+    private ObjectLifecycle objectLifecycle;
+    private ObjectAspects objectAspects;
+    
     public PlainRestObject(String type, Map<String, Object> properties) {
         this.properties = properties;
         this.type = type;
@@ -75,18 +76,26 @@ public class PlainRestObject implements RestObject {
     }
     
     @Override
+    public ObjectLifecycle getObjectLifecycle() {
+        return objectLifecycle;
+    }
+
+    public void setObjectLifecycle(ObjectLifecycle objectLifecycle) {
+        this.objectLifecycle = objectLifecycle;
+    }
+
+    @Override
+    public ObjectAspects getObjectAspects() {
+        return objectAspects;
+    }
+
+    public void setObjectAspects(ObjectAspects objectAspects) {
+        this.objectAspects = objectAspects;
+    }
+
+    @Override
     public String getHref() {
         return href;
-    }
-
-    @Override
-    public List<Link> getLinks() {
-        return null;
-    }
-
-    @Override
-    public String getHref(LinkRelation rel) {
-        return null;
     }
 
     @Override
@@ -101,16 +110,6 @@ public class PlainRestObject implements RestObject {
 
     @Override
     public String getPropertiesType() {
-        return null;
-    }
-
-    @Override
-    public String getHref(LinkRelation rel, String title) {
-        return null;
-    }
-
-    @Override
-    public String self() {
         return null;
     }
 }

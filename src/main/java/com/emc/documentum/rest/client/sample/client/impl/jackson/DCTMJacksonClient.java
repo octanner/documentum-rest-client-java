@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+ * Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
  */
 package com.emc.documentum.rest.client.sample.client.impl.jackson;
 
@@ -17,15 +17,21 @@ import org.springframework.web.client.RestTemplate;
 
 import com.emc.documentum.rest.client.sample.client.DCTMRestClient;
 import com.emc.documentum.rest.client.sample.client.impl.AbstractRestTemplateClient;
+import com.emc.documentum.rest.client.sample.client.util.Collections;
 import com.emc.documentum.rest.client.sample.client.util.Headers;
 import com.emc.documentum.rest.client.sample.client.util.UriHelper;
+import com.emc.documentum.rest.client.sample.model.AuditPolicy;
+import com.emc.documentum.rest.client.sample.model.AuditTrail;
+import com.emc.documentum.rest.client.sample.model.AvailableAuditEvents;
 import com.emc.documentum.rest.client.sample.model.Comment;
 import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.FolderLink;
 import com.emc.documentum.rest.client.sample.model.HomeDocument;
+import com.emc.documentum.rest.client.sample.model.Lifecycle;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
 import com.emc.documentum.rest.client.sample.model.Linkable;
 import com.emc.documentum.rest.client.sample.model.ObjectAspects;
+import com.emc.documentum.rest.client.sample.model.ObjectLifecycle;
 import com.emc.documentum.rest.client.sample.model.Permission;
 import com.emc.documentum.rest.client.sample.model.PermissionSet;
 import com.emc.documentum.rest.client.sample.model.Preference;
@@ -41,21 +47,28 @@ import com.emc.documentum.rest.client.sample.model.ValueAssistantRequest;
 import com.emc.documentum.rest.client.sample.model.VirtualDocumentNode;
 import com.emc.documentum.rest.client.sample.model.batch.Batch;
 import com.emc.documentum.rest.client.sample.model.batch.Capabilities;
+import com.emc.documentum.rest.client.sample.model.json.JsonAuditPolicy;
+import com.emc.documentum.rest.client.sample.model.json.JsonAuditTrail;
+import com.emc.documentum.rest.client.sample.model.json.JsonAvailableAuditEvents;
 import com.emc.documentum.rest.client.sample.model.json.JsonBatch;
 import com.emc.documentum.rest.client.sample.model.json.JsonBatchCapabilities;
 import com.emc.documentum.rest.client.sample.model.json.JsonComment;
 import com.emc.documentum.rest.client.sample.model.json.JsonFeeds;
 import com.emc.documentum.rest.client.sample.model.json.JsonFolderLink;
 import com.emc.documentum.rest.client.sample.model.json.JsonHomeDocument;
+import com.emc.documentum.rest.client.sample.model.json.JsonLifecycle;
 import com.emc.documentum.rest.client.sample.model.json.JsonObject;
 import com.emc.documentum.rest.client.sample.model.json.JsonObjectAspects;
+import com.emc.documentum.rest.client.sample.model.json.JsonObjectLifecycle;
 import com.emc.documentum.rest.client.sample.model.json.JsonPermission;
 import com.emc.documentum.rest.client.sample.model.json.JsonPermissionSet;
 import com.emc.documentum.rest.client.sample.model.json.JsonPreference;
 import com.emc.documentum.rest.client.sample.model.json.JsonRepository;
 import com.emc.documentum.rest.client.sample.model.json.JsonSavedSearch;
 import com.emc.documentum.rest.client.sample.model.json.JsonSearchTemplate;
+import com.emc.documentum.rest.client.sample.model.json.JsonSubscribers;
 import com.emc.documentum.rest.client.sample.model.json.JsonType;
+import com.emc.documentum.rest.client.sample.model.json.JsonType71;
 import com.emc.documentum.rest.client.sample.model.json.JsonValueAssistance;
 import com.emc.documentum.rest.client.sample.model.json.JsonValueAssistantRequest;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -65,9 +78,15 @@ import static com.emc.documentum.rest.client.sample.model.LinkRelation.ACLS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.ASPECT_TYPES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.ASSIS_VALUES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.ASSOCIATIONS;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.AUDIT_POLICIES;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.AVAILABLE_AUDIT_EVENTS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.BATCH_CAPABILITIES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CABINETS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CANCEL_CHECKOUT;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.CANCEL_DEMOTION;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.CANCEL_PROMOTION;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.CANCEL_RESUMPTION;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.CANCEL_SUSPENSION;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CHECKIN_BRANCH_VERSION;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CHECKIN_NEXT_MAJOR;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CHECKIN_NEXT_MINOR;
@@ -77,20 +96,27 @@ import static com.emc.documentum.rest.client.sample.model.LinkRelation.CONTENTS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.CURRENT_USER_PREFERENCES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.DELETE;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.DEMATERIALIZE;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.DEMOTION;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.DOCUMENTS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.EDIT;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.FOLDERS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.FORMATS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.GROUPS;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.LIFECYCLES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.MATERIALIZE;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.NETWORK_LOCATIONS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.OBJECTS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.OBJECT_ASPECTS;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.OBJECT_LIFECYCLE;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.PRIMARY_CONTENT;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.PROMOTION;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.RECENT_TRAILS;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.REGISTERED_AUDIT_EVENTS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.RELATIONS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.RELATION_TYPES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.REPLIES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.REPOSITORIES;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.RESUMPTION;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SAVED_SEARCHES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SAVED_SEARCH_SAVED_RESULTS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SEARCH;
@@ -98,7 +124,11 @@ import static com.emc.documentum.rest.client.sample.model.LinkRelation.SEARCH_EX
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SEARCH_TEMPLATES;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SELF;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.SHARED_PARENT;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.SUBSCRIBE;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.SUBSCRIPTIONS;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.SUSPENSION;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.TYPES;
+import static com.emc.documentum.rest.client.sample.model.LinkRelation.UNSUBSCRIBE;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.USERS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.VERSIONS;
 import static com.emc.documentum.rest.client.sample.model.LinkRelation.VIRTUAL_DOCUMENT_NODES;
@@ -342,7 +372,12 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     
     @Override
     public RestType getType(String name, String... params) {
-        return get(getRepository().getHref(TYPES)+"/"+name, false, JsonType.class, params);
+        if(getMajorVersion() > 7.1) {
+            return get(getRepository().getHref(TYPES)+"/"+name, false, JsonType.class, params);
+        } else {
+            JsonType71 type71 = get(getRepository().getHref(TYPES)+"/"+name, false, JsonType71.class, params);
+            return type71==null?null:type71.getType();
+        }
     }
     
     @Override
@@ -373,6 +408,11 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     @Override
     public void detach(ObjectAspects objectAspects, String aspect) {
         delete(objectAspects.getHref(DELETE, aspect));
+    }
+    
+    @Override
+    public ObjectAspects getObjectAspects(RestObject object, String... params) {
+        return get(object.getHref(OBJECT_ASPECTS), JsonObjectAspects.class, params);        
     }
     
     @Override
@@ -700,5 +740,162 @@ public class DCTMJacksonClient extends AbstractRestTemplateClient implements DCT
     @Override
     public ClientType getClientType() {
         return ClientType.JSON;
+    }
+
+    @Override
+    public Feed<Lifecycle> getLifecycles(String... params) {
+        return feed(LIFECYCLES, JsonFeeds.LifecycleFeed.class, params);
+    }
+    
+    @Override
+    public Lifecycle getLifecycle(String uri, String... params) {
+        return get(uri, false, JsonLifecycle.class, params);
+    }
+
+    @Override
+    public ObjectLifecycle attach(RestObject object, ObjectLifecycle objectLifecycle) {
+        return put(object.getHref(OBJECT_LIFECYCLE), objectLifecycle==null?null:new JsonObjectLifecycle(objectLifecycle), JsonObjectLifecycle.class);
+    }
+
+    @Override
+    public void detach(ObjectLifecycle objectLifecycle) {
+        delete(objectLifecycle.self());
+    }
+    
+    @Override
+    public ObjectLifecycle getObjectLifecycle(RestObject object, String... params) {
+        return get(object.getHref(OBJECT_LIFECYCLE), JsonObjectLifecycle.class, params);
+    }
+
+    @Override
+    public ObjectLifecycle promote(ObjectLifecycle objectLifecycle, String... params) {
+        return put(objectLifecycle.getHref(PROMOTION), JsonObjectLifecycle.class, params);
+    }
+
+    @Override
+    public ObjectLifecycle demote(ObjectLifecycle objectLifecycle, String... params) {
+        return put(objectLifecycle.getHref(DEMOTION), JsonObjectLifecycle.class, params);
+    }
+
+    @Override
+    public ObjectLifecycle suspend(ObjectLifecycle objectLifecycle, String... params) {
+        return put(objectLifecycle.getHref(SUSPENSION), JsonObjectLifecycle.class, params);
+    }
+
+    @Override
+    public ObjectLifecycle resume(ObjectLifecycle objectLifecycle, String... params) {
+        return put(objectLifecycle.getHref(RESUMPTION), JsonObjectLifecycle.class, params);
+    }
+
+    @Override
+    public void cancel(ObjectLifecycle objectLifecycle) {
+        if(objectLifecycle.hasHref(CANCEL_PROMOTION)) {
+            delete(objectLifecycle.getHref(CANCEL_PROMOTION));
+        }
+        if(objectLifecycle.hasHref(CANCEL_DEMOTION)) {
+            delete(objectLifecycle.getHref(CANCEL_DEMOTION));
+        }
+        if(objectLifecycle.hasHref(CANCEL_SUSPENSION)) {
+            delete(objectLifecycle.getHref(CANCEL_SUSPENSION));
+        }
+        if(objectLifecycle.hasHref(CANCEL_RESUMPTION)) {
+            delete(objectLifecycle.getHref(CANCEL_RESUMPTION));
+        }
+    }
+
+    @Override
+    public RestObject subscribe(RestObject object, String... subscribers) {
+        if(!object.hasHref(SUBSCRIBE)) {
+            object = get(object, "check-subscription", "true");
+        }
+        if(object.hasHref(SUBSCRIBE)) {
+            return Collections.isEmpty(subscribers) ?
+                    put(object.getHref(SUBSCRIBE), JsonObject.class):
+                    put(object.getHref(SUBSCRIBE),  new JsonSubscribers(subscribers), JsonObject.class);
+        } else if(object.hasHref(UNSUBSCRIBE)) {
+            throw new IllegalArgumentException("the object is already subscribed");
+        } else {
+            throw new IllegalArgumentException("the object is not subscribable");
+        }
+    }
+
+    @Override
+    public void unsubscribe(RestObject object) {
+        if(!object.hasHref(UNSUBSCRIBE)) {
+            object = get(object, "check-subscription", "true");
+        }
+        if(object.hasHref(UNSUBSCRIBE)) {
+            delete(object.getHref(UNSUBSCRIBE));
+        } else if(object.hasHref(SUBSCRIBE)) {
+            throw new IllegalArgumentException("the object is not subscribed");
+        } else {
+            throw new IllegalArgumentException("the object is not unsubscribable");
+        }
+    }
+    
+    @Override
+    public Feed<RestObject> getSubscriptions(String... params) {
+        return objectFeed(SUBSCRIPTIONS, params);
+    }
+
+    @Override
+    public Feed<AuditPolicy> getAuditPolicies(String... params) {
+        return feed(AUDIT_POLICIES, JsonFeeds.AuditPolicyFeed.class, params);
+    }
+
+    @Override
+    public AuditPolicy createAuditPolicy(AuditPolicy auditPolicy) {
+        return post(getRepository().getHref(AUDIT_POLICIES), new JsonAuditPolicy(auditPolicy), JsonAuditPolicy.class);
+    }
+
+    @Override
+    public AuditPolicy getAuditPolicy(String uri, String... params) {
+        return get(uri, false, JsonAuditPolicy.class, params);
+    }
+
+    @Override
+    public AuditPolicy updateAuditPolicy(AuditPolicy oldPolicy, AuditPolicy newPolicy) {
+        return post(oldPolicy.getHref(EDIT), new JsonAuditPolicy(newPolicy), JsonAuditPolicy.class);
+    }
+
+    @Override
+    public void deleteAuditPolicy(AuditPolicy auditPolicy) {
+        delete(auditPolicy.self());
+    }
+
+    @Override
+    public Feed<RestObject> getRecentAuditTrails(String... params) {
+        return feed(getCurrentUser(), RECENT_TRAILS, JsonFeeds.ObjectFeed.class, params);
+    }
+
+    @Override
+    public AuditTrail getAuditTrail(String auditTrailUri, String... params) {
+        return get(auditTrailUri, false, JsonAuditTrail.class, params);
+    }
+
+    @Override
+    public AvailableAuditEvents getAvailableAuditEvents(String... params) {
+        return getRepository().hasHref(AVAILABLE_AUDIT_EVENTS)?
+            get(getRepository().getHref(AVAILABLE_AUDIT_EVENTS), JsonAvailableAuditEvents.class, params):null;
+    }
+
+    @Override
+    public Feed<RestObject> getRegisteredAuditEvents(String... params) {
+        return feed(getRepository(), REGISTERED_AUDIT_EVENTS, JsonFeeds.ObjectFeed.class, params);
+    }
+
+    @Override
+    public RestObject registerAuditEvent(RestObject auditEvent, String... params) {
+        return post(getRepository().getHref(REGISTERED_AUDIT_EVENTS), new JsonObject(auditEvent), JsonObject.class, params);
+    }
+
+    @Override
+    public RestObject getRegisteredAuditEvent(String uri, String... params) {
+        return getObject(uri, params);
+    }
+
+    @Override
+    public void unregisterAuditEvent(RestObject auditEvent) {
+        delete(auditEvent);
     }
 }

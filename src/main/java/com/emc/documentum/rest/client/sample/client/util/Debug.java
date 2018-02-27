@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+ * Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
  */
 package com.emc.documentum.rest.client.sample.client.util;
 
@@ -18,6 +18,7 @@ import org.springframework.util.StringUtils;
 
 import com.emc.documentum.rest.client.sample.client.DCTMRestClient;
 import com.emc.documentum.rest.client.sample.client.impl.AbstractRestTemplateClient;
+import com.emc.documentum.rest.client.sample.model.AuditPolicy;
 import com.emc.documentum.rest.client.sample.model.Entry;
 import com.emc.documentum.rest.client.sample.model.Facet;
 import com.emc.documentum.rest.client.sample.model.FacetValue;
@@ -25,6 +26,7 @@ import com.emc.documentum.rest.client.sample.model.Feed;
 import com.emc.documentum.rest.client.sample.model.Link;
 import com.emc.documentum.rest.client.sample.model.LinkRelation;
 import com.emc.documentum.rest.client.sample.model.Linkable;
+import com.emc.documentum.rest.client.sample.model.ObjectLifecycle;
 import com.emc.documentum.rest.client.sample.model.Permission;
 import com.emc.documentum.rest.client.sample.model.PermissionSet;
 import com.emc.documentum.rest.client.sample.model.Preference;
@@ -178,14 +180,25 @@ public class Debug {
     }
     
     public static void printFields(Collection<?> objects, String... fields) {
+        printFields(objects, false, fields);
+    }
+    
+    public static void printFields(Collection<?> objects, boolean ignoreNull, String... fields) {
         if(objects != null) {
             for(Object o : objects) {
-                printFields(o, fields);
+                printFields(o, ignoreNull, fields);
             }
         }
     }
     
     public static void printFields(Object object, String... fields) {
+        printFields(object, false, fields);
+    }
+    
+    public static void printFields(Object object, boolean ignoreNull, String... fields) {
+        if(object == null) {
+            return;
+        }
         StringBuilder sb = new StringBuilder();
         if(fields == null || fields.length == 0) {
             fields = new String[object.getClass().getDeclaredFields().length];
@@ -198,10 +211,13 @@ public class Debug {
             try {
                 Field f = getField(object.getClass(), p);
                 if(f != null) {
-                    if(sb.length() > 0) {
-                        sb.append(", ");
+                    Object result = f.get(object);
+                    if(!ignoreNull || result != null) {
+                        if(sb.length() > 0) {
+                            sb.append(", ");
+                        }
+                        sb.append(p.replaceAll("([A-Z])", " $1").toLowerCase()).append(':').append(result);
                     }
-                    sb.append(p.replaceAll("([A-Z])", " $1").toLowerCase()).append(':').append(f.get(object));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -326,5 +342,24 @@ public class Debug {
     
     public static void printStep(String step) {
         System.out.println("-------------" + step);
+    }
+    
+    public static void print(ObjectLifecycle objectLifecycle) {
+        System.out.println("current state: " + objectLifecycle.getCurrentState());
+        if(!StringUtils.isEmpty(objectLifecycle.getNextState())) {
+            System.out.println("next state: " + objectLifecycle.getNextState());
+        }
+        if(!StringUtils.isEmpty(objectLifecycle.getPreviousState())) {
+            System.out.println("previous state: " + objectLifecycle.getPreviousState());
+        }
+        if(!StringUtils.isEmpty(objectLifecycle.getResumeState())) {
+            System.out.println("resume state: " + objectLifecycle.getResumeState());
+        }
+    }
+    
+    public static void print(AuditPolicy auditPolicy) {
+        System.out.println(auditPolicy.getObjectId() + ", name: " + auditPolicy.getName() + ", accessor-name: "
+                + auditPolicy.getAccessorName() + ", is-group: " + auditPolicy.isGroup() + ", attribute-rule: "
+                + auditPolicy.getAttributeRules());
     }
 }

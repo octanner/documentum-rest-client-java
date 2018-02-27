@@ -1,6 +1,11 @@
-#Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+#Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
 JaxbAcl
 JaxbAspectType
+JaxbAuditEvent
+JaxbAuditPolicy
+JaxbAuditTrail
+JaxbAuditTrail$JaxbAuditData
+JaxbAuditTrail$JaxbValuePair
 JaxbAuthor
 JaxbBatch
 JaxbBatchAttachment
@@ -24,11 +29,19 @@ JaxbFormat
 JaxbGroup
 JaxbHomeDocument
 JaxbItem
+JaxbLifecycle
 JaxbLink
 JaxbNetworkLocation
+JaxbObjectLifecycle
 JaxbPermission
 JaxbPermissionSet
 JaxbPreference
+JaxbProperty
+JaxbPropertyAttributeHint
+JaxbPropertyLifecycleInfo
+JaxbPropertyValueAssistFixedValue
+JaxbPropertyValueAssistQuery
+JaxbProperty$JaxbDefaultValue
 JaxbQueryResult
 JaxbRepository
 JaxbSavedSearch
@@ -38,6 +51,13 @@ JaxbSearchFeed
 JaxbSearchTemplate
 JaxbSysObject
 JaxbType
+JaxbTypeDisplayConfig
+JaxbTypeLifecycleBased
+JaxbTypeLifecycleInfo
+JaxbTypeMappingTable
+JaxbTypeScopeConfig
+JaxbTypeStateBased
+JaxbTypeValueConstraint
 JaxbRelation
 JaxbRelationType
 JaxbRestError

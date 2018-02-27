@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+ * Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
  */
 package com.emc.documentum.rest.client.sample.model.json;
 
@@ -20,6 +20,10 @@ public class JsonObjectAspects extends JsonLinkableBase implements ObjectAspects
     
     public JsonObjectAspects(String... aspects) {
         this.aspects = Arrays.asList(aspects);
+    }
+    
+    public JsonObjectAspects(ObjectAspects aspects) {
+        this.aspects = aspects.getAspects();
     }
 
     @Override

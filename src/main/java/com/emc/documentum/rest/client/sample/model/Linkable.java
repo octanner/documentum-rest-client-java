@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+ * Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
  */
 package com.emc.documentum.rest.client.sample.model;
 
@@ -19,6 +19,13 @@ public interface Linkable {
      * @return specified link by relation
      */
     String getHref(LinkRelation rel);
+    
+    /**
+     * whether has the link relation
+     * @param rel the link relation
+     * @return whether has the link relation
+     */
+    boolean hasHref(LinkRelation rel);
     
     /**
      * @param rel the link relation

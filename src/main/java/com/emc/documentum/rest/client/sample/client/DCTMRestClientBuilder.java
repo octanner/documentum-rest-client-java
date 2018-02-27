@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. OPEN TEXT Corporation. All Rights Reserved.
+ * Copyright (c) 2018. Open Text Corporation. All Rights Reserved.
  */
 package com.emc.documentum.rest.client.sample.client;
 
@@ -46,19 +46,24 @@ public final class DCTMRestClientBuilder {
         DCTMRestClientBinding binding = DCTMRestClientBinding.valueOf(bindingStr.toUpperCase());
         String contextRoot = read("Please input the REST context path:", "http://localhost:8080/dctm-rest");
         boolean ignoreAuthenticateServer = ignoreAuthenticateServer(contextRoot);
-        List<String> repositories = getRepositories(binding, contextRoot);
+        boolean ignoreSslWarning = false;
+        if(ignoreAuthenticateServer) {
+            ignoreSslWarning = read("Please input whether allow all host:", false);
+        }
+        List<String> repositories = getRepositories(binding, contextRoot, ignoreAuthenticateServer, ignoreSslWarning);
         String repository = read("Please input the repository name: " + repositories, repositories.get(0));
         String username = read("Please input the username:");
         String password = read("Please input the password:");
-        String useFormatExtension = read("Please input the whether add format extension .xml or .json for URI:", "false");
+        boolean useFormatExtension = read("Please input the whether add format extension .xml or .json for URI:", false);
         String debug = read("Please input whether print debug information:", "false");
         AbstractRestTemplateClient client = (AbstractRestTemplateClient)new DCTMRestClientBuilder().
                    bind(binding).
                    contextRoot(contextRoot).
                    ignoreAuthenticateServer(ignoreAuthenticateServer).
+                   ignoreSslWarning(ignoreSslWarning).
                    credentials(username, password).
                    repository(repository).
-                   useFormatExtension("true".equalsIgnoreCase(useFormatExtension)).
+                   useFormatExtension(useFormatExtension).
                    debug("true".equalsIgnoreCase(debug)).build();
         client.getHomeDocument();
         if(client.getMajorVersion() >= 7.2) {
@@ -116,8 +121,9 @@ public final class DCTMRestClientBuilder {
         return (DCTMRestClient)Proxy.newProxyInstance(DCTMRestClient.class.getClassLoader(), new Class[]{DCTMRestClient.class}, new ClientAsyncRestTemplateClient(100, client));
     }
     
-    private static List<String> getRepositories(DCTMRestClientBinding binding, String contextRoot) {
-        DCTMRestClient client = new DCTMRestClientBuilder().bind(binding).contextRoot(contextRoot).build();
+    private static List<String> getRepositories(DCTMRestClientBinding binding, String contextRoot, boolean ignoreAuthenticateServer, boolean ignoreSslWarning) {
+        DCTMRestClient client = new DCTMRestClientBuilder().bind(binding).contextRoot(contextRoot).
+                ignoreAuthenticateServer(ignoreAuthenticateServer).ignoreSslWarning(ignoreSslWarning).build();
         Feed<Repository> repositories = client.getRepositories();
         List<String> list = new ArrayList<>();
         for(Entry<Repository> r : repositories.getEntries()) {
