@@ -33,6 +33,8 @@ public enum LinkRelation {
     ASPECT_TYPES("aspect-types", true),
     ASSIS_VALUES("assist-values", true),
     ACL("acl", true),
+    ARCHIVED_CONTENTS("archived-contents", true),
+    DISTRIBUTED_UPLOAD("distributed-upload", true),
     
     // Documentum specific link relations
     FOLDERS("folders", true),

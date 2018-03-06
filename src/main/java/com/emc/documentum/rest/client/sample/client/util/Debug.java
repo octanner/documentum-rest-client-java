@@ -30,6 +30,7 @@ import com.emc.documentum.rest.client.sample.model.ObjectLifecycle;
 import com.emc.documentum.rest.client.sample.model.Permission;
 import com.emc.documentum.rest.client.sample.model.PermissionSet;
 import com.emc.documentum.rest.client.sample.model.Preference;
+import com.emc.documentum.rest.client.sample.model.RestError;
 import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.SavedSearch;
 import com.emc.documentum.rest.client.sample.model.Search;
@@ -49,6 +50,16 @@ public class Debug {
     
     public static void error(String msg) {
         System.err.println("  [error] " + msg);
+    }
+    
+    public static void error(RestError error) {
+        if(error != null) {
+            Debug.error("status [" + error.getStatus() + "]");
+            Debug.error("code [" + error.getCode() + "]");
+            Debug.error("message [" + error.getMessage() + "]");
+            Debug.error("detail [" + error.getDetails() + "]");
+            Debug.error("id [" + error.getId() + "]");
+        }
     }
     
     @SuppressWarnings("unchecked")

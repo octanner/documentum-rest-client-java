@@ -37,6 +37,9 @@ public class Reader {
     public static String read(String prompt, String defaultValue) {
         String value = getDefaultInput(prompt);
         if(value == null) {
+            if(silently) {
+                return defaultValue;
+            }
             System.out.println(StringUtils.isEmpty(defaultValue)?prompt:(prompt + " [default " + defaultValue + "]")); 
             value = defaultValue;
             byte[] bytes = new byte[100];

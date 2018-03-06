@@ -82,7 +82,7 @@ public class ObjectCRUDSample extends Sample {
 
         printStep("create an object with binary content under the Temp cabinet");
         RestObject newObjectWithContent = new PlainRestObject("object_name", "obj_with_content");
-        RestObject createdObjectWithContent = client.createObject(tempCabinet, newObjectWithContent, "I'm the content of the object", "text/plain", "format", "crtext");
+        RestObject createdObjectWithContent = client.createObject(tempCabinet, newObjectWithContent, (Object)"I'm the content of the object", "text/plain", "format", "crtext");
         printHttpStatus();
         print(createdObjectWithContent);
         printNewLine();

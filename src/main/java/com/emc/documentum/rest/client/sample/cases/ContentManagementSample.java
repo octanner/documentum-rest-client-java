@@ -3,6 +3,8 @@
  */
 package com.emc.documentum.rest.client.sample.cases;
 
+import java.io.File;
+
 import com.emc.documentum.rest.client.sample.client.annotation.RestServiceSample;
 import com.emc.documentum.rest.client.sample.model.Entry;
 import com.emc.documentum.rest.client.sample.model.Feed;
@@ -21,7 +23,7 @@ public class ContentManagementSample extends Sample {
         
         printStep("create a document with binary content under the Temp cabinet");
         RestObject newObjectWithContent = new PlainRestObject("object_name", "obj_with_content");
-        RestObject createdObjectWithContent = client.createDocument(tempCabinet, newObjectWithContent, "I'm the content of the object", "text/plain", "format", "crtext");
+        RestObject createdObjectWithContent = client.createDocument(tempCabinet, newObjectWithContent, (Object)"I'm the content of the object", "text/plain", "format", "crtext");
         printHttpStatus();
         print(createdObjectWithContent);
         printNewLine();
@@ -53,6 +55,11 @@ public class ContentManagementSample extends Sample {
             System.out.println("the content media link: " + renditionEntry.getHref(ENCLOSURE));
             byte[] bytes = client.getContentBytes(renditionEntry.getHref(ENCLOSURE));
             System.out.println(new String(bytes));
+            File file = client.getContentFile(renditionEntry.getHref(ENCLOSURE), System.getProperty("java.io.tmpdir"));
+            System.out.println("the file " + file.getAbsolutePath() + "(" + file.length() + " bytes) is created");
+            if(file.delete()) {
+                System.out.println("delete file " + file.getAbsolutePath());
+            }
         }
         printNewLine();
         

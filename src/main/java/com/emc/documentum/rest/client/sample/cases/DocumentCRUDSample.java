@@ -52,7 +52,7 @@ public class DocumentCRUDSample extends Sample {
 
         printStep("create a document with binary content under the Temp cabinet");
         RestObject newObjectWithContent = new PlainRestObject("object_name", "obj_with_content");
-        RestObject createdObjectWithContent = client.createDocument(tempCabinet, newObjectWithContent, "I'm the content of the object", "text/plain", "format", "crtext");
+        RestObject createdObjectWithContent = client.createDocument(tempCabinet, newObjectWithContent, (Object)"I'm the content of the object", "text/plain", "format", "crtext");
         printHttpStatus();
         print(createdObjectWithContent);
         printNewLine();

@@ -3,8 +3,12 @@
  */
 package com.emc.documentum.rest.client.sample.client.impl;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
@@ -27,18 +31,26 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RequestCallback;
+import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
 
 import com.emc.documentum.rest.client.sample.client.DCTMRestClient;
 import com.emc.documentum.rest.client.sample.client.DCTMRestErrorException;
 import com.emc.documentum.rest.client.sample.client.converter.MultipartBatchHttpMessageConverter;
+import com.emc.documentum.rest.client.sample.client.util.DCContentUploader;
 import com.emc.documentum.rest.client.sample.client.util.Debug;
 import com.emc.documentum.rest.client.sample.client.util.Headers;
+import com.emc.documentum.rest.client.sample.client.util.Randoms;
+import com.emc.documentum.rest.client.sample.client.util.Strings;
 import com.emc.documentum.rest.client.sample.client.util.SupportedMediaTypes;
 import com.emc.documentum.rest.client.sample.client.util.UriHelper;
 import com.emc.documentum.rest.client.sample.model.Entry;
@@ -54,6 +66,8 @@ import com.emc.documentum.rest.client.sample.model.RestObject;
 import com.emc.documentum.rest.client.sample.model.batch.Attachment;
 import com.emc.documentum.rest.client.sample.model.batch.Batch;
 import com.emc.documentum.rest.client.sample.model.batch.Operation;
+import com.emc.documentum.rest.client.sample.model.json.JsonRestError;
+import com.emc.documentum.rest.client.sample.model.xml.jaxb.JaxbRestError;
 
 import static com.emc.documentum.rest.client.sample.client.util.Headers.ACCEPT_ATOM_HEADERS;
 import static com.emc.documentum.rest.client.sample.client.util.Headers.ACCEPT_JSON_HEADERS;
@@ -373,14 +387,7 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
             setupHttp(entity);
         } catch(DCTMRestErrorException e) {
             setupHttp(e);
-            RestError error = e.getError();
-            if(error != null) {
-                Debug.error("status [" + error.getStatus() + "]");
-                Debug.error("code [" + error.getCode() + "]");
-                Debug.error("message [" + error.getMessage() + "]");
-                Debug.error("detail [" + error.getDetails() + "]");
-                Debug.error("id [" + error.getId() + "]");
-            }
+            Debug.error(e.getError());
             throw e;
         } finally {
             if(enableStreaming && noRequestProcessor) {
@@ -437,8 +444,8 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
 
     
     @Override
-    public RestObject createObject(Linkable parent, RestObject objectToCreate) {
-        return createObject(parent, LinkRelation.OBJECTS, objectToCreate, (Object)null, (String)null);
+    public RestObject createObject(Linkable parent, RestObject objectToCreate, String... params) {
+        return createObject(parent, LinkRelation.OBJECTS, objectToCreate, (Object)null, (String)null, params);
     }
     
     @Override
@@ -448,7 +455,34 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     
     @Override
     public RestObject createDocument(Linkable parent, RestObject objectToCreate) {
-        return createDocument(parent, objectToCreate, (Object)null, (String)null);
+        return createDocument(parent, objectToCreate, (Object)null, (String)null, null);
+    }
+    
+    @Override
+    public void uploadDistributedContent(String url, InputStream content) {
+        try {
+            DCContentUploader uploader = new DCContentUploader(url, content).upload();
+            this.status = HttpStatus.valueOf(uploader.getStatus());
+            this.headers = uploader.getHeaders();
+            if(uploader.getStatus() != HttpStatus.OK.value() && uploader.getStatus() != HttpStatus.FOUND.value()) {
+                RestError error;
+                if(isXml()) {
+                    JaxbRestError xerror = new JaxbRestError();
+                    xerror.setMessage(uploader.getResponse());
+                    xerror.setStatus(uploader.getStatus());
+                    error = xerror;
+                } else {
+                    JsonRestError jerror = new JsonRestError();
+                    jerror.setMessage(uploader.getResponse());
+                    jerror.setStatus(uploader.getStatus());
+                    error = jerror;
+                }
+                Debug.error(error);
+                throw new DCTMRestErrorException(uploader.getHeaders(), HttpStatus.valueOf(uploader.getStatus()), error);
+            }
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     protected <T> T get(String uri, HttpHeaders headers, Class<? extends T> responseBodyClass, String... params) {
@@ -471,7 +505,74 @@ public abstract class AbstractRestTemplateClient implements DCTMRestClient {
     public byte[] getContentBytes(String uri) {
         return get(uri, byte[].class);
     }
+    
+    @Override
+    public File getContentFile(String uri, String destFilePath) {
+        this.requestProcessor = new DownloadProcessor(destFilePath);
+        return get(uri, File.class);
+    }
+    
+    @Override
+    public File getArchivedContents(final String destFilePath, final String objectId, final String... params) {
+        String uri = getRepository().getHref(LinkRelation.ARCHIVED_CONTENTS);
+        this.requestProcessor = new DownloadProcessor(destFilePath);
+        return get(uri, File.class, Strings.combine(params, "object-id", objectId));
+    }
 
+    private class DownloadProcessor implements RequestProcessor {
+        private final String filePath;
+        DownloadProcessor(String filePath) {
+            this.filePath = filePath.trim();
+        }
+        @SuppressWarnings("unchecked")
+        @Override
+        public <T> ResponseEntity<T> process(String url, HttpMethod method, final HttpEntity<?> requestEntity,
+                Class<T> responseType) {
+            RequestCallback requestCallback = new RequestCallback() {
+                public void doWithRequest(ClientHttpRequest request) throws IOException {
+                    HttpHeaders httpHeaders = request.getHeaders();
+                    HttpHeaders requestHeaders = setupRequestHeader(requestEntity.getHeaders());
+                    httpHeaders.putAll(requestHeaders);
+                }
+            };
+            ResponseExtractor<ResponseEntity<File>> responseExtractor = new ResponseExtractor<ResponseEntity<File>>() {
+                @Override
+                public ResponseEntity<File> extractData(ClientHttpResponse response) throws IOException {
+                    if(response.getStatusCode() != HttpStatus.OK) {
+                        restTemplate.getErrorHandler().handleError(response);
+                        return null;
+                    } else {
+                        File file = null;
+                        File tmp = new File(filePath);
+                        if(tmp.isDirectory()) {
+                            String filename = Strings.getFilename(response.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION));
+                            if(filename == null) {
+                                filename = Randoms.nextString(10);
+                            }
+                            file = new File(filePath + filename);
+                        } else if(filePath.lastIndexOf('.') == -1) {
+                            String ext = Strings.getFilenameExt(response.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION));
+                            if(ext != null) {
+                                file = new File(filePath + ext);
+                            }
+                        }
+                        if(file == null) {
+                            file = new File(filePath);
+                        }
+                        while(file.exists()) {
+                           file = new File(Strings.nextNameWithIndex(file.getAbsolutePath())); 
+                        }
+                        file.createNewFile();
+                        OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
+                        FileCopyUtils.copy(response.getBody(), os);
+                        return new ResponseEntity<File>(file, response.getHeaders(), response.getStatusCode());
+                    }
+                }
+            };
+            return (ResponseEntity<T>)restTemplate.execute(url, method, requestCallback, responseExtractor);
+        }
+    }
+    
     @Override
     public void delete(Linkable linkable, String... params) {
         if(linkable.getHref(LinkRelation.DELETE) != null) {

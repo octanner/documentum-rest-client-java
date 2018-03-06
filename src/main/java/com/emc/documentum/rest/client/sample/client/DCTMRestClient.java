@@ -3,6 +3,9 @@
  */
 package com.emc.documentum.rest.client.sample.client;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import javax.annotation.concurrent.NotThreadSafe;
@@ -287,9 +290,10 @@ public interface DCTMRestClient extends Cloneable {
      * create a sysobject (or its subtype) under specified folder/cabinet
      * @param parent the folder/cabinet where the new sysobject will be created under
      * @param objectToCreate the new object with its properties
+     * @param params the query parameters
      * @return the created sysobject
      */
-    public RestObject createObject(Linkable parent, RestObject objectToCreate);
+    public RestObject createObject(Linkable parent, RestObject objectToCreate, String... params);
 
     /**
      * @param objectUri the uri of the object
@@ -380,6 +384,13 @@ public interface DCTMRestClient extends Cloneable {
     public RestObject createContent(RestObject object, Object content, String mediaType, String... params);
     
     /**
+     * upload distributed content to the ACS or BOCS server
+     * @param url the distributed content upload url
+     * @param content the binary content
+     */
+    public void uploadDistributedContent(String url, InputStream content);
+    
+    /**
      * @param object the object where to get content from
      * @param params the query parameters
      * @return the metadata of primary content of the specified RestObject
@@ -406,6 +417,23 @@ public interface DCTMRestClient extends Cloneable {
      */
     @ClientAsyncOption(false)
     public byte[] getContentBytes(String uri);
+    
+    /**
+     * @param uri the uri of the content media
+     * @return the content file
+     */
+    @ClientAsyncOption(false)
+    public File getContentFile(String uri, String destFilePath);
+    
+    /**
+     * @param destFolder the destination folder
+     * @param objectId the object id
+     * @param params the query parameters
+     * @return the archived contents file of the object
+     * @throws IOException
+     */
+    @ClientAsyncOption(false)
+    public File getArchivedContents(String destFolder, String objectId, String... params);
     
     /**
      * get current user
