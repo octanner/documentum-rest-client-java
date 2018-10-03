@@ -62,6 +62,23 @@
             <version>4.5.2</version>
         </dependency>
     </dependencies>
+    <distributionManagement>
+        <!-- use the following if you're not using a snapshot version. -->
+        <repository>
+            <id>artifactory</id>
+            <name>Artifactory</name>
+            <url>https://artifactory.octanner.net/oct-libs-releases-local</url>
+            <uniqueVersion>false</uniqueVersion>
+        </repository>
+
+        <!-- use the following if you ARE using a snapshot version. -->
+        <snapshotRepository>
+            <id>artifactory</id>
+            <name>Artifactory snapshots</name>
+            <url>https://artifactory.octanner.net/oct-libs-snapshots-local</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
     <build>
         <plugins>
             <plugin>

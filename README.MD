@@ -1,3 +1,9 @@
+This repo is forked from the [EMC repo](https://github.com/Enterprise-Content-Management/documentum-rest-client-java).
+Modifications to this repository should be kept to a minimum, just to
+facilitate building for OC Tanner, if possible. This makes it easier to
+adopt changes made by EMC in the future.
+===
+
 Documentum REST Java Client Reference Implementation
 =========
 
